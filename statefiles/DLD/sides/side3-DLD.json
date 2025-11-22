@@ -1,0 +1,13 @@
+{
+  "scope": "DLD",
+  "side": "side3",
+  "sideDefinitionRequest": {
+    "security": "Txn:LusidInstrumentId",
+    "currency": "Txn:TradeCurrency",
+    "rate": "Txn:Units",
+    "units": "1",
+    "amount": "Transaction/MyScope/TradeAmount",
+    "notionalAmount": "Transaction/default/NotionalAmount",
+    "currentFace": "Txn:CurrentFace"
+  }
+}

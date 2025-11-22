@@ -34,43 +34,39 @@ public class PlanService {
                 continue;
             }
 
+            String scope=path.toString().substring(path.toString().lastIndexOf("-")+1,path.toString().length());
             FileCategory category = deriveCategory(path);
             String key = deriveKeyFromPath(path);
-            System.out.println( "Key: " + key);
-            System.out.println( "Category: " + category);
             if (category == FileCategory.DERIVED_PORTFOLIO) {
-                System.out.println( "1 Derived portfolio: " + key);
                 derivedFilesSeen.add(key);
                 processDerivedPortfolio(path, key, plan);
-                System.out.println( "2 Derived portfolio processed: " + key);
                 // Handle deletes for derived portfolios where no changed file was supplied.
-                addDerivedDeletesForMissingChanges(derivedFilesSeen, plan);
+                addDerivedDeletesForMissingChanges(derivedFilesSeen, plan,scope);
                 continue;
             }
 
             // Load state for this key lazily to avoid scanning the whole statefiles tree.
+
             if (!stateFiles.containsKey(mapKey(category, key))) {
                 stateFiles.putAll(loadStateFiles(key));
             }
-            //System.out.println( "State files: " + stateFiles);
-            //System.out.println( "mapKey(category, deriveKeyFromPath(path)): " + mapKey(category, deriveKeyFromPath(path)));
-            System.out.println("deriveKeyFromPath(path)-->"+deriveKeyFromPath(path));
+
             LoadedFile state = stateFiles.get(mapKey(category, deriveKeyFromPath(path)));
-            System.out.println( "State: " + state);
+
             if (Files.exists(path)) {
                 LoadedFile changed = parsePath(path);
                 if (changed == null) {
                     continue;
                 }
                 if (state == null) {
-                    plan.addItem(new PlanItem(Action.NEW, changed.getCategory(), changed.getKey(),
+                    plan.addItem(new PlanItem(Action.NEW, changed.getCategory(),scope, changed.getKey(),
                             changed.getPath().toString(), changed.getPayload()));
                 } else if (!Objects.equals(changed.getPayload(), state.getPayload())) {
-                    plan.addItem(new PlanItem(Action.UPDATE, changed.getCategory(), changed.getKey(),
+                    plan.addItem(new PlanItem(Action.UPDATE, changed.getCategory(),scope, changed.getKey(),
                             changed.getPath().toString(), changed.getPayload()));
                 }
             } else if (state != null) {
-                plan.addItem(new PlanItem(Action.DELETE, state.getCategory(), state.getKey(),
+                plan.addItem(new PlanItem(Action.DELETE, state.getCategory(),scope, state.getKey(),
                         state.getPath().toString(), state.getPayload()));
             }
         }
@@ -81,18 +77,17 @@ public class PlanService {
     
     private Map<String, LoadedFile> loadStateFiles(String key) {
         Map<String, LoadedFile> stateFiles = new HashMap<>();
+        String scope=key.substring(key.lastIndexOf("-")+1,key.length());
 
         for (FileCategory category : FileCategory.values()) {
             if (category == FileCategory.DERIVED_PORTFOLIO) {
                 continue;
             }
-            Path statePath = resolveStatePath(category, key);
+            Path statePath = resolveStatePath(category, key,scope);
             if (!Files.exists(statePath)) {
                 continue;
             }
-            System.out.println("Loading state file: " + statePath);
             LoadedFile loaded = parsePath(statePath);
-            System.out.println("1-->Loaded: " + loaded);
             if (loaded != null) {
                 stateFiles.put(mapKey(loaded), loaded);
             }
@@ -102,11 +97,13 @@ public class PlanService {
     }
 
     private void processDerivedPortfolio(Path changedPath, String key, MasterPlan plan) {
-        Path statePath = resolveStatePath(FileCategory.DERIVED_PORTFOLIO, key);
+
+        String scope=key.substring(key.lastIndexOf("-")+1,key.length());
+
+        Path statePath = resolveStatePath(FileCategory.DERIVED_PORTFOLIO, key, scope);
 
         DerivedPortfolioFile changedFile = null;
         DerivedPortfolioFile stateFile = null;
-        System.out.println( "changedPath: " + changedPath);
         if (Files.exists(changedPath)) {
             LoadedFile changed = parsePath(changedPath);
             if (changed != null && changed.getPayload() instanceof DerivedPortfolioFile) {
@@ -129,10 +126,10 @@ public class PlanService {
             CreateDerivedTransactionPortfolioRequest changed = entry.getValue();
             CreateDerivedTransactionPortfolioRequest existing = stateMap.get(code);
             if (existing == null) {
-                plan.addItem(new PlanItem(Action.NEW, FileCategory.DERIVED_PORTFOLIO, code,
+                plan.addItem(new PlanItem(Action.NEW, FileCategory.DERIVED_PORTFOLIO, scope,code,
                         changedPath.toString(), changed));
             } else if (!Objects.equals(changed, existing)) {
-                plan.addItem(new PlanItem(Action.UPDATE, FileCategory.DERIVED_PORTFOLIO, code,
+                plan.addItem(new PlanItem(Action.UPDATE, FileCategory.DERIVED_PORTFOLIO,scope, code,
                         changedPath.toString(), changed));
             }
         }
@@ -140,7 +137,7 @@ public class PlanService {
         for (Map.Entry<String, CreateDerivedTransactionPortfolioRequest> entry : stateMap.entrySet()) {
             String code = entry.getKey();
             if (!changedMap.containsKey(code)) {
-                plan.addItem(new PlanItem(Action.DELETE, FileCategory.DERIVED_PORTFOLIO, code,
+                plan.addItem(new PlanItem(Action.DELETE, FileCategory.DERIVED_PORTFOLIO, scope,code,
                         statePath.toString(), entry.getValue()));
             }
         }
@@ -170,13 +167,11 @@ public class PlanService {
     }
 
     private String mapKey(FileCategory category, String key) {
-        System.out.println("mapKey --> category: " + category + ", key: " + key );
-        return category.name() + ":" + key;
+       return category.name() + ":" + key;
     }
 
     private FileCategory deriveCategory(Path path) {
         try {
-            System.out.println( "deriveCategory --> path: " + path);
             return strategyFactory.resolve(path).getCategory();
         } catch (Exception e) {
             throw new IllegalArgumentException("Unable to determine category for " + path, e);
@@ -187,7 +182,7 @@ public class PlanService {
         return PathUtils.baseName(path);
     }
 
-    private Path resolveStatePath(FileCategory category, String key) {
+    private Path resolveStatePath(FileCategory category, String key, String scope) {
         String folder;
         switch (category) {
             case SIDE:
@@ -202,7 +197,7 @@ public class PlanService {
             default:
                 throw new IllegalArgumentException("Unsupported category " + category);
         }
-        return Path.of("statefiles", folder, key + ".json");
+        return Path.of("statefiles", scope,folder, key + ".json");
     }
 
     private Map<String, CreateDerivedTransactionPortfolioRequest> toDerivedMap(
@@ -219,7 +214,7 @@ public class PlanService {
         return map;
     }
 
-    private void addDerivedDeletesForMissingChanges(Set<String> derivedFilesSeen, MasterPlan plan) {
+    private void addDerivedDeletesForMissingChanges(Set<String> derivedFilesSeen, MasterPlan plan, String scope) {
         Path dir = Path.of("statefiles", "derivedportfolios");
         if (!Files.exists(dir)) {
             return;
@@ -239,7 +234,7 @@ public class PlanService {
                         Map<String, CreateDerivedTransactionPortfolioRequest> stateMap =
                                 toDerivedMap((com.example.cacex.model.DerivedPortfolioFile) state.getPayload());
                         for (Map.Entry<String, CreateDerivedTransactionPortfolioRequest> entry : stateMap.entrySet()) {
-                            plan.addItem(new PlanItem(Action.DELETE, FileCategory.DERIVED_PORTFOLIO, entry.getKey(),
+                            plan.addItem(new PlanItem(Action.DELETE, FileCategory.DERIVED_PORTFOLIO, scope,entry.getKey(),
                                     statePath.toString(), entry.getValue()));
                         }
                     });

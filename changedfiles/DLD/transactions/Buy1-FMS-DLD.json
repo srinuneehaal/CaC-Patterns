@@ -1,8 +1,8 @@
 {
-  "scope": "ATG",
+  "scope": "DLD",
   "transactionType": "BuyAlias",
   "transactionClass": "Buy1",
-  "source": "default",
+  "source": "FMS",
   "transactionTypeRequest": {
     "aliases": [
       {

@@ -1,9 +1,9 @@
 {
-  "scope": "ATG",
+  "scope": "DLD",
   "createDerivedPortfolioRequestList": [
     {
       "displayName": "MyDerivedPortfolioName 1",
-      "description": "Example long form portfolio description",
+      "description": "Example long form portfolio description change",
       "code": "DerivedPortfolioCode-1",
       "parentPortfolioId": {
         "scope": "MyParentPortfolioScope",
@@ -31,7 +31,7 @@
     },
     {
       "displayName": "MyDerivedPortfolioName 3",
-      "description": "Example long form portfolio description 3",
+      "description": "Example long form portfolio description",
       "code": "DerivedPortfolioCode-3",
       "parentPortfolioId": {
         "scope": "MyParentPortfolioScope",

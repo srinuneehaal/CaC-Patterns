@@ -1,88 +1,14 @@
 {
   "items" : [ {
-    "action" : "UPDATE",
-    "fileCategory" : "TRANSACTION",
-    "key" : "Buy1-default-ATG",
-    "sourcePath" : "changedfiles\\transactions\\Buy1-default-ATG.json",
-    "payload" : {
-      "scope" : "ATG",
-      "transactionClass" : "Buy1",
-      "source" : "default",
-      "transactionType" : "BuyAlias",
-      "transactionTypeRequest" : {
-        "aliases" : [ {
-          "type" : "BuyAlias",
-          "description" : "A similar buy type changed",
-          "transactionClass" : "Buy",
-          "transactionRoles" : "Longer",
-          "isDefault" : false
-        } ],
-        "movements" : [ {
-          "movementTypes" : "StockMovement",
-          "side" : "Side1",
-          "direction" : -1,
-          "properties" : {
-            "TransactionConfiguration/default/TaxLotSelectionMethod" : {
-              "key" : "TransactionConfiguration/default/TaxLotSelectionMethod",
-              "value" : {
-                "labelValue" : "FirstInFirstOut",
-                "metricValue" : null,
-                "labelValueSet" : null
-              },
-              "referenceData" : null
-            }
-          },
-          "mappings" : [ ],
-          "name" : null,
-          "movementOptions" : [ ],
-          "settlementDateOverride" : null,
-          "condition" : null,
-          "settlementMode" : null
-        }, {
-          "movementTypes" : "CashCommitment",
-          "side" : "Side1",
-          "direction" : 1,
-          "properties" : { },
-          "mappings" : [ {
-            "propertyKey" : "Transaction/scopeA/Strategy",
-            "mapFrom" : null,
-            "setTo" : "Cash",
-            "templateFrom" : null,
-            "nullify" : null
-          } ],
-          "name" : null,
-          "movementOptions" : [ ],
-          "settlementDateOverride" : "Transaction/MyScope/SettlementDateOverride",
-          "condition" : null,
-          "settlementMode" : null
-        } ],
-        "properties" : {
-          "TransactionConfiguration/default/TotalConsiderationPolicy" : {
-            "key" : "TransactionConfiguration/default/TotalConsiderationPolicy",
-            "value" : {
-              "labelValue" : "Add",
-              "metricValue" : null,
-              "labelValueSet" : null
-            },
-            "referenceData" : null
-          }
-        },
-        "calculations" : [ {
-          "type" : "TaxAmounts",
-          "side" : "Side1",
-          "formula" : null
-        } ]
-      }
-    }
-  }, {
-    "action" : "UPDATE",
+    "action" : "NEW",
     "fileCategory" : "DERIVED_PORTFOLIO",
-    "key" : "DerivedPortfolioCode-1",
-    "sourcePath" : "changedfiles\\derivedportfolios\\derivedportfolios-ATG.json",
+    "scope" : "ATG",
+    "key" : "DerivedPortfolioCode-3",
+    "sourcePath" : "changedfiles\\ATG\\derivedportfolios\\derivedportfolios-ATG.json",
     "payload" : {
-      "displayName" : "MyDerivedPortfolioName 1",
-      "description" : "Example long form portfolio description change",
-      "code" : "DerivedPortfolioCode-1",
+      "displayName" : "MyDerivedPortfolioName 3",
+      "description" : "Example long form portfolio description",
+      "code" : "DerivedPortfolioCode-3",
       "parentPortfolioId" : {
         "scope" : "MyParentPortfolioScope",
         "code" : "MyParentPortfolioCode"
@@ -100,13 +26,14 @@
       "settlementConfiguration" : null
     }
   }, {
-    "action" : "DELETE",
+    "action" : "NEW",
     "fileCategory" : "DERIVED_PORTFOLIO",
+    "scope" : "DLD",
     "key" : "DerivedPortfolioCode-3",
-    "sourcePath" : "statefiles\\derivedportfolios\\derivedportfolios-ATG.json",
+    "sourcePath" : "changedfiles\\DLD\\derivedportfolios\\derivedportfolios-DLD.json",
     "payload" : {
       "displayName" : "MyDerivedPortfolioName 3",
-      "description" : "Example long form portfolio description 3",
+      "description" : "Example long form portfolio description",
       "code" : "DerivedPortfolioCode-3",
       "parentPortfolioId" : {
         "scope" : "MyParentPortfolioScope",
