@@ -1,3 +1,4 @@
+D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\model\DerivedPortfolioFile.java
 D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\service\ChangedFilesProvider.java
 D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\service\FileParsingStrategyFactory.java
 D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\service\PlanWriter.java
@@ -9,6 +10,7 @@ D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\model\LoadedFile.j
 D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\PlanGeneratorApplication.java
 D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\runner\PlanRunner.java
 D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\model\Action.java
+D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\service\DerivedPortfolioFileParsingStrategy.java
 D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\model\SideFile.java
 D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\service\PlanService.java
 D:\Learning\VS_Code_WS\CaC-Ex\src\main\java\com\example\cacex\model\PlanItem.java

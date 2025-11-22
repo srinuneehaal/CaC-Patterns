@@ -16,6 +16,7 @@ import java.util.List;
 public class PlanRunner implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(PlanRunner.class);
+    private static final String ARG_PLAN = "--plan";
 
     private final ChangedFilesProvider changedFilesProvider;
     private final PlanService planService;
@@ -29,8 +30,32 @@ public class PlanRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+
+        if (args == null || args.length != 1) {
+            log.error("Expected exactly one argument: {}", ARG_PLAN);
+            return;
+        }
+
+        String decisionArg = args[0] == null ? "" : args[0].trim();
+        if (decisionArg.isEmpty()) {
+            log.error("Argument cannot be null or empty. Expected: {}", ARG_PLAN);
+            return;
+        }
+
+        if (ARG_PLAN.equalsIgnoreCase(decisionArg)) {
+            executePlan();
+        } else {
+            log.error("Unknown argument: {}. Expected: {}", decisionArg, ARG_PLAN);
+        }
+    }
+
+    private void executePlan() {
         List<Path> changedPaths = changedFilesProvider.getChangedPaths();
         log.info("Received {} changed file path(s) from CHANGEDFILES", changedPaths.size());
+        if (changedPaths.isEmpty()) {
+            log.warn("No changed files provided. Nothing to plan.");
+            return;
+        }
         MasterPlan masterPlan = planService.buildPlan(changedPaths);
         Path output = planWriter.write(masterPlan);
         log.info("Master plan written to {}", output.toAbsolutePath());

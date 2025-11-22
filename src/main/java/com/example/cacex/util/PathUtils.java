@@ -12,4 +12,6 @@ public final class PathUtils {
         int lastDot = name.lastIndexOf('.');
         return lastDot > 0 ? name.substring(0, lastDot) : name;
     }
+
+
 }

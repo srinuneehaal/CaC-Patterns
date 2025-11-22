@@ -1,0 +1,13 @@
+{
+  "scope": "ATG",
+  "side": "side1",
+  "sideDefinitionRequest": {
+    "security": "Txn:LusidInstrumentId",
+    "currency": "Txn:TradeCurrency",
+    "rate": "Txn:Units",
+    "units": "0",
+    "amount": "Transaction/MyScope/TradeAmount",
+    "notionalAmount": "Transaction/default/NotionalAmount",
+    "currentFace": "Txn:CurrentFace"
+  }
+}

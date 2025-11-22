@@ -1,5 +1,6 @@
 package com.example.cacex.service;
 
+import com.example.cacex.model.DerivedPortfolioFile;
 import com.example.cacex.model.SideFile;
 import com.example.cacex.model.TransactionFile;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -37,6 +38,9 @@ public class JsonModelMapper {
         if (type == TransactionFile.class) {
             return type.cast(readTransactionFile(content));
         }
+        if (type == DerivedPortfolioFile.class) {
+            return type.cast(readDerivedPortfolioFile(content));
+        }
         return objectMapper.readValue(content, type);
     }
 
@@ -70,6 +74,21 @@ public class JsonModelMapper {
                     describeFields(root));
         }
         return txnFile;
+    }
+
+    private DerivedPortfolioFile readDerivedPortfolioFile(String content) throws IOException {
+        JsonNode root = objectMapper.readTree(content);
+        DerivedPortfolioFile file = objectMapper.treeToValue(root, DerivedPortfolioFile.class);
+        JsonNode listNode = root.get("createDerivedPortfolioRequestList");
+        if (listNode != null && !listNode.isNull()) {
+            file.setDerivedPortfolios(objectMapper.readerForListOf(
+                    com.finbourne.lusid.model.CreateDerivedTransactionPortfolioRequest.class)
+                    .readValue(listNode));
+        } else {
+            log.warn("createDerivedPortfolioRequestList missing when parsing derived portfolio payload. Fields: {}",
+                    describeFields(root));
+        }
+        return file;
     }
 
     private List<String> describeFields(JsonNode root) {

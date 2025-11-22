@@ -33,7 +33,8 @@ public class SideFileParsingStrategy implements FileParsingStrategy {
     @Override
     public LoadedFile parse(Path path) throws IOException {
         SideFile sideFile = mapper.read(path, SideFile.class);
-        String key = StringUtils.hasText(sideFile.getSide()) ? sideFile.getSide() : PathUtils.baseName(path);
+        String key = StringUtils.hasText(sideFile.getSide()) ? (sideFile.getSide()+"-"+sideFile.getScope()) : PathUtils.baseName(path);
+        System.out.println("SideFileParsingStrategy.parse --> key: " + key);
         return new LoadedFile(getCategory(), key, path, sideFile);
     }
 }

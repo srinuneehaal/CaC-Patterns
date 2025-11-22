@@ -2,5 +2,6 @@ package com.example.cacex.model;
 
 public enum FileCategory {
     TRANSACTION,
-    SIDE
+    SIDE,
+    DERIVED_PORTFOLIO
 }

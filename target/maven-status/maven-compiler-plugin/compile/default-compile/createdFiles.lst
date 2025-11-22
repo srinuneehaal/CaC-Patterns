@@ -12,6 +12,7 @@ com\example\cacex\model\SideFile.class
 com\example\cacex\service\FileParsingStrategyFactory.class
 com\example\cacex\service\FileParsingStrategy.class
 com\example\cacex\service\PlanService.class
+com\example\cacex\service\PlanService$1.class
 com\example\cacex\service\PlanWriter.class
 com\example\cacex\model\Action.class
 com\example\cacex\service\JsonModelMapper.class

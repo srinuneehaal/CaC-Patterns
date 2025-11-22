@@ -33,7 +33,9 @@ public class TransactionFileParsingStrategy implements FileParsingStrategy {
     @Override
     public LoadedFile parse(Path path) throws IOException {
         TransactionFile transactionFile = mapper.read(path, TransactionFile.class);
-        String key = StringUtils.hasText(transactionFile.getType()) ? transactionFile.getType() : PathUtils.baseName(path);
+        String key = StringUtils.hasText(transactionFile.getType()) ?
+                (transactionFile.getTransactionClass() + "-" + transactionFile.getSource() + "-" + transactionFile.getScope()) :
+                PathUtils.baseName(path);
         return new LoadedFile(getCategory(), key, path, transactionFile);
     }
 }
