@@ -1,29 +1,20 @@
 package com.example.cacex.service;
 
-import com.example.cacex.model.Action;
-import com.example.cacex.model.DerivedPortfolioFile;
-import com.example.cacex.model.FileCategory;
-import com.example.cacex.model.LoadedFile;
-import com.example.cacex.model.MasterPlan;
-import com.example.cacex.model.PlanItem;
-import com.example.cacex.model.PortfolioGroupFile;
+import com.example.cacex.model.*;
 import com.example.cacex.strategies.FileParsingStrategy;
 import com.example.cacex.strategies.FileParsingStrategyFactory;
 import com.example.cacex.util.PathUtils;
 import com.finbourne.lusid.model.CreateDerivedTransactionPortfolioRequest;
 import com.finbourne.lusid.model.CreatePortfolioGroupRequest;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.function.Function;
 
 @Service
 public class PlanService {
@@ -50,20 +41,37 @@ public class PlanService {
 
             FileCategory category = deriveCategory(path);
             String scope = deriveScope(path, "changedfiles");
-            System.out.println("scope: " + scope + ", category:"+category);
+            System.out.println("scope: " + scope + ", category:" + category);
             String key = deriveKeyFromFilename(path);
 
             if (category == FileCategory.DERIVED_PORTFOLIO) {
                 derivedFilesSeen.add(scopeKey(scope, key));
                 processDerivedPortfolio(path, scope, key, plan);
-                addDerivedDeletesForMissingChanges(derivedFilesSeen, plan,scope);
+                //addDerivedDeletesForMissingChanges(derivedFilesSeen, plan,scope);
+                addDeletesForMissingChanges(
+                        Path.of("statefiles", scope),
+                        derivedFilesSeen,
+                        plan,
+                        scope,
+                        "derivedportfolios",
+                        FileCategory.DERIVED_PORTFOLIO,
+                        DerivedPortfolioFile.class,
+                        this::toDerivedMap);
                 continue;
             }
 
             if (category == FileCategory.PORTFOLIO_GROUP) {
                 portfolioGroupFilesSeen.add(scopeKey(scope, key));
                 processPortfolioGroup(path, scope, key, plan);
-                addPortfolioGroupDeletesForMissingChanges(portfolioGroupFilesSeen, plan,scope);
+                addDeletesForMissingChanges(
+                        Path.of("statefiles"),
+                        portfolioGroupFilesSeen,
+                        plan,
+                        scope,
+                        "portfoliogroups",
+                        FileCategory.PORTFOLIO_GROUP,
+                        PortfolioGroupFile.class,
+                        this::toPortfolioGroupMap);
                 continue;
             }
 
@@ -330,67 +338,42 @@ public class PlanService {
         return map;
     }
 
-    private void addDerivedDeletesForMissingChanges(Set<String> derivedFilesSeen, MasterPlan plan, String scope) {
-        Path stateRoot = Path.of("statefiles",scope);
+    private <T> void addDeletesForMissingChanges(
+            Path stateRoot,
+            Set<String> filesSeen,
+            MasterPlan plan,
+            String scope,
+            String folderMarker,
+            FileCategory category,
+            Class<T> payloadType,
+            Function<T, Map<String, ?>> mapExtractor) {
         if (!Files.exists(stateRoot)) {
             return;
         }
         try (java.util.stream.Stream<Path> stream = Files.walk(stateRoot)) {
             stream.filter(path -> Files.isRegularFile(path)
-                            && path.toString().toLowerCase().contains("derivedportfolios")
+                            && path.toString().toLowerCase().contains(folderMarker)
                             && path.toString().toLowerCase().endsWith(".json"))
                     .forEach(statePath -> {
-//                        String scope = deriveScope(statePath, "statefiles");
                         String key = deriveKeyFromFilename(statePath);
                         String scopedKey = scopeKey(scope, key);
-                        if (derivedFilesSeen.contains(scopedKey)) {
+                        if (filesSeen.contains(scopedKey)) {
                             return;
                         }
                         LoadedFile state = parsePath(statePath);
-                        if (state == null || !(state.getPayload() instanceof DerivedPortfolioFile)) {
+                        if (state == null || !payloadType.isInstance(state.getPayload())) {
                             return;
                         }
-                        Map<String, CreateDerivedTransactionPortfolioRequest> stateMap =
-                                toDerivedMap((DerivedPortfolioFile) state.getPayload());
-                        for (Map.Entry<String, CreateDerivedTransactionPortfolioRequest> entry : stateMap.entrySet()) {
-                            plan.addItem(new PlanItem(Action.DELETE, FileCategory.DERIVED_PORTFOLIO, scope, entry.getKey(),
+                        Map<String, ?> stateMap = mapExtractor.apply(payloadType.cast(state.getPayload()));
+                        for (Map.Entry<String, ?> entry : stateMap.entrySet()) {
+                            plan.addItem(new PlanItem(Action.DELETE, category, scope, entry.getKey(),
                                     statePath.toString(), entry.getValue()));
                         }
                     });
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to scan derived portfolio state files", e);
+            throw new IllegalStateException("Failed to scan " + folderMarker + " state files", e);
         }
     }
 
-    private void addPortfolioGroupDeletesForMissingChanges(Set<String> groupFilesSeen, MasterPlan plan,String scope) {
-        Path stateRoot = Path.of("statefiles");
-        if (!Files.exists(stateRoot)) {
-            return;
-        }
-        try (java.util.stream.Stream<Path> stream = Files.walk(stateRoot)) {
-            stream.filter(path -> Files.isRegularFile(path)
-                            && path.toString().toLowerCase().contains("portfoliogroups")
-                            && path.toString().toLowerCase().endsWith(".json"))
-                    .forEach(statePath -> {
-                       // String scope = deriveScope(statePath, "statefiles");
-                        String key = deriveKeyFromFilename(statePath);
-                        String scopedKey = scopeKey(scope, key);
-                        if (groupFilesSeen.contains(scopedKey)) {
-                            return;
-                        }
-                        LoadedFile state = parsePath(statePath);
-                        if (state == null || !(state.getPayload() instanceof PortfolioGroupFile)) {
-                            return;
-                        }
-                        Map<String, CreatePortfolioGroupRequest> stateMap =
-                                toPortfolioGroupMap((PortfolioGroupFile) state.getPayload());
-                        for (Map.Entry<String, CreatePortfolioGroupRequest> entry : stateMap.entrySet()) {
-                            plan.addItem(new PlanItem(Action.DELETE, FileCategory.PORTFOLIO_GROUP, scope, entry.getKey(),
-                                    statePath.toString(), entry.getValue()));
-                        }
-                    });
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to scan portfolio group state files", e);
-        }
-    }
+
 }

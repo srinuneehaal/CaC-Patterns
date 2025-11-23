@@ -2,6 +2,20 @@
   "scope": "ATG",
   "createDerivedPortfolioRequestList": [
     {
+      "displayName": "MyDerivedPortfolioName 1",
+      "description": "Example long form portfolio 3 description",
+      "code": "DerivedPortfolioCode-1",
+      "parentPortfolioId": {
+        "scope": "MyParentPortfolioScope",
+        "code": "MyParentPortfolioCode"
+      },
+      "subHoldingKeys": [
+        "Transaction/MyScope/Strategy",
+        "Transaction/MyScope/SubAccount"
+      ],
+      "trnsactionTypeScope": "default"
+    },
+    {
       "displayName": "MyDerivedPortfolioName 4",
       "description": "Example long form portfolio 4 description",
       "code": "DerivedPortfolioCode-2",

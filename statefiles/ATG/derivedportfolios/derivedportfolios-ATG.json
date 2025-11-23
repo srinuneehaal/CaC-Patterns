@@ -2,9 +2,9 @@
   "scope": "ATG",
   "createDerivedPortfolioRequestList": [
     {
-      "displayName": "MyDerivedPortfolioName 1",
-      "description": "Example long form portfolio description change",
-      "code": "DerivedPortfolioCode-1",
+      "displayName": "MyDerivedPortfolioName 4",
+      "description": "Example long form portfolio 4 description",
+      "code": "DerivedPortfolioCode-2",
       "parentPortfolioId": {
         "scope": "MyParentPortfolioScope",
         "code": "MyParentPortfolioCode"
@@ -16,9 +16,9 @@
       "trnsactionTypeScope": "default"
     },
     {
-      "displayName": "MyDerivedPortfolioName 2",
-      "description": "Example long form portfolio description",
-      "code": "DerivedPortfolioCode-2",
+      "displayName": "MyDerivedPortfolioName 3",
+      "description": "Example long form portfolio 3 description",
+      "code": "DerivedPortfolioCode-3",
       "parentPortfolioId": {
         "scope": "MyParentPortfolioScope",
         "code": "MyParentPortfolioCode"
