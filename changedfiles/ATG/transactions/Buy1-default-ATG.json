@@ -7,7 +7,7 @@
     "aliases": [
       {
         "type": "BuyAlias",
-        "description": "A similar buy type changed",
+        "description": "A similar buy type",
         "transactionClass": "Buy",
         "transactionRoles": "Longer",
         "isDefault": false

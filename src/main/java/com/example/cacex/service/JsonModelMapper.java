@@ -1,6 +1,7 @@
 package com.example.cacex.service;
 
 import com.example.cacex.model.DerivedPortfolioFile;
+import com.example.cacex.model.PortfolioGroupFile;
 import com.example.cacex.model.SideFile;
 import com.example.cacex.model.TransactionFile;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -40,6 +41,9 @@ public class JsonModelMapper {
         }
         if (type == DerivedPortfolioFile.class) {
             return type.cast(readDerivedPortfolioFile(content));
+        }
+        if (type == PortfolioGroupFile.class) {
+            return type.cast(readPortfolioGroupFile(content));
         }
         return objectMapper.readValue(content, type);
     }
@@ -86,6 +90,20 @@ public class JsonModelMapper {
                     .readValue(listNode));
         } else {
             log.warn("createDerivedPortfolioRequestList missing when parsing derived portfolio payload. Fields: {}",
+                    describeFields(root));
+        }
+        return file;
+    }
+
+    private PortfolioGroupFile readPortfolioGroupFile(String content) throws IOException {
+        JsonNode root = objectMapper.readTree(content);
+        PortfolioGroupFile file = objectMapper.treeToValue(root, PortfolioGroupFile.class);
+        JsonNode listNode = root.get("createPortfolioGroupRequestList");
+        if (listNode != null && !listNode.isNull()) {
+            file.setGroups(objectMapper.readerForListOf(
+                    com.finbourne.lusid.model.CreatePortfolioGroupRequest.class).readValue(listNode));
+        } else {
+            log.warn("createPortfolioGroupRequestList missing when parsing portfolio group payload. Fields: {}",
                     describeFields(root));
         }
         return file;
