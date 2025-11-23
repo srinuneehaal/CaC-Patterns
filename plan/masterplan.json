@@ -1,29 +1,22 @@
 {
   "items" : [ {
-    "action" : "NEW",
-    "fileCategory" : "DERIVED_PORTFOLIO",
-    "scope" : "ATG",
-    "key" : "DerivedPortfolioCode-3",
-    "sourcePath" : "changedfiles\\ATG\\derivedportfolios\\derivedportfolios-ATG.json",
+    "action" : "UPDATE",
+    "fileCategory" : "SIDE",
+    "scope" : "ATG.json",
+    "key" : "side1-ATG",
+    "sourcePath" : "changedfiles\\ATG\\sides\\side1-ATG.json",
     "payload" : {
-      "displayName" : "MyDerivedPortfolioName 3",
-      "description" : "Example long form portfolio description",
-      "code" : "DerivedPortfolioCode-3",
-      "parentPortfolioId" : {
-        "scope" : "MyParentPortfolioScope",
-        "code" : "MyParentPortfolioCode"
-      },
-      "created" : null,
-      "corporateActionSourceId" : null,
-      "accountingMethod" : null,
-      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ],
-      "instrumentScopes" : null,
-      "amortisationMethod" : null,
-      "transactionTypeScope" : null,
-      "cashGainLossCalculationDate" : null,
-      "amortisationRuleSetId" : null,
-      "instrumentEventConfiguration" : null,
-      "settlementConfiguration" : null
+      "scope" : "ATG",
+      "side" : "side1",
+      "sideDefinitionRequest" : {
+        "security" : "Txn:LusidInstrumentId",
+        "currency" : "Txn:TradeCurrency",
+        "rate" : "Txn:Units",
+        "units" : "0",
+        "amount" : "Transaction/MyScope/TradeAmount",
+        "notionalAmount" : "Transaction/default/NotionalAmount",
+        "currentFace" : "Txn:CurrentFace"
+      }
     }
   }, {
     "action" : "NEW",
@@ -39,17 +32,39 @@
         "scope" : "MyParentPortfolioScope",
         "code" : "MyParentPortfolioCode"
       },
-      "created" : null,
-      "corporateActionSourceId" : null,
-      "accountingMethod" : null,
-      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ],
-      "instrumentScopes" : null,
-      "amortisationMethod" : null,
-      "transactionTypeScope" : null,
-      "cashGainLossCalculationDate" : null,
-      "amortisationRuleSetId" : null,
-      "instrumentEventConfiguration" : null,
-      "settlementConfiguration" : null
+      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "DERIVED_PORTFOLIO",
+    "scope" : "DLD",
+    "key" : "DerivedPortfolioCode-1",
+    "sourcePath" : "statefiles\\DLD\\derivedportfolios\\derivedportfolios-DLD.json",
+    "payload" : {
+      "displayName" : "MyDerivedPortfolioName 1",
+      "description" : "Example long form portfolio description change",
+      "code" : "DerivedPortfolioCode-1",
+      "parentPortfolioId" : {
+        "scope" : "MyParentPortfolioScope",
+        "code" : "MyParentPortfolioCode"
+      },
+      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
+    }
+  }, {
+    "action" : "NEW",
+    "fileCategory" : "DERIVED_PORTFOLIO",
+    "scope" : "ATG",
+    "key" : "DerivedPortfolioCode-3",
+    "sourcePath" : "changedfiles\\ATG\\derivedportfolios\\derivedportfolios-ATG.json",
+    "payload" : {
+      "displayName" : "MyDerivedPortfolioName 3",
+      "description" : "Example long form portfolio description",
+      "code" : "DerivedPortfolioCode-3",
+      "parentPortfolioId" : {
+        "scope" : "MyParentPortfolioScope",
+        "code" : "MyParentPortfolioCode"
+      },
+      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
     }
   } ]
 }

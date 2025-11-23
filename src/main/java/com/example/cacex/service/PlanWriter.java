@@ -1,6 +1,7 @@
 package com.example.cacex.service;
 
 import com.example.cacex.model.MasterPlan;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ public class PlanWriter {
 
     public PlanWriter() {
         this.objectMapper = new ObjectMapper()
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .enable(SerializationFeature.INDENT_OUTPUT);
     }
 
