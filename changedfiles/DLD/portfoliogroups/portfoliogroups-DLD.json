@@ -45,6 +45,50 @@
       "properties": {},
       "displayName": "MyGroupName",
       "description": "My group description"
+    },{
+      "code": "MyGroupCode-3",
+      "created": "2019-10-04T00:00:00.0000000+00:00",
+      "values": [
+        {
+          "scope": "MyScope",
+          "code": "MyPortfolioCode1"
+        },
+        {
+          "scope": "MyScope",
+          "code": "MyPortfolioCode2"
+        }
+      ],
+      "subGroups": [
+        {
+          "scope": "MyScope",
+          "code": "MySubGroupCode"
+        }
+      ],
+      "properties": {},
+      "displayName": "MyGroupName",
+      "description": "My group description changed"
+    },{
+      "code": "MyGroupCode-4",
+      "created": "2019-10-04T00:00:00.0000000+00:00",
+      "values": [
+        {
+          "scope": "MyScope",
+          "code": "MyPortfolioCode1"
+        },
+        {
+          "scope": "MyScope",
+          "code": "MyPortfolioCode2"
+        }
+      ],
+      "subGroups": [
+        {
+          "scope": "MyScope",
+          "code": "MySubGroupCode"
+        }
+      ],
+      "properties": {},
+      "displayName": "MyGroupName",
+      "description": "My group description New"
     }
   ]
 }

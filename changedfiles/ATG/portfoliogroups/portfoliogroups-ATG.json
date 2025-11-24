@@ -44,7 +44,7 @@
       ],
       "properties": {},
       "displayName": "MyGroupName",
-      "description": "My group description"
+      "description": "My group description changed"
     },{
       "code": "MyGroupCode-3",
       "created": "2019-10-04T00:00:00.0000000+00:00",

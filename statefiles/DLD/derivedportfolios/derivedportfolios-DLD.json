@@ -3,7 +3,7 @@
   "createDerivedPortfolioRequestList": [
     {
       "displayName": "MyDerivedPortfolioName 1",
-      "description": "Example long form portfolio description",
+      "description": "Example long form portfolio description changed",
       "code": "DerivedPortfolioCode-1",
       "parentPortfolioId": {
         "scope": "MyParentPortfolioScope",
@@ -30,9 +30,9 @@
       "trnsactionTypeScope": "default"
     },
     {
-      "displayName": "MyDerivedPortfolioName 3",
+      "displayName": "MyDerivedPortfolioName 4",
       "description": "Example long form portfolio description",
-      "code": "DerivedPortfolioCode-3",
+      "code": "DerivedPortfolioCode-4",
       "parentPortfolioId": {
         "scope": "MyParentPortfolioScope",
         "code": "MyParentPortfolioCode"

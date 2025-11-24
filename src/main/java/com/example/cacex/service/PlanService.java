@@ -46,31 +46,20 @@ public class PlanService {
 
             if (category == FileCategory.DERIVED_PORTFOLIO) {
                 derivedFilesSeen.add(scopeKey(scope, key));
-                processDerivedPortfolio(path, scope, key, plan);
-                //addDerivedDeletesForMissingChanges(derivedFilesSeen, plan,scope);
-                addDeletesForMissingChanges(
-                        Path.of("statefiles", scope),
-                        derivedFilesSeen,
-                        plan,
-                        scope,
-                        "derivedportfolios",
-                        FileCategory.DERIVED_PORTFOLIO,
-                        DerivedPortfolioFile.class,
+                processPlanEntries(path, scope, key, plan, FileCategory.DERIVED_PORTFOLIO, DerivedPortfolioFile.class,
+                        this::toDerivedMap);
+                addDeletesForMissingChanges(Path.of("statefiles", scope), derivedFilesSeen, plan, scope,
+                        "derivedportfolios", FileCategory.DERIVED_PORTFOLIO, DerivedPortfolioFile.class,
                         this::toDerivedMap);
                 continue;
             }
 
             if (category == FileCategory.PORTFOLIO_GROUP) {
                 portfolioGroupFilesSeen.add(scopeKey(scope, key));
-                processPortfolioGroup(path, scope, key, plan);
-                addDeletesForMissingChanges(
-                        Path.of("statefiles"),
-                        portfolioGroupFilesSeen,
-                        plan,
-                        scope,
-                        "portfoliogroups",
-                        FileCategory.PORTFOLIO_GROUP,
-                        PortfolioGroupFile.class,
+                processPlanEntries(path, scope, key, plan, FileCategory.PORTFOLIO_GROUP, PortfolioGroupFile.class,
+                        this::toPortfolioGroupMap);
+                addDeletesForMissingChanges(Path.of("statefiles"), portfolioGroupFilesSeen, plan, scope,
+                        "portfoliogroups", FileCategory.PORTFOLIO_GROUP, PortfolioGroupFile.class,
                         this::toPortfolioGroupMap);
                 continue;
             }
@@ -103,8 +92,6 @@ public class PlanService {
                         state.getPath().toString(), state.getPayload()));
             }
         }
-
-
         return plan;
     }
 
@@ -114,94 +101,6 @@ public class PlanService {
             return null;
         }
         return parsePath(statePath);
-    }
-
-    private void processDerivedPortfolio(Path changedPath, String scope, String key, MasterPlan plan) {
-        Path statePath = resolveStatePath(FileCategory.DERIVED_PORTFOLIO, scope, key);
-
-        DerivedPortfolioFile changedFile = null;
-        DerivedPortfolioFile stateFile = null;
-        if (Files.exists(changedPath)) {
-            LoadedFile changed = parsePath(changedPath);
-            if (changed != null && changed.getPayload() instanceof DerivedPortfolioFile) {
-                changedFile = (DerivedPortfolioFile) changed.getPayload();
-            }
-        }
-
-        if (Files.exists(statePath)) {
-            LoadedFile state = parsePath(statePath);
-            if (state != null && state.getPayload() instanceof DerivedPortfolioFile) {
-                stateFile = (DerivedPortfolioFile) state.getPayload();
-            }
-        }
-
-        Map<String, CreateDerivedTransactionPortfolioRequest> changedMap = toDerivedMap(changedFile);
-        Map<String, CreateDerivedTransactionPortfolioRequest> stateMap = toDerivedMap(stateFile);
-
-        for (Map.Entry<String, CreateDerivedTransactionPortfolioRequest> entry : changedMap.entrySet()) {
-            String code = entry.getKey();
-            CreateDerivedTransactionPortfolioRequest changed = entry.getValue();
-            CreateDerivedTransactionPortfolioRequest existing = stateMap.get(code);
-            if (existing == null) {
-                plan.addItem(new PlanItem(Action.NEW, FileCategory.DERIVED_PORTFOLIO, scope, code,
-                        changedPath.toString(), changed));
-            } else if (!Objects.equals(changed, existing)) {
-                plan.addItem(new PlanItem(Action.UPDATE, FileCategory.DERIVED_PORTFOLIO, scope, code,
-                        changedPath.toString(), changed));
-            }
-        }
-
-        for (Map.Entry<String, CreateDerivedTransactionPortfolioRequest> entry : stateMap.entrySet()) {
-            String code = entry.getKey();
-            if (!changedMap.containsKey(code)) {
-                plan.addItem(new PlanItem(Action.DELETE, FileCategory.DERIVED_PORTFOLIO, scope, code,
-                        statePath.toString(), entry.getValue()));
-            }
-        }
-    }
-
-    private void processPortfolioGroup(Path changedPath, String scope, String key, MasterPlan plan) {
-        Path statePath = resolveStatePath(FileCategory.PORTFOLIO_GROUP, scope, key);
-
-        PortfolioGroupFile changedFile = null;
-        PortfolioGroupFile stateFile = null;
-        if (Files.exists(changedPath)) {
-            LoadedFile changed = parsePath(changedPath);
-            if (changed != null && changed.getPayload() instanceof PortfolioGroupFile) {
-                changedFile = (PortfolioGroupFile) changed.getPayload();
-            }
-        }
-
-        if (Files.exists(statePath)) {
-            LoadedFile state = parsePath(statePath);
-            if (state != null && state.getPayload() instanceof PortfolioGroupFile) {
-                stateFile = (PortfolioGroupFile) state.getPayload();
-            }
-        }
-
-        Map<String, CreatePortfolioGroupRequest> changedMap = toPortfolioGroupMap(changedFile);
-        Map<String, CreatePortfolioGroupRequest> stateMap = toPortfolioGroupMap(stateFile);
-
-        for (Map.Entry<String, CreatePortfolioGroupRequest> entry : changedMap.entrySet()) {
-            String code = entry.getKey();
-            CreatePortfolioGroupRequest changed = entry.getValue();
-            CreatePortfolioGroupRequest existing = stateMap.get(code);
-            if (existing == null) {
-                plan.addItem(new PlanItem(Action.NEW, FileCategory.PORTFOLIO_GROUP, scope, code,
-                        changedPath.toString(), changed));
-            } else if (!Objects.equals(changed, existing)) {
-                plan.addItem(new PlanItem(Action.UPDATE, FileCategory.PORTFOLIO_GROUP, scope, code,
-                        changedPath.toString(), changed));
-            }
-        }
-
-        for (Map.Entry<String, CreatePortfolioGroupRequest> entry : stateMap.entrySet()) {
-            String code = entry.getKey();
-            if (!changedMap.containsKey(code)) {
-                plan.addItem(new PlanItem(Action.DELETE, FileCategory.PORTFOLIO_GROUP, scope, code,
-                        statePath.toString(), entry.getValue()));
-            }
-        }
     }
 
     private LoadedFile parsePath(Path path) {
@@ -338,11 +237,7 @@ public class PlanService {
         return map;
     }
 
-    private <T> void addDeletesForMissingChanges(
-            Path stateRoot,
-            Set<String> filesSeen,
-            MasterPlan plan,
-            String scope,
+    private <T> void addDeletesForMissingChanges(Path stateRoot, Set<String> filesSeen, MasterPlan plan, String scope,
             String folderMarker,
             FileCategory category,
             Class<T> payloadType,
@@ -373,6 +268,55 @@ public class PlanService {
         } catch (IOException e) {
             throw new IllegalStateException("Failed to scan " + folderMarker + " state files", e);
         }
+    }
+
+    private <F, R> void processPlanEntries(
+            Path changedPath,
+            String scope,
+            String key,
+            MasterPlan plan,
+            FileCategory category,
+            Class<F> payloadType,
+            Function<F, Map<String, R>> mapExtractor) {
+        Path statePath = resolveStatePath(category, scope, key);
+
+        F changedFile = parsePayload(changedPath, payloadType);
+        F stateFile = parsePayload(statePath, payloadType);
+
+        Map<String, R> changedMap = mapExtractor.apply(changedFile);
+        Map<String, R> stateMap = mapExtractor.apply(stateFile);
+
+        for (Map.Entry<String, R> entry : changedMap.entrySet()) {
+            String code = entry.getKey();
+            R changed = entry.getValue();
+            R existing = stateMap.get(code);
+            if (existing == null) {
+                plan.addItem(new PlanItem(Action.NEW, category, scope, code, changedPath.toString(), changed));
+            } else if (!Objects.equals(changed, existing)) {
+                plan.addItem(new PlanItem(Action.UPDATE, category, scope, code, changedPath.toString(), changed));
+            }
+        }
+
+        for (Map.Entry<String, R> entry : stateMap.entrySet()) {
+            String code = entry.getKey();
+            if (!changedMap.containsKey(code)) {
+                plan.addItem(new PlanItem(Action.DELETE, category, scope, code, statePath.toString(), entry.getValue()));
+            }
+        }
+    }
+
+    private <F> F parsePayload(Path path, Class<F> payloadType) {
+        if (!Files.exists(path)) {
+            return null;
+        }
+        LoadedFile loaded = parsePath(path);
+        if (loaded == null || loaded.getPayload() == null) {
+            return null;
+        }
+        if (!payloadType.isInstance(loaded.getPayload())) {
+            return null;
+        }
+        return payloadType.cast(loaded.getPayload());
     }
 
 

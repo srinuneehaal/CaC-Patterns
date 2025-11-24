@@ -3,7 +3,7 @@
   "createDerivedPortfolioRequestList": [
     {
       "displayName": "MyDerivedPortfolioName 1",
-      "description": "Example long form portfolio description changed",
+      "description": "Example long form portfolio description changed-1",
       "code": "DerivedPortfolioCode-1",
       "parentPortfolioId": {
         "scope": "MyParentPortfolioScope",
@@ -19,20 +19,6 @@
       "displayName": "MyDerivedPortfolioName 2",
       "description": "Example long form portfolio description",
       "code": "DerivedPortfolioCode-2",
-      "parentPortfolioId": {
-        "scope": "MyParentPortfolioScope",
-        "code": "MyParentPortfolioCode"
-      },
-      "subHoldingKeys": [
-        "Transaction/MyScope/Strategy",
-        "Transaction/MyScope/SubAccount"
-      ],
-      "trnsactionTypeScope": "default"
-    },
-    {
-      "displayName": "MyDerivedPortfolioName 4",
-      "description": "Example long form portfolio description",
-      "code": "DerivedPortfolioCode-4",
       "parentPortfolioId": {
         "scope": "MyParentPortfolioScope",
         "code": "MyParentPortfolioCode"
