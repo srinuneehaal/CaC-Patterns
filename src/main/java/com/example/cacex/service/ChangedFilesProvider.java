@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Component
 public class ChangedFilesProvider {
 
-    private static final String ENV_KEY = "CHANGEDFILES";
+    private static final String ENV_KEY = "CHANGED_FILES";
 
     public List<Path> getChangedPaths() {
         String envValue = System.getenv(ENV_KEY);

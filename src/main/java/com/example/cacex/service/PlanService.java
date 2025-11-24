@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 @Service
 public class PlanService {
@@ -237,15 +238,14 @@ public class PlanService {
         return map;
     }
 
-    private <T> void addDeletesForMissingChanges(Path stateRoot, Set<String> filesSeen, MasterPlan plan, String scope,
-            String folderMarker,
-            FileCategory category,
-            Class<T> payloadType,
-            Function<T, Map<String, ?>> mapExtractor) {
+    private <T> void
+    addDeletesForMissingChanges(Path stateRoot, Set<String> filesSeen, MasterPlan plan, String scope,
+                                String folderMarker, FileCategory category, Class<T> payloadType,
+                                Function<T, Map<String, ?>> mapExtractor) {
         if (!Files.exists(stateRoot)) {
             return;
         }
-        try (java.util.stream.Stream<Path> stream = Files.walk(stateRoot)) {
+        try (Stream<Path> stream = Files.walk(stateRoot)) {
             stream.filter(path -> Files.isRegularFile(path)
                             && path.toString().toLowerCase().contains(folderMarker)
                             && path.toString().toLowerCase().endsWith(".json"))

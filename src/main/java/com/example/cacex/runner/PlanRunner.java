@@ -51,7 +51,7 @@ public class PlanRunner implements CommandLineRunner {
 
     private void executePlan() {
         List<Path> changedPaths = changedFilesProvider.getChangedPaths();
-        log.info("Received {} changed file path(s) from CHANGEDFILES", changedPaths.size());
+        log.info("Received {} changed file path(s) from CHANGED_FILES", changedPaths.size());
         if (changedPaths.isEmpty()) {
             log.warn("No changed files provided. Nothing to plan.");
             return;
