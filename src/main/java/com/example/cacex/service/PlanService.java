@@ -30,8 +30,6 @@ public class PlanService {
 
     public MasterPlan buildPlan(List<Path> changedPaths) {
         Map<String, LoadedFile> stateFiles = new HashMap<>();
-        Set<String> derivedFilesSeen = new HashSet<>();
-        Set<String> portfolioGroupFilesSeen = new HashSet<>();
 
         MasterPlan plan = new MasterPlan();
 
@@ -46,20 +44,22 @@ public class PlanService {
             String key = deriveKeyFromFilename(path);
 
             if (category == FileCategory.DERIVED_PORTFOLIO) {
-                derivedFilesSeen.add(scopeKey(scope, key));
+                Set<String> filesSeen = new HashSet<>();
+                filesSeen.add(scopeKey(scope, key));
                 processPlanEntries(path, scope, key, plan, FileCategory.DERIVED_PORTFOLIO, DerivedPortfolioFile.class,
                         this::toDerivedMap);
-                addDeletesForMissingChanges(Path.of("statefiles", scope), derivedFilesSeen, plan, scope,
+                addDeletesForMissingChanges(Path.of("statefiles", scope), filesSeen, plan, scope,
                         "derivedportfolios", FileCategory.DERIVED_PORTFOLIO, DerivedPortfolioFile.class,
                         this::toDerivedMap);
                 continue;
             }
 
             if (category == FileCategory.PORTFOLIO_GROUP) {
-                portfolioGroupFilesSeen.add(scopeKey(scope, key));
+                Set<String> filesSeen = new HashSet<>();
+                filesSeen.add(scopeKey(scope, key));
                 processPlanEntries(path, scope, key, plan, FileCategory.PORTFOLIO_GROUP, PortfolioGroupFile.class,
                         this::toPortfolioGroupMap);
-                addDeletesForMissingChanges(Path.of("statefiles"), portfolioGroupFilesSeen, plan, scope,
+                addDeletesForMissingChanges(Path.of("statefiles"), filesSeen, plan, scope,
                         "portfoliogroups", FileCategory.PORTFOLIO_GROUP, PortfolioGroupFile.class,
                         this::toPortfolioGroupMap);
                 continue;

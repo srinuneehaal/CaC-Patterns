@@ -14,16 +14,19 @@ public class FileParsingStrategyFactory {
     private final Map<FileCategory, FileParsingStrategy> strategies = new EnumMap<>(FileCategory.class);
 
     public FileParsingStrategyFactory(List<FileParsingStrategy> discoveredStrategies) {
+
         for (FileParsingStrategy strategy : discoveredStrategies) {
             strategies.put(strategy.getCategory(), strategy);
         }
     }
 
     public FileParsingStrategy resolve(Path path) {
-        return strategies.values().stream()
-                .filter(strategy -> strategy.supports(path))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unsupported file path: " + path));
+        for (FileParsingStrategy strategy : strategies.values()) {
+            if (strategy.supports(path)) {
+                return strategy;
+            }
+        }
+        throw new IllegalArgumentException("Unsupported file path: " + path);
     }
 
     public FileParsingStrategy resolve(FileCategory category) {
