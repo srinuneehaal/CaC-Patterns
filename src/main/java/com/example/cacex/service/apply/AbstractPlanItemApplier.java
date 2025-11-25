@@ -1,5 +1,7 @@
 package com.example.cacex.service.apply;
 
+import com.example.cacex.exception.InvalidPlanItemException;
+import com.example.cacex.exception.PlanApplyException;
 import com.example.cacex.model.Action;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.PlanItem;
@@ -24,17 +26,21 @@ public abstract class AbstractPlanItemApplier<T> implements PlanItemApplier {
             T payload = extractPayload(item);
             Action action = item.getAction();
             if (action == null) {
-                throw new IllegalArgumentException("Plan item action cannot be null");
+                throw new InvalidPlanItemException("Plan item action cannot be null");
             }
             switch (action) {
                 case NEW -> apiService.create(item.getScope(), item.getKey(), payload);
                 case UPDATE -> apiService.update(item.getScope(), item.getKey(), payload);
                 case DELETE -> apiService.delete(item.getScope(), item.getKey(), payload);
-                default -> throw new IllegalStateException("Unsupported action " + action);
+                default -> throw new InvalidPlanItemException("Unsupported action " + action);
             }
+        } catch (InvalidPlanItemException ex) {
+            log.error("Invalid plan item {} for category {}: {}", item.getKey(), item.getFileCategory(),
+                    ex.getMessage());
+            throw ex;
         } catch (RuntimeException ex) {
             log.error("Failed to apply plan item {} for category {}", item.getKey(), item.getFileCategory(), ex);
-            throw ex;
+            throw new PlanApplyException("Failed to apply plan item " + item.getKey(), ex);
         }
     }
 
@@ -44,7 +50,7 @@ public abstract class AbstractPlanItemApplier<T> implements PlanItemApplier {
             return null;
         }
         if (!payloadType.isInstance(payload)) {
-            throw new IllegalArgumentException("Expected payload of type " + payloadType.getSimpleName()
+            throw new InvalidPlanItemException("Expected payload of type " + payloadType.getSimpleName()
                     + " but found " + payload.getClass().getSimpleName());
         }
         return payloadType.cast(payload);

@@ -1,5 +1,7 @@
 package com.example.cacex.service.parse.stratagy;
 
+import com.example.cacex.exception.UnsupportedFileCategoryException;
+import com.example.cacex.exception.UnsupportedFilePathException;
 import com.example.cacex.model.FileCategory;
 import org.springframework.stereotype.Component;
 
@@ -27,13 +29,13 @@ public class FileParsingStrategyFactory {
                 return strategy;
             }
         }
-        throw new IllegalArgumentException("Unsupported file path: " + path);
+        throw new UnsupportedFilePathException("Unsupported file path: " + path);
     }
 
     public FileParsingStrategy resolve(FileCategory category) {
         FileParsingStrategy strategy = strategies.get(category);
         if (strategy == null) {
-            throw new IllegalArgumentException("Unsupported file category: " + category);
+            throw new UnsupportedFileCategoryException("Unsupported file category: " + category);
         }
         return strategy;
     }

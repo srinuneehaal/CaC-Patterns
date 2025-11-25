@@ -1,5 +1,8 @@
 package com.example.cacex.service;
 
+import com.example.cacex.exception.PlanProcessingException;
+import com.example.cacex.exception.UnsupportedFileCategoryException;
+import com.example.cacex.exception.UnsupportedFilePathException;
 import com.example.cacex.model.*;
 import com.example.cacex.service.parse.stratagy.FileParsingStrategy;
 import com.example.cacex.service.parse.stratagy.FileParsingStrategyFactory;
@@ -34,66 +37,98 @@ public class PlanService {
         MasterPlan plan = new MasterPlan();
 
         for (Path path : changedPaths) {
-            if (!isChangedFilePath(path)) {
-                continue;
-            }
-
-            FileCategory category = deriveCategory(path);
-            String scope = deriveScope(path, "changedfiles");
-            System.out.println("scope: " + scope + ", category:" + category);
-            String key = deriveKeyFromFilename(path);
-
-            if (category == FileCategory.DERIVED_PORTFOLIO) {
-                Set<String> filesSeen = new HashSet<>();
-                filesSeen.add(scopeKey(scope, key));
-                processPlanEntries(path, scope, key, plan, FileCategory.DERIVED_PORTFOLIO, DerivedPortfolioFile.class,
-                        this::toDerivedMap);
-                addDeletesForMissingChanges(Path.of("statefiles", scope), filesSeen, plan, scope,
-                        "derivedportfolios", FileCategory.DERIVED_PORTFOLIO, DerivedPortfolioFile.class,
-                        this::toDerivedMap);
-                continue;
-            }
-
-            if (category == FileCategory.PORTFOLIO_GROUP) {
-                Set<String> filesSeen = new HashSet<>();
-                filesSeen.add(scopeKey(scope, key));
-                processPlanEntries(path, scope, key, plan, FileCategory.PORTFOLIO_GROUP, PortfolioGroupFile.class,
-                        this::toPortfolioGroupMap);
-                addDeletesForMissingChanges(Path.of("statefiles"), filesSeen, plan, scope,
-                        "portfoliogroups", FileCategory.PORTFOLIO_GROUP, PortfolioGroupFile.class,
-                        this::toPortfolioGroupMap);
-                continue;
-            }
-
-            String stateKey = mapKey(category, scope, key);
-
-            if (!stateFiles.containsKey(stateKey)) {
-                LoadedFile loaded = loadStateFile(scope, category, key);
-                if (loaded != null) {
-                    stateFiles.put(mapKey(loaded), loaded);
-                }
-            }
-
-            LoadedFile state = stateFiles.get(stateKey);
-
-            if (Files.exists(path)) {
-                LoadedFile changed = parsePath(path);
-                if (changed == null) {
-                    continue;
-                }
-                if (state == null) {
-                    plan.addItem(new PlanItem(Action.NEW, changed.getCategory(), scope, key,
-                            changed.getPath().toString(), changed.getPayload()));
-                } else if (!Objects.equals(changed.getPayload(), state.getPayload())) {
-                    plan.addItem(new PlanItem(Action.UPDATE, changed.getCategory(), scope, key,
-                            changed.getPath().toString(), changed.getPayload()));
-                }
-            } else if (state != null) {
-                plan.addItem(new PlanItem(Action.DELETE, state.getCategory(), scope, key,
-                        state.getPath().toString(), state.getPayload()));
+            try {
+                processChangedFile(path, plan, stateFiles);
+            } catch (UnsupportedFilePathException | UnsupportedFileCategoryException e) {
+                log.warn("Skipping unsupported file {}: {}", path, e.getMessage());
+            } catch (PlanProcessingException e) {
+                log.error("Failed to process changed file {}: {}", path, e.getMessage(), e);
+            } catch (Exception e) {
+                log.error("Unexpected failure processing {}: {}", path, e.getMessage(), e);
             }
         }
         return plan;
+    }
+
+    private void processChangedFile(Path path, MasterPlan plan, Map<String, LoadedFile> stateFiles) {
+        if (!isChangedFilePath(path)) {
+            return;
+        }
+
+        FileCategory category = deriveCategory(path);
+        String scope = deriveScope(path, "changedfiles");
+        log.debug("Processing scope {} for category {}", scope, category);
+        String key = deriveKeyFromFilename(path);
+
+        if (category == FileCategory.DERIVED_PORTFOLIO) {
+            Set<String> filesSeen = new HashSet<>();
+            filesSeen.add(scopeKey(scope, key));
+            processPlanEntries(path, scope, key, plan, FileCategory.DERIVED_PORTFOLIO, DerivedPortfolioFile.class,
+                    this::toDerivedMap);
+            try {
+                addDeletesForMissingChanges(
+                        DeleteScanSpec.of(Path.of("statefiles", scope),
+                                "derivedportfolios",
+                                FileCategory.DERIVED_PORTFOLIO,
+                                DerivedPortfolioFile.class,
+                                this::toDerivedMap),
+                        filesSeen,
+                        plan,
+                        scope);
+            } catch (Exception e) {
+                log.error("Failed to scan derived portfolio state files for scope {}: {}", scope, e.getMessage(), e);
+            }
+            return;
+        }
+
+        if (category == FileCategory.PORTFOLIO_GROUP) {
+            Set<String> filesSeen = new HashSet<>();
+            filesSeen.add(scopeKey(scope, key));
+            processPlanEntries(path, scope, key, plan, FileCategory.PORTFOLIO_GROUP, PortfolioGroupFile.class,
+                    this::toPortfolioGroupMap);
+            try {
+                addDeletesForMissingChanges(
+                        DeleteScanSpec.of(Path.of("statefiles"),
+                                "portfoliogroups",
+                                FileCategory.PORTFOLIO_GROUP,
+                                PortfolioGroupFile.class,
+                                this::toPortfolioGroupMap),
+                        filesSeen,
+                        plan,
+                        scope);
+            } catch (Exception e) {
+                log.error("Failed to scan portfolio group state files for scope {}: {}", scope, e.getMessage(), e);
+            }
+            return;
+        }
+
+        String stateKey = mapKey(category, scope, key);
+
+        if (!stateFiles.containsKey(stateKey)) {
+            LoadedFile loaded = loadStateFile(scope, category, key);
+            if (loaded != null) {
+                stateFiles.put(mapKey(loaded), loaded);
+            }
+        }
+
+        LoadedFile state = stateFiles.get(stateKey);
+
+        if (Files.exists(path)) {
+            LoadedFile changed = parsePath(path);
+            if (changed == null) {
+                return;
+            }
+            if (state == null) {
+                plan.addItem(new PlanItem(Action.NEW, changed.getCategory(), scope, key,
+                        changed.getPath().toString(), changed.getPayload()));
+            } else if (!Objects.equals(changed.getPayload(), state.getPayload())) {
+                plan.addItem(new PlanItem(Action.UPDATE, changed.getCategory(), scope, key,
+                        changed.getPath().toString(), changed.getPayload()));
+            }
+        } else if (state != null) {
+            plan.addItem(new PlanItem(Action.DELETE, state.getCategory(), scope, key,
+                    state.getPath().toString(), state.getPayload()));
+        }
     }
 
     private LoadedFile loadStateFile(String scope, FileCategory category, String key) {
@@ -137,8 +172,10 @@ public class PlanService {
     private FileCategory deriveCategory(Path path) {
         try {
             return strategyFactory.resolve(path).getCategory();
+        } catch (UnsupportedFilePathException e) {
+            throw e;
         } catch (Exception e) {
-            throw new IllegalArgumentException("Unable to determine category for " + path, e);
+            throw new PlanProcessingException("Unable to determine category for " + path, e);
         }
     }
 
@@ -167,7 +204,7 @@ public class PlanService {
                 folder = "portfoliogroups";
                 break;
             default:
-                throw new IllegalArgumentException("Unsupported category " + category);
+                throw new UnsupportedFileCategoryException("Unsupported category " + category);
         }
         boolean hasScope = scope != null && !scope.isEmpty();
         String filename = hasScope ? key + "-" + scope + ".json" : key + ".json";
@@ -238,16 +275,16 @@ public class PlanService {
         return map;
     }
 
-    private <T> void
-    addDeletesForMissingChanges(Path stateRoot, Set<String> filesSeen, MasterPlan plan, String scope,
-                                String folderMarker, FileCategory category, Class<T> payloadType,
-                                Function<T, Map<String, ?>> mapExtractor) {
-        if (!Files.exists(stateRoot)) {
+    private <T> void addDeletesForMissingChanges(DeleteScanSpec<T> spec,
+                                                 Set<String> filesSeen,
+                                                 MasterPlan plan,
+                                                 String scope) {
+        if (!Files.exists(spec.stateRoot())) {
             return;
         }
-        try (Stream<Path> stream = Files.walk(stateRoot)) {
+        try (Stream<Path> stream = Files.walk(spec.stateRoot())) {
             stream.filter(path -> Files.isRegularFile(path)
-                            && path.toString().toLowerCase().contains(folderMarker)
+                            && path.toString().toLowerCase().contains(spec.folderMarker())
                             && path.toString().toLowerCase().endsWith(".json"))
                     .forEach(statePath -> {
                         String key = deriveKeyFromFilename(statePath);
@@ -256,17 +293,17 @@ public class PlanService {
                             return;
                         }
                         LoadedFile state = parsePath(statePath);
-                        if (state == null || !payloadType.isInstance(state.getPayload())) {
+                        if (state == null || !spec.payloadType().isInstance(state.getPayload())) {
                             return;
                         }
-                        Map<String, ?> stateMap = mapExtractor.apply(payloadType.cast(state.getPayload()));
+                        Map<String, ?> stateMap = spec.mapExtractor().apply(spec.payloadType().cast(state.getPayload()));
                         for (Map.Entry<String, ?> entry : stateMap.entrySet()) {
-                            plan.addItem(new PlanItem(Action.DELETE, category, scope, entry.getKey(),
+                            plan.addItem(new PlanItem(Action.DELETE, spec.category(), scope, entry.getKey(),
                                     statePath.toString(), entry.getValue()));
                         }
                     });
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to scan " + folderMarker + " state files", e);
+            throw new PlanProcessingException("Failed to scan " + spec.folderMarker() + " state files", e);
         }
     }
 
@@ -319,5 +356,18 @@ public class PlanService {
         return payloadType.cast(loaded.getPayload());
     }
 
+    private record DeleteScanSpec<T>(Path stateRoot,
+                                     String folderMarker,
+                                     FileCategory category,
+                                     Class<T> payloadType,
+                                     Function<T, Map<String, ?>> mapExtractor) {
+        static <T> DeleteScanSpec<T> of(Path stateRoot,
+                                        String folderMarker,
+                                        FileCategory category,
+                                        Class<T> payloadType,
+                                        Function<T, Map<String, ?>> mapExtractor) {
+            return new DeleteScanSpec<>(stateRoot, folderMarker, category, payloadType, mapExtractor);
+        }
+    }
 
 }

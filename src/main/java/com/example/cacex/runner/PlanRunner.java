@@ -4,13 +4,13 @@ import com.example.cacex.model.MasterPlan;
 import com.example.cacex.service.ChangedFilesProvider;
 import com.example.cacex.service.PlanService;
 import com.example.cacex.service.PlanWriter;
+import com.example.cacex.util.CommandLineFlags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -31,16 +31,18 @@ public class PlanRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        System.out.println(this.getClass()+":"+ Arrays.toString(args));
-
-        if (!hasFlag(args, ARG_PLAN)) {
+        if (!CommandLineFlags.hasFlag(args, ARG_PLAN)) {
             log.info("Plan flag not provided. Skipping plan generation.");
             return;
         }
         if (args != null && args.length > 1) {
             log.warn("Extra arguments detected alongside {}: {}", ARG_PLAN, List.of(args));
         }
-        executePlan();
+        try {
+            executePlan();
+        } catch (Exception e) {
+            log.error("Plan generation failed: {}", e.getMessage(), e);
+        }
     }
 
     private void executePlan() {
@@ -53,15 +55,5 @@ public class PlanRunner implements CommandLineRunner {
         MasterPlan masterPlan = planService.buildPlan(changedPaths);
         Path output = planWriter.write(masterPlan);
         log.info("Master plan written to {}", output.toAbsolutePath());
-    }
-
-    private boolean hasFlag(String[] args, String flag) {
-        if (args == null || args.length == 0) {
-            return false;
-        }
-        return java.util.Arrays.stream(args)
-                .filter(arg -> arg != null)
-                .map(String::trim)
-                .anyMatch(flag::equalsIgnoreCase);
     }
 }

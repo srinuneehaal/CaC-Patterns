@@ -1,12 +1,12 @@
 package com.example.cacex.runner;
 
+import com.example.cacex.exception.PlanApplyException;
 import com.example.cacex.service.PlanApplyService;
+import com.example.cacex.util.CommandLineFlags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 
 @Component
 public class ApplyRunner implements CommandLineRunner {
@@ -22,24 +22,19 @@ public class ApplyRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        System.out.println(this.getClass()+":"+Arrays.toString(args));
-        if (!hasFlag(args, ARG_APPLY)) {
+        if (!CommandLineFlags.hasFlag(args, ARG_APPLY)) {
             log.debug("Apply flag not provided. Skipping plan application.");
             return;
         }
         if (args != null && args.length > 1) {
-            log.warn("Extra arguments detected alongside {}: {}", ARG_APPLY, Arrays.toString(args));
+            log.warn("Extra arguments detected alongside {}: {}", ARG_APPLY, java.util.Arrays.toString(args));
         }
-        planApplyService.applyPlan();
-    }
-
-    private boolean hasFlag(String[] args, String flag) {
-        if (args == null || args.length == 0) {
-            return false;
+        try {
+            planApplyService.applyPlan();
+        } catch (PlanApplyException e) {
+            log.error("Plan application failed: {}", e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Unexpected failure applying plan: {}", e.getMessage(), e);
         }
-        return Arrays.stream(args)
-                .filter(arg -> arg != null)
-                .map(String::trim)
-                .anyMatch(flag::equalsIgnoreCase);
     }
 }
