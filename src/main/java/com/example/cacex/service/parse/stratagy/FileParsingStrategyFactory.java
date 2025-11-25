@@ -1,4 +1,4 @@
-package com.example.cacex.strategies;
+package com.example.cacex.service.parse.stratagy;
 
 import com.example.cacex.model.FileCategory;
 import org.springframework.stereotype.Component;
