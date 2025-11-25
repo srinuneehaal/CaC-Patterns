@@ -1,0 +1,19 @@
+{
+  "items" : [ {
+    "action" : "UPDATE",
+    "fileCategory" : "DERIVED_PORTFOLIO",
+    "scope" : "ATG",
+    "key" : "DerivedPortfolioCode-1",
+    "sourcePath" : "changedfiles\\ATG\\derivedportfolios\\derivedportfolios-ATG.json",
+    "payload" : {
+      "displayName" : "MyDerivedPortfolioName 1",
+      "description" : "Example long form portfolio 3 description",
+      "code" : "DerivedPortfolioCode-1",
+      "parentPortfolioId" : {
+        "scope" : "MyParentPortfolioScope",
+        "code" : "MyParentPortfolioCode"
+      },
+      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
+    }
+  } ]
+}

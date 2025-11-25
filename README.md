@@ -12,14 +12,15 @@ and writes a master plan describing new, updated, or deleted objects.
 From the project root:
 
 ```powershell
-# Example: list changed files separated by spaces
-$env:CHANGEDFILES="changedfiles\sides\side1.json changedfiles\sides\side2.json changedfiles\transactions\transaction1.json changedfiles\transactions\transaction2.json"
-mvn -q -DskipTests spring-boot:run
+# Build a plan from CHANGED_FILES
+$env:CHANGED_FILES="changedfiles\\ATG\\sides\\side1-ATG.json changedfiles\\ATG\\transactions\\Buy-default-ATG.json"
+mvn -q -DskipTests spring-boot:run -- --plan
+
+# Apply an existing plan from plan/masterplan.json
+mvn -q -DskipTests spring-boot:run -- --apply
 ```
 
-CHANGEDFILES=changedfiles/ATG/sides/side1-ATG.json changedfiles/DLD/derivedportfolios/derivedportfolios-DLD.json changedfiles/ATG/derivedportfolios/derivedportfolios-ATG.json changedfiles/ATG/portfoliogroups/portfoliogroups-ATG.json
-$env:CHANGEDFILES=changedfiles/derivedportfolios/derivedportfolios-DLD.json changedfiles\sides\side1.json changedfiles/transactions/transaction3.json
-Find the generated plan at `plan/masterplan.json`.
+Find the generated plan at `plan/masterplan.json`. Apply mode will read that file and dispatch each item to the relevant service (sides, transaction types, derived portfolios, or portfolio groups).
 
 ## Build
 ```sh

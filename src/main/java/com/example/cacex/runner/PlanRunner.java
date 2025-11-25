@@ -10,6 +10,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -30,23 +31,16 @@ public class PlanRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        System.out.println(this.getClass()+":"+ Arrays.toString(args));
 
-        if (args == null || args.length != 1) {
-            log.error("Expected exactly one argument: {}", ARG_PLAN);
+        if (!hasFlag(args, ARG_PLAN)) {
+            log.info("Plan flag not provided. Skipping plan generation.");
             return;
         }
-
-        String decisionArg = args[0] == null ? "" : args[0].trim();
-        if (decisionArg.isEmpty()) {
-            log.error("Argument cannot be null or empty. Expected: {}", ARG_PLAN);
-            return;
+        if (args != null && args.length > 1) {
+            log.warn("Extra arguments detected alongside {}: {}", ARG_PLAN, List.of(args));
         }
-
-        if (ARG_PLAN.equalsIgnoreCase(decisionArg)) {
-            executePlan();
-        } else {
-            log.error("Unknown argument: {}. Expected: {}", decisionArg, ARG_PLAN);
-        }
+        executePlan();
     }
 
     private void executePlan() {
@@ -59,5 +53,15 @@ public class PlanRunner implements CommandLineRunner {
         MasterPlan masterPlan = planService.buildPlan(changedPaths);
         Path output = planWriter.write(masterPlan);
         log.info("Master plan written to {}", output.toAbsolutePath());
+    }
+
+    private boolean hasFlag(String[] args, String flag) {
+        if (args == null || args.length == 0) {
+            return false;
+        }
+        return java.util.Arrays.stream(args)
+                .filter(arg -> arg != null)
+                .map(String::trim)
+                .anyMatch(flag::equalsIgnoreCase);
     }
 }

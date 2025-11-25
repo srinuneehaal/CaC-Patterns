@@ -21,6 +21,7 @@ public class FileParsingStrategyFactory {
     }
 
     public FileParsingStrategy resolve(Path path) {
+
         for (FileParsingStrategy strategy : strategies.values()) {
             if (strategy.supports(path)) {
                 return strategy;
