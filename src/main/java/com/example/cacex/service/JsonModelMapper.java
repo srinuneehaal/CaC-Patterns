@@ -1,5 +1,6 @@
 package com.example.cacex.service;
 
+import com.example.cacex.model.ChartOfAccountsFile;
 import com.example.cacex.model.DerivedPortfolioFile;
 import com.example.cacex.model.PortfolioGroupFile;
 import com.example.cacex.model.SideFile;
@@ -44,6 +45,9 @@ public class JsonModelMapper {
         }
         if (type == PortfolioGroupFile.class) {
             return type.cast(readPortfolioGroupFile(content));
+        }
+        if (type == ChartOfAccountsFile.class) {
+            return type.cast(readChartOfAccountsFile(content));
         }
         return objectMapper.readValue(content, type);
     }
@@ -104,6 +108,20 @@ public class JsonModelMapper {
                     com.finbourne.lusid.model.CreatePortfolioGroupRequest.class).readValue(listNode));
         } else {
             log.warn("createPortfolioGroupRequestList missing when parsing portfolio group payload. Fields: {}",
+                    describeFields(root));
+        }
+        return file;
+    }
+
+    private ChartOfAccountsFile readChartOfAccountsFile(String content) throws IOException {
+        JsonNode root = objectMapper.readTree(content);
+        ChartOfAccountsFile file = objectMapper.treeToValue(root, ChartOfAccountsFile.class);
+        JsonNode requestNode = root.get("chartOfAccountsRequest");
+        if (requestNode != null && !requestNode.isNull()) {
+            file.setChartOfAccountsRequest(objectMapper.treeToValue(requestNode,
+                    com.finbourne.lusid.model.ChartOfAccountsRequest.class));
+        } else {
+            log.warn("chartOfAccountsRequest missing when parsing chart of accounts payload. Fields: {}",
                     describeFields(root));
         }
         return file;

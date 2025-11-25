@@ -1,123 +1,23 @@
 {
   "items" : [ {
-    "action" : "UPDATE",
-    "fileCategory" : "DERIVED_PORTFOLIO",
-    "scope" : "ATG",
-    "key" : "DerivedPortfolioCode-1",
-    "sourcePath" : "changedfiles\\ATG\\derivedportfolios\\derivedportfolios-ATG.json",
-    "payload" : {
-      "displayName" : "MyDerivedPortfolioName 1",
-      "description" : "Example long form portfolio 3 description",
-      "code" : "DerivedPortfolioCode-1",
-      "parentPortfolioId" : {
-        "scope" : "MyParentPortfolioScope",
-        "code" : "MyParentPortfolioCode"
-      },
-      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
-    }
-  }, {
-    "action" : "UPDATE",
-    "fileCategory" : "PORTFOLIO_GROUP",
-    "scope" : "ATG",
-    "key" : "MyGroupCode-2",
-    "sourcePath" : "changedfiles\\ATG\\portfoliogroups\\portfoliogroups-ATG.json",
-    "payload" : {
-      "code" : "MyGroupCode-2",
-      "created" : "2019-10-04T00:00:00Z",
-      "values" : [ {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode1"
-      }, {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode2"
-      } ],
-      "subGroups" : [ {
-        "scope" : "MyScope",
-        "code" : "MySubGroupCode"
-      } ],
-      "properties" : { },
-      "displayName" : "MyGroupName",
-      "description" : "My group description changed"
-    }
-  }, {
-    "action" : "UPDATE",
-    "fileCategory" : "DERIVED_PORTFOLIO",
-    "scope" : "DLD",
-    "key" : "DerivedPortfolioCode-1",
-    "sourcePath" : "changedfiles\\DLD\\derivedportfolios\\derivedportfolios-DLD.json",
-    "payload" : {
-      "displayName" : "MyDerivedPortfolioName 1",
-      "description" : "Example long form portfolio description changed-1",
-      "code" : "DerivedPortfolioCode-1",
-      "parentPortfolioId" : {
-        "scope" : "MyParentPortfolioScope",
-        "code" : "MyParentPortfolioCode"
-      },
-      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
-    }
-  }, {
     "action" : "DELETE",
-    "fileCategory" : "DERIVED_PORTFOLIO",
-    "scope" : "DLD",
-    "key" : "DerivedPortfolioCode-4",
-    "sourcePath" : "statefiles\\DLD\\derivedportfolios\\derivedportfolios-DLD.json",
+    "fileCategory" : "CHART_OF_ACCOUNTS",
+    "scope" : "ATG",
+    "key" : "USG",
+    "sourcePath" : "statefiles\\ATG\\coa\\USG-ATG.json",
     "payload" : {
-      "displayName" : "MyDerivedPortfolioName 4",
-      "description" : "Example long form portfolio description",
-      "code" : "DerivedPortfolioCode-4",
-      "parentPortfolioId" : {
-        "scope" : "MyParentPortfolioScope",
-        "code" : "MyParentPortfolioCode"
-      },
-      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
-    }
-  }, {
-    "action" : "NEW",
-    "fileCategory" : "PORTFOLIO_GROUP",
-    "scope" : "DLD",
-    "key" : "MyGroupCode-4",
-    "sourcePath" : "changedfiles\\DLD\\portfoliogroups\\portfoliogroups-DLD.json",
-    "payload" : {
-      "code" : "MyGroupCode-4",
-      "created" : "2019-10-04T00:00:00Z",
-      "values" : [ {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode1"
-      }, {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode2"
-      } ],
-      "subGroups" : [ {
-        "scope" : "MyScope",
-        "code" : "MySubGroupCode"
-      } ],
-      "properties" : { },
-      "displayName" : "MyGroupName",
-      "description" : "My group description New"
-    }
-  }, {
-    "action" : "UPDATE",
-    "fileCategory" : "PORTFOLIO_GROUP",
-    "scope" : "DLD",
-    "key" : "MyGroupCode-3",
-    "sourcePath" : "changedfiles\\DLD\\portfoliogroups\\portfoliogroups-DLD.json",
-    "payload" : {
-      "code" : "MyGroupCode-3",
-      "created" : "2019-10-04T00:00:00Z",
-      "values" : [ {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode1"
-      }, {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode2"
-      } ],
-      "subGroups" : [ {
-        "scope" : "MyScope",
-        "code" : "MySubGroupCode"
-      } ],
-      "properties" : { },
-      "displayName" : "MyGroupName",
-      "description" : "My group description changed"
+      "code" : "ChartOfAccounts",
+      "displayName" : "ChartOfAccountsName_1",
+      "description" : "Standard COA",
+      "properties" : {
+        "ChartOfAccounts/MyScope/FundManagerName" : {
+          "key" : "ChartOfAccounts/MyScope/FundManagerName",
+          "value" : {
+            "labelValue" : "Smith"
+          },
+          "effectiveFrom" : "2018-03-05T00:00:00Z"
+        }
+      }
     }
   } ]
 }

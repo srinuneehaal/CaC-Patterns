@@ -4,5 +4,6 @@ public enum FileCategory {
     TRANSACTION,
     SIDE,
     DERIVED_PORTFOLIO,
-    PORTFOLIO_GROUP
+    PORTFOLIO_GROUP,
+    CHART_OF_ACCOUNTS
 }

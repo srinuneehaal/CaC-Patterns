@@ -203,6 +203,9 @@ public class PlanService {
             case PORTFOLIO_GROUP:
                 folder = "portfoliogroups";
                 break;
+            case CHART_OF_ACCOUNTS:
+                folder = "coa";
+                break;
             default:
                 throw new UnsupportedFileCategoryException("Unsupported category " + category);
         }

@@ -1,0 +1,18 @@
+{
+  "scope": "ATG",
+  "chartOfAccountsCode": "USG",
+  "chartOfAccountsRequest": {
+    "code": "ChartOfAccounts",
+    "displayName": "ChartOfAccountsName_1",
+    "description": "Standard COA",
+    "properties": {
+      "ChartOfAccounts/MyScope/FundManagerName": {
+        "key": "ChartOfAccounts/MyScope/FundManagerName",
+        "value": {
+          "labelValue": "Smith"
+        },
+        "effectiveFrom": "2018-03-05T00:00:00.0000000+00:00"
+      }
+    }
+  }
+}

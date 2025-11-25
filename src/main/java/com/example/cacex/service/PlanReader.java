@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.finbourne.lusid.model.ChartOfAccountsRequest;
 import com.finbourne.lusid.model.CreateDerivedTransactionPortfolioRequest;
 import com.finbourne.lusid.model.CreatePortfolioGroupRequest;
 import org.slf4j.Logger;
@@ -69,6 +70,8 @@ public class PlanReader {
                     objectMapper.convertValue(payloadNode, CreateDerivedTransactionPortfolioRequest.class);
             case PORTFOLIO_GROUP ->
                     objectMapper.convertValue(payloadNode, CreatePortfolioGroupRequest.class);
+            case CHART_OF_ACCOUNTS ->
+                    objectMapper.convertValue(payloadNode, ChartOfAccountsRequest.class);
         };
     }
 }
