@@ -5,5 +5,6 @@ public enum FileCategory {
     SIDE,
     DERIVED_PORTFOLIO,
     PORTFOLIO_GROUP,
-    CHART_OF_ACCOUNTS
+    CHART_OF_ACCOUNTS,
+    ACCOUNT
 }

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.finbourne.lusid.model.Account;
 import com.finbourne.lusid.model.ChartOfAccountsRequest;
 import com.finbourne.lusid.model.CreateDerivedTransactionPortfolioRequest;
 import com.finbourne.lusid.model.CreatePortfolioGroupRequest;
@@ -72,6 +73,7 @@ public class PlanReader {
                     objectMapper.convertValue(payloadNode, CreatePortfolioGroupRequest.class);
             case CHART_OF_ACCOUNTS ->
                     objectMapper.convertValue(payloadNode, ChartOfAccountsRequest.class);
+            case ACCOUNT -> objectMapper.convertValue(payloadNode, Account.class);
         };
     }
 }

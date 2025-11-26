@@ -1,0 +1,45 @@
+{
+  "scope": "ATG",
+  "chartOfAccountsCode": "USG",
+  "glAccounts": [
+    {
+      "code": "0016",
+      "description": "Cash New",
+      "type": "Asset",
+      "status": "ACTIVE",
+      "control": "Manual",
+      "properties": {}
+    },
+    {
+      "code": "001456",
+      "description": "Cash",
+      "type": "Asset",
+      "status": "ACTIVE",
+      "control": "Manual",
+      "properties": {}
+    },
+    {
+      "code": "123653",
+      "description": "Dividends update",
+      "type": "Revenue",
+      "status": "ACTIVE",
+      "control": "System",
+      "properties": {}
+    },{
+      "code": "001458",
+      "description": "Cash 1",
+      "type": "Asset",
+      "status": "ACTIVE",
+      "control": "Manual",
+      "properties": {}
+    },
+    {
+      "code": "123654",
+      "description": "Dividends 1",
+      "type": "Revenue",
+      "status": "ACTIVE",
+      "control": "System",
+      "properties": {}
+    }
+  ]
+}

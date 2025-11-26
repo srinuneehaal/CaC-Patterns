@@ -7,6 +7,7 @@ import com.example.cacex.model.*;
 import com.example.cacex.service.parse.stratagy.FileParsingStrategy;
 import com.example.cacex.service.parse.stratagy.FileParsingStrategyFactory;
 import com.example.cacex.util.PathUtils;
+import com.finbourne.lusid.model.Account;
 import com.finbourne.lusid.model.CreateDerivedTransactionPortfolioRequest;
 import com.finbourne.lusid.model.CreatePortfolioGroupRequest;
 import org.slf4j.Logger;
@@ -98,6 +99,27 @@ public class PlanService {
                         scope);
             } catch (Exception e) {
                 log.error("Failed to scan portfolio group state files for scope {}: {}", scope, e.getMessage(), e);
+            }
+            return;
+        }
+
+        if (category == FileCategory.ACCOUNT) {
+            Set<String> filesSeen = new HashSet<>();
+            filesSeen.add(scopeKey(scope, key));
+            processPlanEntries(path, scope, key, plan, FileCategory.ACCOUNT, AccountFile.class,
+                    this::toAccountMap);
+            try {
+                addDeletesForMissingChanges(
+                        DeleteScanSpec.of(Path.of("statefiles", scope),
+                                "gla",
+                                FileCategory.ACCOUNT,
+                                AccountFile.class,
+                                this::toAccountMap),
+                        filesSeen,
+                        plan,
+                        scope);
+            } catch (Exception e) {
+                log.error("Failed to scan account state files for scope {}: {}", scope, e.getMessage(), e);
             }
             return;
         }
@@ -206,6 +228,9 @@ public class PlanService {
             case CHART_OF_ACCOUNTS:
                 folder = "coa";
                 break;
+            case ACCOUNT:
+                folder = "gla";
+                break;
             default:
                 throw new UnsupportedFileCategoryException("Unsupported category " + category);
         }
@@ -273,6 +298,19 @@ public class PlanService {
         for (CreatePortfolioGroupRequest request : file.getGroups()) {
             if (request != null && request.getCode() != null) {
                 map.put(request.getCode(), request);
+            }
+        }
+        return map;
+    }
+
+    private Map<String, Account> toAccountMap(AccountFile file) {
+        Map<String, Account> map = new HashMap<>();
+        if (file == null || file.getAccounts() == null) {
+            return map;
+        }
+        for (Account account : file.getAccounts()) {
+            if (account != null && account.getCode() != null) {
+                map.put(account.getCode(), account);
             }
         }
         return map;

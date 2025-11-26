@@ -20,7 +20,7 @@ mvn -q -DskipTests spring-boot:run -- --plan
 mvn -q -DskipTests spring-boot:run -- --apply
 ```
 
-Supported inputs live under `changedfiles/<scope>/` and include transactions, sides, derived portfolios, portfolio groups, and chart of accounts (in `coa/`). State files are read from the matching structure under `statefiles/`.
+Supported inputs live under `changedfiles/<scope>/` and include transactions, sides, derived portfolios, portfolio groups, chart of accounts (in `coa/`), and general ledger accounts (in `gla/`). State files are read from the matching structure under `statefiles/`.
 
 Find the generated plan at `plan/masterplan.json`. Apply mode will read that file and dispatch each item to the relevant service (sides, transaction types, derived portfolios, portfolio groups, or chart of accounts).
 

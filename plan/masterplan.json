@@ -1,23 +1,31 @@
 {
   "items" : [ {
-    "action" : "DELETE",
-    "fileCategory" : "CHART_OF_ACCOUNTS",
+    "action" : "NEW",
+    "fileCategory" : "ACCOUNT",
     "scope" : "ATG",
-    "key" : "USG",
-    "sourcePath" : "statefiles\\ATG\\coa\\USG-ATG.json",
+    "key" : "0016",
+    "sourcePath" : "changedfiles\\ATG\\gla\\USG-ATG.json",
     "payload" : {
-      "code" : "ChartOfAccounts",
-      "displayName" : "ChartOfAccountsName_1",
-      "description" : "Standard COA",
-      "properties" : {
-        "ChartOfAccounts/MyScope/FundManagerName" : {
-          "key" : "ChartOfAccounts/MyScope/FundManagerName",
-          "value" : {
-            "labelValue" : "Smith"
-          },
-          "effectiveFrom" : "2018-03-05T00:00:00Z"
-        }
-      }
+      "code" : "0016",
+      "description" : "Cash New",
+      "type" : "Asset",
+      "status" : "ACTIVE",
+      "control" : "Manual",
+      "properties" : { }
+    }
+  }, {
+    "action" : "UPDATE",
+    "fileCategory" : "ACCOUNT",
+    "scope" : "ATG",
+    "key" : "123653",
+    "sourcePath" : "changedfiles\\ATG\\gla\\USG-ATG.json",
+    "payload" : {
+      "code" : "123653",
+      "description" : "Dividends update",
+      "type" : "Revenue",
+      "status" : "ACTIVE",
+      "control" : "System",
+      "properties" : { }
     }
   } ]
 }

@@ -1,5 +1,6 @@
 package com.example.cacex.service;
 
+import com.example.cacex.model.AccountFile;
 import com.example.cacex.model.ChartOfAccountsFile;
 import com.example.cacex.model.DerivedPortfolioFile;
 import com.example.cacex.model.PortfolioGroupFile;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.finbourne.lusid.model.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -48,6 +50,9 @@ public class JsonModelMapper {
         }
         if (type == ChartOfAccountsFile.class) {
             return type.cast(readChartOfAccountsFile(content));
+        }
+        if (type == AccountFile.class) {
+            return type.cast(readAccountFile(content));
         }
         return objectMapper.readValue(content, type);
     }
@@ -123,6 +128,18 @@ public class JsonModelMapper {
         } else {
             log.warn("chartOfAccountsRequest missing when parsing chart of accounts payload. Fields: {}",
                     describeFields(root));
+        }
+        return file;
+    }
+
+    private AccountFile readAccountFile(String content) throws IOException {
+        JsonNode root = objectMapper.readTree(content);
+        AccountFile file = objectMapper.treeToValue(root, AccountFile.class);
+        JsonNode accountsNode = root.get("glAccounts");
+        if (accountsNode != null && !accountsNode.isNull()) {
+            file.setAccounts(objectMapper.readerForListOf(Account.class).readValue(accountsNode));
+        } else {
+            log.warn("glAccounts missing when parsing accounts payload. Fields: {}", describeFields(root));
         }
         return file;
     }
