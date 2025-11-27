@@ -3,6 +3,7 @@
   "transactionType": "BuyAlias",
   "transactionClass": "Buy1",
   "source": "FMS",
+  "transactionSequence": 4,
   "transactionTypeRequest": {
     "aliases": [
       {
