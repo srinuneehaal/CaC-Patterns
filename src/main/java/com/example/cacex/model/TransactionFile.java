@@ -12,6 +12,7 @@ public class TransactionFile {
     private String type;
     private String transactionClass;
     private String source;
+    private Integer transactionSequence;
     @JsonProperty("transactionTypeRequest")
     private TransactionTypeRequest transactionTypeRequest;
 
@@ -46,7 +47,13 @@ public class TransactionFile {
     public void setSource(String source) {
         this.source = source;
     }
+    public Integer getTransactionSequence() {
+        return transactionSequence;
+    }
 
+    public void setTransactionSequence(Integer transactionSequence) {
+        this.transactionSequence = transactionSequence;
+    }
     public TransactionTypeRequest getTransactionTypeRequest() {
         return transactionTypeRequest;
     }
