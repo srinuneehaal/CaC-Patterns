@@ -27,9 +27,11 @@ public class PlanService {
     private static final Logger log = LoggerFactory.getLogger(PlanService.class);
 
     private final FileParsingStrategyFactory strategyFactory;
+    private final PlanOrderingRuleEngine planOrderingRuleEngine;
 
-    public PlanService(FileParsingStrategyFactory strategyFactory) {
+    public PlanService(FileParsingStrategyFactory strategyFactory, PlanOrderingRuleEngine planOrderingRuleEngine) {
         this.strategyFactory = strategyFactory;
+        this.planOrderingRuleEngine = planOrderingRuleEngine;
     }
 
     public MasterPlan buildPlan(List<Path> changedPaths) {
@@ -48,7 +50,7 @@ public class PlanService {
                 log.error("Unexpected failure processing {}: {}", path, e.getMessage(), e);
             }
         }
-        return plan;
+        return planOrderingRuleEngine.applyOrdering(plan);
     }
 
     private void processChangedFile(Path path, MasterPlan plan, Map<String, LoadedFile> stateFiles) {

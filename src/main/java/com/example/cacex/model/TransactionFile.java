@@ -75,12 +75,13 @@ public class TransactionFile {
                 && Objects.equals(type, that.type)
                 && Objects.equals(transactionClass, that.transactionClass)
                 && Objects.equals(source, that.source)
+                && Objects.equals(transactionSequence, that.transactionSequence)
                 && Objects.equals(transactionTypeRequest, that.transactionTypeRequest);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(scope, type, transactionClass, source, transactionTypeRequest);
+        return Objects.hash(scope, type, transactionClass, source, transactionSequence, transactionTypeRequest);
     }
 
     @Override
@@ -88,7 +89,9 @@ public class TransactionFile {
         return "TransactionFile{" +
                 "scope='" + scope + '\'' +
                 ", type='" + type + '\'' +
+                ", transactionClass='" + transactionClass + '\'' +
                 ", source='" + source + '\'' +
+                ", transactionSequence=" + transactionSequence +
                 ", transactionTypeRequest=" + transactionTypeRequest +
                 '}';
     }

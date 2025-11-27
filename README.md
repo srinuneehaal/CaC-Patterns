@@ -24,6 +24,9 @@ Supported inputs live under `changedfiles/<scope>/` and include transactions, si
 
 Find the generated plan at `plan/masterplan.json`. Apply mode will read that file and dispatch each item to the relevant service (sides, transaction types, derived portfolios, portfolio groups, or chart of accounts).
 
+## Plan ordering
+The master plan is sorted by a configurable rule engine. Edit `src/main/resources/application.properties` to change the category/action order (for example the default sequence is sides create/update, transactions delete/update/create sorted by `transactionSequence`, side deletes, chart of accounts, accounts, portfolio create/update, portfolio groups, and portfolio deletes). Update the `plan.ordering.rules[*]` entries to suit your rollout constraints without touching code.
+
 ## Build
 ```sh
 mvn -q -DskipTests package

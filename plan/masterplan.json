@@ -1,5 +1,24 @@
 {
   "items" : [ {
+    "action" : "NEW",
+    "fileCategory" : "SIDE",
+    "scope" : "DLD",
+    "key" : "side1",
+    "sourcePath" : "changedfiles\\DLD\\sides\\side1-DLD.json",
+    "payload" : {
+      "scope" : "DLD",
+      "side" : "side1",
+      "sideDefinitionRequest" : {
+        "security" : "Txn:LusidInstrumentId",
+        "currency" : "Txn:TradeCurrency",
+        "rate" : "Txn:Units",
+        "units" : "1",
+        "amount" : "Transaction/MyScope/TradeAmount",
+        "notionalAmount" : "Transaction/default/NotionalAmount",
+        "currentFace" : "Txn:CurrentFace"
+      }
+    }
+  }, {
     "action" : "UPDATE",
     "fileCategory" : "TRANSACTION",
     "scope" : "ATG",
@@ -57,6 +76,25 @@
           "type" : "TaxAmounts",
           "side" : "Side1"
         } ]
+      }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "SIDE",
+    "scope" : "ATG",
+    "key" : "side1",
+    "sourcePath" : "statefiles\\ATG\\sides\\side1-ATG.json",
+    "payload" : {
+      "scope" : "ATG",
+      "side" : "side1",
+      "sideDefinitionRequest" : {
+        "security" : "Txn:LusidInstrumentId",
+        "currency" : "Txn:TradeCurrency",
+        "rate" : "Txn:Units",
+        "units" : "1",
+        "amount" : "Transaction/MyScope/TradeAmount",
+        "notionalAmount" : "Transaction/default/NotionalAmount",
+        "currentFace" : "Txn:CurrentFace"
       }
     }
   }, {
