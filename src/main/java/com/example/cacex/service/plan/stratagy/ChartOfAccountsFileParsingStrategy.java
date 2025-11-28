@@ -35,7 +35,7 @@ public class ChartOfAccountsFileParsingStrategy implements FileParsingStrategy {
     @Override
     public LoadedFile parse(Path path) throws IOException {
         ChartOfAccountsFile file = mapper.read(path, ChartOfAccountsFile.class);
-        String scope = StringUtils.trimWhitespace(file.getScope());
+        String scope = file.getScope() == null ? null : file.getScope().strip();
         String code = resolveCode(file);
         String key = buildKey(path, scope, code);
         return new LoadedFile(getCategory(), key, path, file.getChartOfAccountsRequest());

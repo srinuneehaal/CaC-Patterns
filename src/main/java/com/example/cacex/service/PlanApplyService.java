@@ -29,7 +29,6 @@ public class PlanApplyService {
         this.appliers = discoveredAppliers.stream()
                 .collect(Collectors.toMap(PlanItemApplier::supportedCategory, applier -> applier,
                         (a, b) -> a, () -> new EnumMap<>(FileCategory.class)));
-        System.out.println(appliers);
     }
 
     public void applyPlan() {

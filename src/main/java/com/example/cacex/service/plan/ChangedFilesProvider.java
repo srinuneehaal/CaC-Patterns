@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class ChangedFilesProvider {
@@ -21,7 +20,7 @@ public class ChangedFilesProvider {
 
         return Arrays.stream(envValue.trim().split("\\s+"))
                 .map(this::normalizePath)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private Path normalizePath(String rawPath) {

@@ -55,9 +55,7 @@ public class JsonModelMapper {
     private SideFile readSideFile(String content) throws IOException {
         JsonNode root = objectMapper.readTree(content);
         SideFile sideFile = objectMapper.treeToValue(root, SideFile.class);
-        JsonNode definition = root.has("sideDefinition")
-                ? root.get("sideDefinition")
-                : root.get("sideDefinitionRequest");
+        JsonNode definition =  root.get("sideDefinitionRequest");
         if (definition != null && !definition.isNull()) {
             sideFile.setSideDefinition(objectMapper.treeToValue(definition,
                     com.finbourne.lusid.model.SideDefinitionRequest.class));
@@ -71,9 +69,7 @@ public class JsonModelMapper {
     private TransactionFile readTransactionFile(String content) throws IOException {
         JsonNode root = objectMapper.readTree(content);
         TransactionFile txnFile = objectMapper.treeToValue(root, TransactionFile.class);
-        JsonNode definition = root.has("sideDefinition")
-                ? root.get("sideDefinition")
-                : root.get("transactionTypeRequest");
+        JsonNode definition =  root.get("transactionTypeRequest");
         if (definition != null && !definition.isNull()) {
             txnFile.setSideDefinition(objectMapper.treeToValue(definition,
                     com.finbourne.lusid.model.TransactionTypeRequest.class));

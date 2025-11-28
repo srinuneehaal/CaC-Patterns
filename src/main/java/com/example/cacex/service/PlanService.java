@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 public class PlanService {
 
     private static final Logger log = LoggerFactory.getLogger(PlanService.class);
+    private static final String JSON_EXTENSION = ".json";
 
     private final FileLocationProperties fileLocationProperties;
     private final FileParsingStrategyFactory strategyFactory;
@@ -190,7 +191,7 @@ public class PlanService {
             log.debug("Ignoring path outside {}: {}", changedRoot, path);
             return false;
         }
-        return normalized.endsWith(".json");
+        return normalized.endsWith(JSON_EXTENSION);
     }
 
     private String mapKey(LoadedFile file) {
@@ -248,7 +249,7 @@ public class PlanService {
                 throw new UnsupportedFileCategoryException("Unsupported category " + category);
         }
         boolean hasScope = scope != null && !scope.isEmpty();
-        String filename = hasScope ? key + "-" + scope + ".json" : key + ".json";
+        String filename = hasScope ? key + "-" + scope + JSON_EXTENSION : key + JSON_EXTENSION;
         if (hasScope) {
             return fileLocationProperties.stateFilesRoot()
                     .resolve(scope)
@@ -346,7 +347,7 @@ public class PlanService {
         try (Stream<Path> stream = Files.walk(spec.stateRoot())) {
             stream.filter(path -> Files.isRegularFile(path)
                             && path.toString().toLowerCase().contains(spec.folderMarker())
-                            && path.toString().toLowerCase().endsWith(".json"))
+                            && path.toString().toLowerCase().endsWith(JSON_EXTENSION))
                     .forEach(statePath -> {
                         String key = deriveKeyFromFilename(statePath);
                         String scopedKey = scopeKey(scope, key);

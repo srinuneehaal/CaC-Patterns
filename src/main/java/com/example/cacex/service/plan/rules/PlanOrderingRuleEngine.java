@@ -4,7 +4,6 @@ import com.example.cacex.model.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Rule engine that orders plan items using a configurable list of category/action rules.
@@ -42,7 +41,7 @@ public class PlanOrderingRuleEngine {
         List<PlanOrderingRule> configured = properties.getRules().stream()
                 .filter(rule -> rule.getCategory() != null)
                 .map(this::toRule)
-                .collect(Collectors.toList());
+                .toList();
         if (!configured.isEmpty()) {
             return configured;
         }
