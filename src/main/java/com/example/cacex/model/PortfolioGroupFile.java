@@ -2,6 +2,7 @@ package com.example.cacex.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.finbourne.lusid.model.CreatePortfolioGroupRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

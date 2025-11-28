@@ -1,9 +1,9 @@
 package com.example.cacex.runner;
 
 import com.example.cacex.model.MasterPlan;
-import com.example.cacex.service.ChangedFilesProvider;
 import com.example.cacex.service.PlanService;
-import com.example.cacex.service.PlanWriter;
+import com.example.cacex.service.plan.ChangedFilesProvider;
+import com.example.cacex.service.plan.PlanWriter;
 import com.example.cacex.util.CommandLineFlags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
