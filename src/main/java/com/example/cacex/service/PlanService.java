@@ -333,9 +333,15 @@ public class PlanService {
         if (file == null || file.getAccounts() == null) {
             return map;
         }
+        String chartOfAccountsCode = Optional.ofNullable(file.getChartOfAccountsCode())
+                .map(String::trim)
+                .filter(code -> !code.isEmpty())
+                .orElse(null);
         for (Account account : file.getAccounts()) {
             if (account != null && account.getCode() != null) {
-                map.put(account.getCode(), account);
+                String accountCode = account.getCode();
+                String key = chartOfAccountsCode != null ? chartOfAccountsCode + "-" + accountCode : accountCode;
+                map.put(key, account);
             }
         }
         return map;

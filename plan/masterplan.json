@@ -1,30 +1,58 @@
 {
   "items" : [ {
-    "action" : "NEW",
+    "action" : "DELETE",
     "fileCategory" : "ACCOUNT",
     "scope" : "ATG",
-    "key" : "0016",
-    "sourcePath" : "changedfiles\\ATG\\gla\\USG-ATG.json",
+    "key" : "USG-123653",
+    "sourcePath" : "statefiles\\ATG\\gla\\USG-ATG.json",
     "payload" : {
-      "code" : "0016",
-      "description" : "Cash New",
+      "code" : "123653",
+      "description" : "Dividends",
+      "type" : "Revenue",
+      "status" : "ACTIVE",
+      "control" : "System",
+      "properties" : { }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "ACCOUNT",
+    "scope" : "ATG",
+    "key" : "USG-123654",
+    "sourcePath" : "statefiles\\ATG\\gla\\USG-ATG.json",
+    "payload" : {
+      "code" : "123654",
+      "description" : "Dividends 1",
+      "type" : "Revenue",
+      "status" : "ACTIVE",
+      "control" : "System",
+      "properties" : { }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "ACCOUNT",
+    "scope" : "ATG",
+    "key" : "USG-001458",
+    "sourcePath" : "statefiles\\ATG\\gla\\USG-ATG.json",
+    "payload" : {
+      "code" : "001458",
+      "description" : "Cash 1",
       "type" : "Asset",
       "status" : "ACTIVE",
       "control" : "Manual",
       "properties" : { }
     }
   }, {
-    "action" : "UPDATE",
+    "action" : "DELETE",
     "fileCategory" : "ACCOUNT",
     "scope" : "ATG",
-    "key" : "123653",
-    "sourcePath" : "changedfiles\\ATG\\gla\\USG-ATG.json",
+    "key" : "USG-001456",
+    "sourcePath" : "statefiles\\ATG\\gla\\USG-ATG.json",
     "payload" : {
-      "code" : "123653",
-      "description" : "Dividends update",
-      "type" : "Revenue",
+      "code" : "001456",
+      "description" : "Cash",
+      "type" : "Asset",
       "status" : "ACTIVE",
-      "control" : "System",
+      "control" : "Manual",
       "properties" : { }
     }
   } ]

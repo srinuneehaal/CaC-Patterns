@@ -32,14 +32,7 @@
       "status": "ACTIVE",
       "control": "Manual",
       "properties": {}
-    },
-    {
-      "code": "123654",
-      "description": "Dividends 1",
-      "type": "Revenue",
-      "status": "ACTIVE",
-      "control": "System",
-      "properties": {}
     }
+
   ]
 }
