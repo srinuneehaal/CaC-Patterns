@@ -99,6 +99,7 @@ public class PlanOrderingRuleEngine {
         defaults.add(new PlanOrderingRule(FileCategory.DERIVED_PORTFOLIO, List.of(Action.NEW, Action.UPDATE), false));
         defaults.add(new PlanOrderingRule(FileCategory.PORTFOLIO_GROUP, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
         defaults.add(new PlanOrderingRule(FileCategory.DERIVED_PORTFOLIO, List.of(Action.DELETE), false));
+        defaults.add(new PlanOrderingRule(FileCategory.POSTING_RULE, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
         return defaults;
     }
 

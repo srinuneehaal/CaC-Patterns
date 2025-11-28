@@ -11,6 +11,7 @@ import com.finbourne.lusid.model.Account;
 import com.finbourne.lusid.model.ChartOfAccountsRequest;
 import com.finbourne.lusid.model.CreateDerivedTransactionPortfolioRequest;
 import com.finbourne.lusid.model.CreatePortfolioGroupRequest;
+import com.finbourne.lusid.model.PostingModuleRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -73,6 +74,7 @@ public class PlanReader {
             case CHART_OF_ACCOUNTS ->
                     objectMapper.convertValue(payloadNode, ChartOfAccountsRequest.class);
             case ACCOUNT -> objectMapper.convertValue(payloadNode, Account.class);
+            case POSTING_RULE -> objectMapper.convertValue(payloadNode, PostingModuleRequest.class);
         };
     }
 }

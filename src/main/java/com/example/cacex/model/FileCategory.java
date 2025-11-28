@@ -6,5 +6,6 @@ public enum FileCategory {
     DERIVED_PORTFOLIO,
     PORTFOLIO_GROUP,
     CHART_OF_ACCOUNTS,
-    ACCOUNT
+    ACCOUNT,
+    POSTING_RULE
 }

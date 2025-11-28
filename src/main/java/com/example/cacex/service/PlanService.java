@@ -115,6 +115,7 @@ public class PlanService {
         if (category == FileCategory.ACCOUNT) {
             Set<String> filesSeen = new HashSet<>();
             filesSeen.add(scopeKey(scope, key));
+            System.out.println("Account------>1  "+key);
             processPlanEntries(path, scope, key, plan, FileCategory.ACCOUNT, AccountFile.class,
                     this::toAccountMap);
             try {
@@ -244,6 +245,9 @@ public class PlanService {
                 break;
             case ACCOUNT:
                 folder = "gla";
+                break;
+            case POSTING_RULE:
+                folder = "postingrules";
                 break;
             default:
                 throw new UnsupportedFileCategoryException("Unsupported category " + category);

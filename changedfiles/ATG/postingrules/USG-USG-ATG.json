@@ -1,0 +1,22 @@
+{
+  "scope": "ATG",
+  "chartOfAccountsCode": "USG",
+  "postingModuleCode": "USG",
+  "postingModuleRequest": {
+    "code": "USG",
+    "displayName": "PostingModuleName",
+    "description": "PostingModuleDescription",
+    "rules": [
+      {
+        "ruleId": "rule1Id-1",
+        "generalLedgerAccountCode": "account1",
+        "ruleFilter": "Transaction.TransactionId eq 'Transaction_1'"
+      },
+      {
+        "ruleId": "rule1Id-2",
+        "generalLedgerAccountCode": "account2",
+        "ruleFilter": "Transaction.TransactionId eq 'Transaction_2'"
+      }
+    ]
+  }
+}
