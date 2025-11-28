@@ -1,5 +1,6 @@
 package com.example.cacex.service;
 
+import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.exception.PlanProcessingException;
 import com.example.cacex.exception.UnsupportedFileCategoryException;
 import com.example.cacex.exception.UnsupportedFilePathException;
@@ -26,10 +27,14 @@ public class PlanService {
 
     private static final Logger log = LoggerFactory.getLogger(PlanService.class);
 
+    private final FileLocationProperties fileLocationProperties;
     private final FileParsingStrategyFactory strategyFactory;
     private final PlanOrderingRuleEngine planOrderingRuleEngine;
 
-    public PlanService(FileParsingStrategyFactory strategyFactory, PlanOrderingRuleEngine planOrderingRuleEngine) {
+    public PlanService(FileParsingStrategyFactory strategyFactory,
+                       PlanOrderingRuleEngine planOrderingRuleEngine,
+                       FileLocationProperties fileLocationProperties) {
+        this.fileLocationProperties = fileLocationProperties;
         this.strategyFactory = strategyFactory;
         this.planOrderingRuleEngine = planOrderingRuleEngine;
     }
@@ -59,7 +64,7 @@ public class PlanService {
         }
 
         FileCategory category = deriveCategory(path);
-        String scope = deriveScope(path, "changedfiles");
+        String scope = deriveScope(path, fileLocationProperties.getChangedFilesDir());
         log.debug("Processing scope {} for category {}", scope, category);
         String key = deriveKeyFromFilename(path);
 
@@ -70,7 +75,7 @@ public class PlanService {
                     this::toDerivedMap);
             try {
                 addDeletesForMissingChanges(
-                        DeleteScanSpec.of(Path.of("statefiles", scope),
+                        DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
                                 "derivedportfolios",
                                 FileCategory.DERIVED_PORTFOLIO,
                                 DerivedPortfolioFile.class,
@@ -91,7 +96,7 @@ public class PlanService {
                     this::toPortfolioGroupMap);
             try {
                 addDeletesForMissingChanges(
-                        DeleteScanSpec.of(Path.of("statefiles"),
+                        DeleteScanSpec.of(fileLocationProperties.stateFilesRoot(),
                                 "portfoliogroups",
                                 FileCategory.PORTFOLIO_GROUP,
                                 PortfolioGroupFile.class,
@@ -112,7 +117,7 @@ public class PlanService {
                     this::toAccountMap);
             try {
                 addDeletesForMissingChanges(
-                        DeleteScanSpec.of(Path.of("statefiles", scope),
+                        DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
                                 "gla",
                                 FileCategory.ACCOUNT,
                                 AccountFile.class,
@@ -174,9 +179,14 @@ public class PlanService {
     }
 
     private boolean isChangedFilePath(Path path) {
-        String normalized = path.toString().toLowerCase();
-        if (!normalized.contains("changedfiles")) {
-            log.debug("Ignoring path outside changedfiles: {}", path);
+        String changedRoot = changedFilesRootName();
+        if (changedRoot.isEmpty()) {
+            log.warn("Changed files root directory is not configured; skipping {}", path);
+            return false;
+        }
+        String normalized = path.toString().toLowerCase(Locale.ROOT);
+        if (!normalized.contains(changedRoot.toLowerCase(Locale.ROOT))) {
+            log.debug("Ignoring path outside {}: {}", changedRoot, path);
             return false;
         }
         return normalized.endsWith(".json");
@@ -239,9 +249,14 @@ public class PlanService {
         boolean hasScope = scope != null && !scope.isEmpty();
         String filename = hasScope ? key + "-" + scope + ".json" : key + ".json";
         if (hasScope) {
-            return Path.of("statefiles", scope, folder, filename);
+            return fileLocationProperties.stateFilesRoot()
+                    .resolve(scope)
+                    .resolve(folder)
+                    .resolve(filename);
         }
-        return Path.of("statefiles", folder, filename);
+        return fileLocationProperties.stateFilesRoot()
+                .resolve(folder)
+                .resolve(filename);
     }
 
     private String deriveScope(Path path, String rootFolder) {
@@ -255,12 +270,14 @@ public class PlanService {
     }
 
     private String detectRoot(Path path) {
-        String lower = path.toString().toLowerCase();
-        if (lower.contains("changedfiles")) {
-            return "changedfiles";
+        String lower = path.toString().toLowerCase(Locale.ROOT);
+        String changedRoot = changedFilesRootName();
+        if (!changedRoot.isEmpty() && lower.contains(changedRoot.toLowerCase(Locale.ROOT))) {
+            return changedRoot;
         }
-        if (lower.contains("statefiles")) {
-            return "statefiles";
+        String stateRoot = stateFilesRootName();
+        if (!stateRoot.isEmpty() && lower.contains(stateRoot.toLowerCase(Locale.ROOT))) {
+            return stateRoot;
         }
         return "";
     }
@@ -397,6 +414,14 @@ public class PlanService {
             return null;
         }
         return payloadType.cast(loaded.getPayload());
+    }
+
+    private String changedFilesRootName() {
+        return Optional.ofNullable(fileLocationProperties.getChangedFilesDir()).orElse("");
+    }
+
+    private String stateFilesRootName() {
+        return Optional.ofNullable(fileLocationProperties.getStateFilesDir()).orElse("");
     }
 
     private record DeleteScanSpec<T>(Path stateRoot,

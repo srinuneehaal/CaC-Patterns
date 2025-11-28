@@ -1,0 +1,18 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+A["Changed file paths (CHANGED_FILES env)"] --> B["PlanRunner"]
+B --> C["PlanService.buildPlan"]
+C --> D{"Parse &amp; classify<br>(FileParsingStrategyFactory)"}
+D -- Unsupported --> D0["Skip/log warn"]
+D --> E["Load statefile<br>(same scope/key/category)"]
+E --> F["Diff: NEW / UPDATE / DELETE"]
+F --> G["Collect PlanItems (unsorted)"]
+G --> H["PlanOrderingRuleEngine"]
+H -- "Rules from application.properties" --> I["Ordered PlanItems"]
+I --> J["PlanWriter -> plan/masterplan.json"]
+J --> K["PlanApplyService (apply mode)"]
+K --> L["Dispatch to per-category appliers"]
+L --> M["External APIs (sides, tx types, accounts, etc.)"]

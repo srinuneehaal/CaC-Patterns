@@ -1,0 +1,75 @@
+classDiagram
+    direction LR
+
+    class PlanRunner {
+        +run(args)
+        -executePlan()
+    }
+    class ChangedFilesProvider {
+        +getChangedPaths(): List<Path>
+    }
+    class PlanService {
+        +buildPlan(List<Path>): MasterPlan
+        -processChangedFile(...)
+    }
+    class PlanOrderingRuleEngine {
+        +applyOrdering(MasterPlan): MasterPlan
+    }
+    class PlanOrderingProperties {
+        +List<Rule> rules
+    }
+    class PlanWriter {
+        +write(MasterPlan): Path
+    }
+    class PlanApplyService {
+        +applyPlan()
+        -resolveApplier(FileCategory): PlanItemApplier
+    }
+    class PlanReader {
+        +read(): MasterPlan
+    }
+    class PlanItemApplier {
+        <<interface>>
+        +supportedCategory(): FileCategory
+        +apply(PlanItem)
+    }
+
+    class MasterPlan {
+        -List<PlanItem> items
+        +getItems()
+        +addItem(PlanItem)
+    }
+    class PlanItem {
+        +Action action
+        +FileCategory fileCategory
+        +String scope
+        +String key
+        +String sourcePath
+        +Object payload
+    }
+    class Action
+    class FileCategory
+    class TransactionFile {
+        +Integer transactionSequence
+    }
+
+    PlanRunner --> ChangedFilesProvider
+    PlanRunner --> PlanService
+    PlanRunner --> PlanWriter
+
+    PlanService --> FileParsingStrategyFactory
+    PlanService --> PlanOrderingRuleEngine
+    PlanService --> MasterPlan
+    PlanOrderingRuleEngine --> PlanOrderingProperties
+
+    PlanWriter --> MasterPlan
+
+    PlanApplyService --> PlanReader
+    PlanApplyService --> PlanItemApplier
+    PlanApplyService --> MasterPlan
+
+    MasterPlan "1" o-- "*" PlanItem
+    PlanItem --> Action
+    PlanItem --> FileCategory
+    PlanItem --> TransactionFile : payload (for transactions)
+

@@ -1,5 +1,6 @@
 package com.example.cacex.service;
 
+import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.MasterPlan;
 import com.example.cacex.model.PlanItem;
@@ -26,11 +27,12 @@ import java.nio.file.Path;
 public class PlanReader {
 
     private static final Logger log = LoggerFactory.getLogger(PlanReader.class);
-    private static final Path INPUT_PATH = Path.of("plan", "masterplan.json");
 
+    private final FileLocationProperties fileLocationProperties;
     private final ObjectMapper objectMapper;
 
-    public PlanReader() {
+    public PlanReader(FileLocationProperties fileLocationProperties) {
+        this.fileLocationProperties = fileLocationProperties;
         this.objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -38,15 +40,16 @@ public class PlanReader {
     }
 
     public MasterPlan read() {
-        if (!Files.exists(INPUT_PATH)) {
-            throw new IllegalStateException("Plan file not found at " + INPUT_PATH.toAbsolutePath());
+        Path inputPath = fileLocationProperties.masterPlanPath();
+        if (!Files.exists(inputPath)) {
+            throw new IllegalStateException("Plan file not found at " + inputPath.toAbsolutePath());
         }
         try {
-            JsonNode root = objectMapper.readTree(INPUT_PATH.toFile());
+            JsonNode root = objectMapper.readTree(inputPath.toFile());
             MasterPlan plan = new MasterPlan();
             JsonNode itemsNode = root.get("items");
             if (itemsNode == null || !itemsNode.isArray()) {
-                log.warn("Plan file {} contains no items array", INPUT_PATH.toAbsolutePath());
+                log.warn("Plan file {} contains no items array", inputPath.toAbsolutePath());
                 return plan;
             }
             for (JsonNode itemNode : itemsNode) {

@@ -1,5 +1,6 @@
 package com.example.cacex.service;
 
+import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.model.MasterPlan;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,11 +15,11 @@ import java.nio.file.Path;
 @Component
 public class PlanWriter {
 
-    private static final Path OUTPUT_PATH = Path.of("plan", "masterplan.json");
-
+    private final FileLocationProperties fileLocationProperties;
     private final ObjectMapper objectMapper;
 
-    public PlanWriter() {
+    public PlanWriter(FileLocationProperties fileLocationProperties) {
+        this.fileLocationProperties = fileLocationProperties;
         this.objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -27,10 +28,14 @@ public class PlanWriter {
     }
 
     public Path write(MasterPlan masterPlan) {
+        Path outputPath = fileLocationProperties.masterPlanPath();
         try {
-            Files.createDirectories(OUTPUT_PATH.getParent());
-            objectMapper.writeValue(OUTPUT_PATH.toFile(), masterPlan);
-            return OUTPUT_PATH;
+            Path parent = outputPath.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            objectMapper.writeValue(outputPath.toFile(), masterPlan);
+            return outputPath;
         } catch (IOException e) {
             throw new IllegalStateException("Unable to write plan file", e);
         }
