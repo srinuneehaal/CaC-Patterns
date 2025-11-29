@@ -1,9 +1,11 @@
-name: Build
+name: CI & Release
 
 on:
   push:
     branches:
       - '**'
+    tags:
+      - 'v*'
   pull_request:
 
 jobs:
@@ -23,3 +25,30 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B -DskipTests package
+
+      - name: Upload build artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-artifacts
+          path: |
+            target/*.jar
+            target/*.war
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: java-artifacts
+          path: dist
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
