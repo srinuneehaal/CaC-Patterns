@@ -8,7 +8,6 @@ import com.example.cacex.model.*;
 import com.example.cacex.service.plan.rules.PlanOrderingRuleEngine;
 import com.example.cacex.service.plan.stratagy.FileParsingStrategy;
 import com.example.cacex.service.plan.stratagy.FileParsingStrategyFactory;
-import com.example.cacex.util.PathUtils;
 import com.finbourne.lusid.model.AborConfigurationRequest;
 import com.finbourne.lusid.model.AborRequest;
 import com.finbourne.lusid.model.Account;
@@ -34,13 +33,16 @@ public class PlanService {
     private final FileLocationProperties fileLocationProperties;
     private final FileParsingStrategyFactory strategyFactory;
     private final PlanOrderingRuleEngine planOrderingRuleEngine;
+    private final StateFileService stateFileService;
 
     public PlanService(FileParsingStrategyFactory strategyFactory,
                        PlanOrderingRuleEngine planOrderingRuleEngine,
-                       FileLocationProperties fileLocationProperties) {
+                       FileLocationProperties fileLocationProperties,
+                       StateFileService stateFileService) {
         this.fileLocationProperties = fileLocationProperties;
         this.strategyFactory = strategyFactory;
         this.planOrderingRuleEngine = planOrderingRuleEngine;
+        this.stateFileService = stateFileService;
     }
 
     public MasterPlan buildPlan(List<Path> changedPaths) {
@@ -70,7 +72,7 @@ public class PlanService {
         FileCategory category = deriveCategory(path);
         String scope = deriveScope(path, fileLocationProperties.getChangedFilesDir());
         log.debug("Processing scope {} for category {}", scope, category);
-        String key = deriveKeyFromFilename(path);
+        String key = stateFileService.deriveKeyFromFilename(path);
 
         if (category == FileCategory.ABOR) {
             Set<String> filesSeen = new HashSet<>();
@@ -208,7 +210,7 @@ public class PlanService {
     }
 
     private LoadedFile loadStateFile(String scope, FileCategory category, String key) {
-        Path statePath = resolveStatePath(category, scope, key);
+        Path statePath = stateFileService.resolveStatePath(category, scope, key);
         if (!Files.exists(statePath)) {
             return null;
         }
@@ -258,61 +260,6 @@ public class PlanService {
         } catch (Exception e) {
             throw new PlanProcessingException("Unable to determine category for " + path, e);
         }
-    }
-
-    private String deriveKeyFromFilename(Path path) {
-        String base = PathUtils.baseName(path);
-        int dash = base.lastIndexOf('-');
-        if (dash > 0) {
-            return base.substring(0, dash);
-        }
-        return base;
-    }
-
-    private Path resolveStatePath(FileCategory category, String scope, String key) {
-        String folder;
-        switch (category) {
-            case SIDE:
-                folder = "sides";
-                break;
-            case TRANSACTION:
-                folder = "transactions";
-                break;
-            case DERIVED_PORTFOLIO:
-                folder = "derivedportfolios";
-                break;
-            case PORTFOLIO_GROUP:
-                folder = "portfoliogroups";
-                break;
-            case CHART_OF_ACCOUNTS:
-                folder = "coa";
-                break;
-            case ACCOUNT:
-                folder = "gla";
-                break;
-            case POSTING_RULE:
-                folder = "postingrules";
-                break;
-            case ABOR_CONFIGURATION:
-                folder = "aborconfigs";
-                break;
-            case ABOR:
-                folder = "abor";
-                break;
-            default:
-                throw new UnsupportedFileCategoryException("Unsupported category " + category);
-        }
-        boolean hasScope = scope != null && !scope.isEmpty();
-        String filename = hasScope ? key + "-" + scope + JSON_EXTENSION : key + JSON_EXTENSION;
-        if (hasScope) {
-            return fileLocationProperties.stateFilesRoot()
-                    .resolve(scope)
-                    .resolve(folder)
-                    .resolve(filename);
-        }
-        return fileLocationProperties.stateFilesRoot()
-                .resolve(folder)
-                .resolve(filename);
     }
 
     private String deriveScope(Path path, String rootFolder) {
@@ -435,7 +382,7 @@ public class PlanService {
                             && path.toString().toLowerCase().contains(spec.folderMarker())
                             && path.toString().toLowerCase().endsWith(JSON_EXTENSION))
                     .forEach(statePath -> {
-                        String key = deriveKeyFromFilename(statePath);
+                        String key = stateFileService.deriveKeyFromFilename(statePath);
                         String scopedKey = scopeKey(scope, key);
                         if (filesSeen.contains(scopedKey)) {
                             return;
@@ -463,7 +410,7 @@ public class PlanService {
             FileCategory category,
             Class<F> payloadType,
             Function<F, Map<String, R>> mapExtractor) {
-        Path statePath = resolveStatePath(category, scope, key);
+        Path statePath = stateFileService.resolveStatePath(category, scope, key);
 
         F changedFile = parsePayload(changedPath, payloadType);
         F stateFile = parsePayload(statePath, payloadType);

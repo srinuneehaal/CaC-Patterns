@@ -23,9 +23,13 @@ public class PlanApplyService {
 
     private final PlanReader planReader;
     private final Map<FileCategory, PlanItemApplier> appliers;
+    private final StateFileService stateFileService;
 
-    public PlanApplyService(PlanReader planReader, List<PlanItemApplier> discoveredAppliers) {
+    public PlanApplyService(PlanReader planReader,
+                            StateFileService stateFileService,
+                            List<PlanItemApplier> discoveredAppliers) {
         this.planReader = planReader;
+        this.stateFileService = stateFileService;
         this.appliers = discoveredAppliers.stream()
                 .collect(Collectors.toMap(PlanItemApplier::supportedCategory, applier -> applier,
                         (a, b) -> a, () -> new EnumMap<>(FileCategory.class)));
@@ -42,6 +46,7 @@ public class PlanApplyService {
             try {
                 PlanItemApplier applier = resolveApplier(item.getFileCategory());
                 applier.apply(item);
+                stateFileService.applyStateChange(item);
             } catch (MissingApplierException e) {
                 log.error("Skipping item {}: {}", item.getKey(), e.getMessage());
             } catch (PlanApplyException e) {
