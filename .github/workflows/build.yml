@@ -1,5 +1,8 @@
 name: CI & Release
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -53,5 +56,6 @@ jobs:
           files: dist/**
           tag_name: commit-${{ github.sha }}
           name: Commit ${{ github.sha }}
+          target_commitish: ${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
