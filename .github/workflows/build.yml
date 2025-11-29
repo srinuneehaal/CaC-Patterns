@@ -54,8 +54,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: dist/**
-          tag_name: commit-${{ github.sha }}
-          name: Commit ${{ github.sha }}
+          tag_name: commit-${{ github.run_id }}
+          name: Commit ${{ github.run_id }}
           target_commitish: ${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
