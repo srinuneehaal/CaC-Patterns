@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.finbourne.lusid.model.AborConfigurationRequest;
 import com.finbourne.lusid.model.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,9 @@ public class JsonModelMapper {
         }
         if (type == AccountFile.class) {
             return type.cast(readAccountFile(content));
+        }
+        if (type == AborConfigurationFile.class) {
+            return type.cast(readAborConfigurationFile(content));
         }
         return objectMapper.readValue(content, type);
     }
@@ -131,6 +135,19 @@ public class JsonModelMapper {
             file.setAccounts(objectMapper.readerForListOf(Account.class).readValue(accountsNode));
         } else {
             log.warn("glAccounts missing when parsing accounts payload. Fields: {}", describeFields(root));
+        }
+        return file;
+    }
+
+    private AborConfigurationFile readAborConfigurationFile(String content) throws IOException {
+        JsonNode root = objectMapper.readTree(content);
+        AborConfigurationFile file = objectMapper.treeToValue(root, AborConfigurationFile.class);
+        JsonNode listNode = root.get("aborConfigurationRequestList");
+        if (listNode != null && !listNode.isNull()) {
+            file.setAborConfigurations(objectMapper.readerForListOf(AborConfigurationRequest.class).readValue(listNode));
+        } else {
+            log.warn("aborConfigurationRequestList missing when parsing ABOR configuration payload. Fields: {}",
+                    describeFields(root));
         }
         return file;
     }

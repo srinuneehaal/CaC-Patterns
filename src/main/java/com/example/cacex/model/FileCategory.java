@@ -7,5 +7,6 @@ public enum FileCategory {
     PORTFOLIO_GROUP,
     CHART_OF_ACCOUNTS,
     ACCOUNT,
-    POSTING_RULE
+    POSTING_RULE,
+    ABOR_CONFIGURATION
 }

@@ -103,11 +103,13 @@ public class PlanOrderingRuleEngine {
         defaults.add(new PlanOrderingRule(FileCategory.ACCOUNT, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
         // 6. create/update/delete posting rules
         defaults.add(new PlanOrderingRule(FileCategory.POSTING_RULE, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
-        // 7. create/update portfolios
+        // 7. create/update/delete ABOR configuration
+        defaults.add(new PlanOrderingRule(FileCategory.ABOR_CONFIGURATION, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
+        // 8. create/update portfolios
         defaults.add(new PlanOrderingRule(FileCategory.DERIVED_PORTFOLIO, List.of(Action.NEW, Action.UPDATE), false));
-        // 8. create/update/delete portfolio groups
+        // 9. create/update/delete portfolio groups
         defaults.add(new PlanOrderingRule(FileCategory.PORTFOLIO_GROUP, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
-        // 9. delete portfolios
+        // 10. delete portfolios
         defaults.add(new PlanOrderingRule(FileCategory.DERIVED_PORTFOLIO, List.of(Action.DELETE), false));
         return defaults;
     }
