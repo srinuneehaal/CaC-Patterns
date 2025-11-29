@@ -1,5 +1,6 @@
 package com.example.cacex.service.plan.stratagy;
 
+import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.model.AccountFile;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.LoadedFile;
@@ -9,14 +10,17 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Locale;
 
 @Component
 public class AccountFileParsingStrategy implements FileParsingStrategy {
 
     private final JsonModelMapper mapper;
+    private final String folderMarker;
 
-    public AccountFileParsingStrategy(JsonModelMapper mapper) {
+    public AccountFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
+        this.folderMarker = fileLocationProperties.getAccountsDirName().toLowerCase(Locale.ROOT);
     }
 
     @Override
@@ -26,12 +30,12 @@ public class AccountFileParsingStrategy implements FileParsingStrategy {
 
     @Override
     public boolean supports(Path path) {
-        String value = path.toString().toLowerCase();
+        String value = path.toString().toLowerCase(Locale.ROOT);
         if (!value.endsWith(".json")) {
             return false;
         }
         for (Path part : path.normalize()) {
-            if ("gla".equalsIgnoreCase(part.toString())) {
+            if (folderMarker.equalsIgnoreCase(part.toString())) {
                 return true;
             }
         }

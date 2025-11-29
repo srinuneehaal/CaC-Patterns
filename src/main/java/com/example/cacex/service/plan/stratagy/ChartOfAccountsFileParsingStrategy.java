@@ -1,5 +1,6 @@
 package com.example.cacex.service.plan.stratagy;
 
+import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.model.ChartOfAccountsFile;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.LoadedFile;
@@ -10,14 +11,17 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Locale;
 
 @Component
 public class ChartOfAccountsFileParsingStrategy implements FileParsingStrategy {
 
     private final JsonModelMapper mapper;
+    private final String folderMarker;
 
-    public ChartOfAccountsFileParsingStrategy(JsonModelMapper mapper) {
+    public ChartOfAccountsFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
+        this.folderMarker = fileLocationProperties.getChartOfAccountsDirName().toLowerCase(Locale.ROOT);
     }
 
     @Override
@@ -27,8 +31,10 @@ public class ChartOfAccountsFileParsingStrategy implements FileParsingStrategy {
 
     @Override
     public boolean supports(Path path) {
-        String value = path.toString().toLowerCase();
-        boolean inCoaFolder = value.contains("\\coa\\") || value.contains("/coa/") || value.contains("chartofaccounts");
+        String value = path.toString().toLowerCase(Locale.ROOT);
+        boolean inCoaFolder = value.contains("\\" + folderMarker + "\\")
+                || value.contains("/" + folderMarker + "/")
+                || value.contains("chartofaccounts");
         return inCoaFolder && value.endsWith(".json");
     }
 

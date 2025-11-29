@@ -1,5 +1,6 @@
 package com.example.cacex.service.plan.stratagy;
 
+import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.model.AborFile;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.LoadedFile;
@@ -9,14 +10,19 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Locale;
 
 @Component
 public class AborFileParsingStrategy implements FileParsingStrategy {
 
     private final JsonModelMapper mapper;
+    private final String folderMarker;
+    private final String aborConfigMarker;
 
-    public AborFileParsingStrategy(JsonModelMapper mapper) {
+    public AborFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
+        this.folderMarker = fileLocationProperties.getAborDirName().toLowerCase(Locale.ROOT);
+        this.aborConfigMarker = fileLocationProperties.getAborConfigurationsDirName().toLowerCase(Locale.ROOT);
     }
 
     @Override
@@ -26,8 +32,8 @@ public class AborFileParsingStrategy implements FileParsingStrategy {
 
     @Override
     public boolean supports(Path path) {
-        String value = path.toString().toLowerCase();
-        return value.contains("abor") && !value.contains("aborconfig") && value.endsWith(".json");
+        String value = path.toString().toLowerCase(Locale.ROOT);
+        return value.contains(folderMarker) && !value.contains(aborConfigMarker) && value.endsWith(".json");
     }
 
     @Override

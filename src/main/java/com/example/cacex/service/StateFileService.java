@@ -76,18 +76,7 @@ public class StateFileService {
     }
 
     public Path resolveStatePath(FileCategory category, String scope, String key) {
-        String folder = switch (category) {
-            case SIDE -> "sides";
-            case TRANSACTION -> "transactions";
-            case DERIVED_PORTFOLIO -> "derivedportfolios";
-            case PORTFOLIO_GROUP -> "portfoliogroups";
-            case CHART_OF_ACCOUNTS -> "coa";
-            case ACCOUNT -> "gla";
-            case POSTING_RULE -> "postingrules";
-            case ABOR_CONFIGURATION -> "aborconfigs";
-            case ABOR -> "abor";
-            default -> throw new UnsupportedFileCategoryException("Unsupported category " + category);
-        };
+        String folder = folderFor(category);
         boolean hasScope = scope != null && !scope.isBlank();
         String normalizedKey = key == null ? "" : key.trim();
         if (hasScope) {
@@ -269,6 +258,21 @@ public class StateFileService {
             key = deriveKeyFromFilename(Path.of(item.getSourcePath()));
         }
         return resolveStatePath(item.getFileCategory(), item.getScope(), key);
+    }
+
+    private String folderFor(FileCategory category) {
+        return switch (category) {
+            case SIDE -> fileLocationProperties.getSidesDirName();
+            case TRANSACTION -> fileLocationProperties.getTransactionsDirName();
+            case DERIVED_PORTFOLIO -> fileLocationProperties.getDerivedPortfoliosDirName();
+            case PORTFOLIO_GROUP -> fileLocationProperties.getPortfolioGroupsDirName();
+            case CHART_OF_ACCOUNTS -> fileLocationProperties.getChartOfAccountsDirName();
+            case ACCOUNT -> fileLocationProperties.getAccountsDirName();
+            case POSTING_RULE -> fileLocationProperties.getPostingRulesDirName();
+            case ABOR_CONFIGURATION -> fileLocationProperties.getAborConfigurationsDirName();
+            case ABOR -> fileLocationProperties.getAborDirName();
+            default -> throw new UnsupportedFileCategoryException("Unsupported category " + category);
+        };
     }
 
     private <T> T readOrDefault(Path path, Class<T> type, Supplier<T> fallback) {

@@ -1,3 +1,23 @@
 {
-  "items" : [ ]
+  "items" : [ {
+    "action" : "UPDATE",
+    "fileCategory" : "CHART_OF_ACCOUNTS",
+    "scope" : "ATG",
+    "key" : "USG",
+    "sourcePath" : "changedfiles\\ATG\\coa\\USG-ATG.json",
+    "payload" : {
+      "code" : "ChartOfAccounts",
+      "displayName" : "ChartOfAccountsName",
+      "description" : "Standard COA changed",
+      "properties" : {
+        "ChartOfAccounts/MyScope/FundManagerName" : {
+          "key" : "ChartOfAccounts/MyScope/FundManagerName",
+          "value" : {
+            "labelValue" : "Smith"
+          },
+          "effectiveFrom" : "2018-03-05T00:00:00Z"
+        }
+      }
+    }
+  } ]
 }

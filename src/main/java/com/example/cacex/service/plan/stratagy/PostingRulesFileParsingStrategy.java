@@ -1,5 +1,6 @@
 package com.example.cacex.service.plan.stratagy;
 
+import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.LoadedFile;
 import com.example.cacex.model.PostingRulesFile;
@@ -15,12 +16,12 @@ import java.util.Locale;
 @Component
 public class PostingRulesFileParsingStrategy implements FileParsingStrategy {
 
-    private static final String FOLDER_MARKER = "postingrules";
-
     private final JsonModelMapper mapper;
+    private final String folderMarker;
 
-    public PostingRulesFileParsingStrategy(JsonModelMapper mapper) {
+    public PostingRulesFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
+        this.folderMarker = fileLocationProperties.getPostingRulesDirName().toLowerCase(Locale.ROOT);
     }
 
     @Override
@@ -31,7 +32,7 @@ public class PostingRulesFileParsingStrategy implements FileParsingStrategy {
     @Override
     public boolean supports(Path path) {
         String value = path.toString().toLowerCase(Locale.ROOT);
-        return value.contains(FOLDER_MARKER) && value.endsWith(".json");
+        return value.contains(folderMarker) && value.endsWith(".json");
     }
 
     @Override

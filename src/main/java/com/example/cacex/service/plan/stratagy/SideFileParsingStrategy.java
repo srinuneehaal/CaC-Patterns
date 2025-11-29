@@ -1,5 +1,6 @@
 package com.example.cacex.service.plan.stratagy;
 
+import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.LoadedFile;
 import com.example.cacex.model.SideFile;
@@ -10,14 +11,17 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Locale;
 
 @Component
 public class SideFileParsingStrategy implements FileParsingStrategy {
 
     private final JsonModelMapper mapper;
+    private final String folderMarker;
 
-    public SideFileParsingStrategy(JsonModelMapper mapper) {
+    public SideFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
+        this.folderMarker = fileLocationProperties.getSidesDirName().toLowerCase(Locale.ROOT);
     }
 
     @Override
@@ -27,8 +31,8 @@ public class SideFileParsingStrategy implements FileParsingStrategy {
 
     @Override
     public boolean supports(Path path) {
-        String value = path.toString().toLowerCase();
-        return value.contains("sides") && value.endsWith(".json");
+        String value = path.toString().toLowerCase(Locale.ROOT);
+        return value.contains(folderMarker) && value.endsWith(".json");
     }
 
     @Override

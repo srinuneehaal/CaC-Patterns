@@ -17,6 +17,15 @@ public class FileLocationProperties {
     private String stateFilesDir;
     private String planDir ;
     private String masterPlanFile;
+    private String sidesDirName = "sides";
+    private String transactionsDirName = "transactions";
+    private String derivedPortfoliosDirName = "derivedportfolios";
+    private String portfolioGroupsDirName = "portfoliogroups";
+    private String chartOfAccountsDirName = "coa";
+    private String accountsDirName = "gla";
+    private String postingRulesDirName = "postingrules";
+    private String aborConfigurationsDirName = "aborconfigs";
+    private String aborDirName = "abor";
 
     public String getChangedFilesDir() {
         return changedFilesDir;
@@ -48,6 +57,78 @@ public class FileLocationProperties {
 
     public void setMasterPlanFile(String masterPlanFile) {
         this.masterPlanFile = masterPlanFile;
+    }
+
+    public String getSidesDirName() {
+        return sidesDirName;
+    }
+
+    public void setSidesDirName(String sidesDirName) {
+        this.sidesDirName = sidesDirName;
+    }
+
+    public String getTransactionsDirName() {
+        return transactionsDirName;
+    }
+
+    public void setTransactionsDirName(String transactionsDirName) {
+        this.transactionsDirName = transactionsDirName;
+    }
+
+    public String getDerivedPortfoliosDirName() {
+        return derivedPortfoliosDirName;
+    }
+
+    public void setDerivedPortfoliosDirName(String derivedPortfoliosDirName) {
+        this.derivedPortfoliosDirName = derivedPortfoliosDirName;
+    }
+
+    public String getPortfolioGroupsDirName() {
+        return portfolioGroupsDirName;
+    }
+
+    public void setPortfolioGroupsDirName(String portfolioGroupsDirName) {
+        this.portfolioGroupsDirName = portfolioGroupsDirName;
+    }
+
+    public String getChartOfAccountsDirName() {
+        return chartOfAccountsDirName;
+    }
+
+    public void setChartOfAccountsDirName(String chartOfAccountsDirName) {
+        this.chartOfAccountsDirName = chartOfAccountsDirName;
+    }
+
+    public String getAccountsDirName() {
+        return accountsDirName;
+    }
+
+    public void setAccountsDirName(String accountsDirName) {
+        this.accountsDirName = accountsDirName;
+    }
+
+    public String getPostingRulesDirName() {
+        return postingRulesDirName;
+    }
+
+    public void setPostingRulesDirName(String postingRulesDirName) {
+        this.postingRulesDirName = postingRulesDirName;
+    }
+
+    public String getAborConfigurationsDirName() {
+        return aborConfigurationsDirName;
+    }
+
+    public void setAborConfigurationsDirName(String aborConfigurationsDirName) {
+        this.aborConfigurationsDirName = aborConfigurationsDirName;
+    }
+
+    public String getAborDirName() {
+        return aborDirName;
+    }
+
+    public void setAborDirName(String aborDirName) {
+        this.aborDirName = aborDirName;
     }
 
     public Path changedFilesRoot() {

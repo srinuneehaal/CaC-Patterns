@@ -82,7 +82,7 @@ public class PlanService {
             try {
                 addDeletesForMissingChanges(
                         DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
-                                "abor",
+                                fileLocationProperties.getAborDirName().toLowerCase(Locale.ROOT),
                                 FileCategory.ABOR,
                                 AborFile.class,
                                 this::toAborMap),
@@ -103,7 +103,7 @@ public class PlanService {
             try {
                 addDeletesForMissingChanges(
                         DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
-                                "aborconfigs",
+                                fileLocationProperties.getAborConfigurationsDirName().toLowerCase(Locale.ROOT),
                                 FileCategory.ABOR_CONFIGURATION,
                                 AborConfigurationFile.class,
                                 this::toAborConfigurationMap),
@@ -124,7 +124,7 @@ public class PlanService {
             try {
                 addDeletesForMissingChanges(
                         DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
-                                "derivedportfolios",
+                                fileLocationProperties.getDerivedPortfoliosDirName().toLowerCase(Locale.ROOT),
                                 FileCategory.DERIVED_PORTFOLIO,
                                 DerivedPortfolioFile.class,
                                 this::toDerivedMap),
@@ -145,7 +145,7 @@ public class PlanService {
             try {
                 addDeletesForMissingChanges(
                         DeleteScanSpec.of(fileLocationProperties.stateFilesRoot(),
-                                "portfoliogroups",
+                                fileLocationProperties.getPortfolioGroupsDirName().toLowerCase(Locale.ROOT),
                                 FileCategory.PORTFOLIO_GROUP,
                                 PortfolioGroupFile.class,
                                 this::toPortfolioGroupMap),
@@ -167,7 +167,7 @@ public class PlanService {
             try {
                 addDeletesForMissingChanges(
                         DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
-                                "gla",
+                                fileLocationProperties.getAccountsDirName().toLowerCase(Locale.ROOT),
                                 FileCategory.ACCOUNT,
                                 AccountFile.class,
                                 this::toAccountMap),
