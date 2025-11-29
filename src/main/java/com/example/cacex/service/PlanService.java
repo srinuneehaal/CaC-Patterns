@@ -54,7 +54,7 @@ public class PlanService {
             try {
                 processChangedFile(path, plan, stateFiles);
             } catch (UnsupportedFilePathException | UnsupportedFileCategoryException e) {
-                log.warn("Skipping unsupported file {}: {}", path, e.getMessage());
+                log.warn("Skipping  unsupported file {}: {}", path, e.getMessage());
             } catch (PlanProcessingException e) {
                 log.error("Failed to process changed file {}: {}", path, e.getMessage(), e);
             } catch (Exception e) {
