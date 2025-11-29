@@ -1,0 +1,60 @@
+{
+  "scope": "ATG",
+  "aborConfigurationRequestList": [
+    {
+      "code": "AborCode-1",
+      "displayName": "AborConfiguration Name-1",
+      "description": "Standard AborConfigurationRequest-1",
+      "recipeId": {
+        "scope": "RecipeScope",
+        "code": "RecipeCode"
+      },
+      "chartOfAccountsId": {
+        "scope": "CoAScope",
+        "code": "CoACode"
+      },
+      "postingModuleCodes": [
+        "PostingModuleCode"
+      ],
+      "cleardownModuleCodes": [
+        "CleardownModuleCode"
+      ],
+      "properties": {
+        "AborConfiguration/MyScope/FundManagerName": {
+          "key": "AborConfiguration/MyScope/FundManagerName",
+          "value": {
+            "labelValue": "Smith"
+          },
+          "effectiveFrom": "2020-03-05T00:00:00.0000000+00:00"
+        }
+      }
+    },{
+      "code": "AborCode-2",
+      "displayName": "AborConfiguration Name-2",
+      "description": "Standard AborConfigurationRequest-2",
+      "recipeId": {
+        "scope": "RecipeScope",
+        "code": "RecipeCode"
+      },
+      "chartOfAccountsId": {
+        "scope": "CoAScope",
+        "code": "CoACode"
+      },
+      "postingModuleCodes": [
+        "PostingModuleCode"
+      ],
+      "cleardownModuleCodes": [
+        "CleardownModuleCode"
+      ],
+      "properties": {
+        "AborConfiguration/MyScope/FundManagerName": {
+          "key": "AborConfiguration/MyScope/FundManagerName",
+          "value": {
+            "labelValue": "Smith"
+          },
+          "effectiveFrom": "2020-03-05T00:00:00.0000000+00:00"
+        }
+      }
+    }
+  ]
+}

@@ -91,15 +91,24 @@ public class PlanOrderingRuleEngine {
 
     private List<PlanOrderingRule> defaultRules() {
         List<PlanOrderingRule> defaults = new ArrayList<>();
+        // 1. create/update side
         defaults.add(new PlanOrderingRule(FileCategory.SIDE, List.of(Action.NEW, Action.UPDATE), false));
+        // 2. delete/update/create transactions (sorted by transactionSequence)
         defaults.add(new PlanOrderingRule(FileCategory.TRANSACTION, List.of(Action.DELETE, Action.UPDATE, Action.NEW), true));
+        // 3. delete side
         defaults.add(new PlanOrderingRule(FileCategory.SIDE, List.of(Action.DELETE), false));
+        // 4. create/update/delete chart of accounts
         defaults.add(new PlanOrderingRule(FileCategory.CHART_OF_ACCOUNTS, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
+        // 5. create/update/delete account
         defaults.add(new PlanOrderingRule(FileCategory.ACCOUNT, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
-        defaults.add(new PlanOrderingRule(FileCategory.DERIVED_PORTFOLIO, List.of(Action.NEW, Action.UPDATE), false));
-        defaults.add(new PlanOrderingRule(FileCategory.PORTFOLIO_GROUP, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
-        defaults.add(new PlanOrderingRule(FileCategory.DERIVED_PORTFOLIO, List.of(Action.DELETE), false));
+        // 6. create/update/delete posting rules
         defaults.add(new PlanOrderingRule(FileCategory.POSTING_RULE, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
+        // 7. create/update portfolios
+        defaults.add(new PlanOrderingRule(FileCategory.DERIVED_PORTFOLIO, List.of(Action.NEW, Action.UPDATE), false));
+        // 8. create/update/delete portfolio groups
+        defaults.add(new PlanOrderingRule(FileCategory.PORTFOLIO_GROUP, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
+        // 9. delete portfolios
+        defaults.add(new PlanOrderingRule(FileCategory.DERIVED_PORTFOLIO, List.of(Action.DELETE), false));
         return defaults;
     }
 
