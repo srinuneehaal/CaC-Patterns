@@ -8,5 +8,6 @@ public enum FileCategory {
     CHART_OF_ACCOUNTS,
     ACCOUNT,
     POSTING_RULE,
-    ABOR_CONFIGURATION
+    ABOR_CONFIGURATION,
+    ABOR
 }

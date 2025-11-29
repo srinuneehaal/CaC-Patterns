@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.finbourne.lusid.model.AborRequest;
 import com.finbourne.lusid.model.AborConfigurationRequest;
 import com.finbourne.lusid.model.Account;
 import com.finbourne.lusid.model.ChartOfAccountsRequest;
@@ -70,6 +71,8 @@ public class PlanReader {
             case TRANSACTION -> objectMapper.convertValue(payloadNode, TransactionFile.class);
             case ABOR_CONFIGURATION ->
                     objectMapper.convertValue(payloadNode, AborConfigurationRequest.class);
+            case ABOR ->
+                    objectMapper.convertValue(payloadNode, AborRequest.class);
             case DERIVED_PORTFOLIO ->
                     objectMapper.convertValue(payloadNode, CreateDerivedTransactionPortfolioRequest.class);
             case PORTFOLIO_GROUP ->

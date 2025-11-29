@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.finbourne.lusid.model.AborRequest;
 import com.finbourne.lusid.model.AborConfigurationRequest;
 import com.finbourne.lusid.model.Account;
 import org.slf4j.Logger;
@@ -53,6 +54,9 @@ public class JsonModelMapper {
         if (type == AborConfigurationFile.class) {
             return type.cast(readAborConfigurationFile(content));
         }
+        if (type == AborFile.class) {
+            return type.cast(readAborFile(content));
+        }
         return objectMapper.readValue(content, type);
     }
 
@@ -95,6 +99,18 @@ public class JsonModelMapper {
         } else {
             log.warn("createDerivedPortfolioRequestList missing when parsing derived portfolio payload. Fields: {}",
                     describeFields(root));
+        }
+        return file;
+    }
+
+    private AborFile readAborFile(String content) throws IOException {
+        JsonNode root = objectMapper.readTree(content);
+        AborFile file = objectMapper.treeToValue(root, AborFile.class);
+        JsonNode listNode = root.get("aborRequestList");
+        if (listNode != null && !listNode.isNull()) {
+            file.setAborRequests(objectMapper.readerForListOf(AborRequest.class).readValue(listNode));
+        } else {
+            log.warn("aborRequestList missing when parsing ABOR payload. Fields: {}", describeFields(root));
         }
         return file;
     }

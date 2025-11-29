@@ -1,0 +1,55 @@
+{
+  "scope": "ATG",
+  "aborRequestList": [
+    {
+      "code": "AborCode-3",
+      "displayName": "Standard Abor",
+      "description": "A standard Abor",
+      "portfolioIds": [
+        {
+          "scope": "portfolioScope",
+          "code": "portfolioCode",
+          "portfolioEntityType": "SinglePortfolio"
+        }
+      ],
+      "aborConfigurationId": {
+        "scope": "ConfigScope",
+        "code": "ConfigCode"
+      },
+      "properties": {
+        "Abor/MyScope/FundManagerName": {
+          "key": "Abor/MyScope/FundManagerName",
+          "value": {
+            "labelValue": "Smith"
+          },
+          "effectiveFrom": "2020-03-05T00:00:00.0000000+00:00"
+        }
+      }
+    },
+    {
+      "code": "AborCode2",
+      "displayName": "Standard Abor 2",
+      "description": "A standard Abor 2",
+      "portfolioIds": [
+        {
+          "scope": "portfolioScope2",
+          "code": "portfolioCode2",
+          "portfolioEntityType": "SinglePortfolio"
+        }
+      ],
+      "aborConfigurationId": {
+        "scope": "ConfigScope2",
+        "code": "ConfigCode2"
+      },
+      "properties": {
+        "Abor/MyScope/FundManagerName": {
+          "key": "Abor/MyScope/FundManagerName",
+          "value": {
+            "labelValue": "Johnson"
+          },
+          "effectiveFrom": "2021-06-10T00:00:00.0000000+00:00"
+        }
+      }
+    }
+  ]
+}

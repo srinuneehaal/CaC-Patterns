@@ -1,27 +1,26 @@
 {
   "items" : [ {
     "action" : "NEW",
-    "fileCategory" : "ABOR_CONFIGURATION",
+    "fileCategory" : "ABOR",
     "scope" : "ATG",
-    "key" : "AborCode-1",
-    "sourcePath" : "changedfiles\\ATG\\aborconfigs\\aborconfig-ATG.json",
+    "key" : "AborCode-3",
+    "sourcePath" : "changedfiles\\ATG\\abor\\abor-ATG.json",
     "payload" : {
-      "code" : "AborCode-1",
-      "displayName" : "AborConfiguration Name-1",
-      "description" : "Standard AborConfigurationRequest-1",
-      "recipeId" : {
-        "scope" : "RecipeScope",
-        "code" : "RecipeCode"
+      "code" : "AborCode-3",
+      "displayName" : "Standard Abor",
+      "description" : "A standard Abor",
+      "portfolioIds" : [ {
+        "scope" : "portfolioScope",
+        "code" : "portfolioCode",
+        "portfolioEntityType" : "SinglePortfolio"
+      } ],
+      "aborConfigurationId" : {
+        "scope" : "ConfigScope",
+        "code" : "ConfigCode"
       },
-      "chartOfAccountsId" : {
-        "scope" : "CoAScope",
-        "code" : "CoACode"
-      },
-      "postingModuleCodes" : [ "PostingModuleCode" ],
-      "cleardownModuleCodes" : [ "CleardownModuleCode" ],
       "properties" : {
-        "AborConfiguration/MyScope/FundManagerName" : {
-          "key" : "AborConfiguration/MyScope/FundManagerName",
+        "Abor/MyScope/FundManagerName" : {
+          "key" : "Abor/MyScope/FundManagerName",
           "value" : {
             "labelValue" : "Smith"
           },
@@ -30,28 +29,27 @@
       }
     }
   }, {
-    "action" : "NEW",
-    "fileCategory" : "ABOR_CONFIGURATION",
+    "action" : "DELETE",
+    "fileCategory" : "ABOR",
     "scope" : "ATG",
-    "key" : "AborCode-2",
-    "sourcePath" : "changedfiles\\ATG\\aborconfigs\\aborconfig-ATG.json",
+    "key" : "AborCode",
+    "sourcePath" : "statefiles\\ATG\\abor\\abor-ATG.json",
     "payload" : {
-      "code" : "AborCode-2",
-      "displayName" : "AborConfiguration Name-2",
-      "description" : "Standard AborConfigurationRequest-2",
-      "recipeId" : {
-        "scope" : "RecipeScope",
-        "code" : "RecipeCode"
+      "code" : "AborCode",
+      "displayName" : "Standard Abor",
+      "description" : "A standard Abor",
+      "portfolioIds" : [ {
+        "scope" : "portfolioScope",
+        "code" : "portfolioCode",
+        "portfolioEntityType" : "SinglePortfolio"
+      } ],
+      "aborConfigurationId" : {
+        "scope" : "ConfigScope",
+        "code" : "ConfigCode"
       },
-      "chartOfAccountsId" : {
-        "scope" : "CoAScope",
-        "code" : "CoACode"
-      },
-      "postingModuleCodes" : [ "PostingModuleCode" ],
-      "cleardownModuleCodes" : [ "CleardownModuleCode" ],
       "properties" : {
-        "AborConfiguration/MyScope/FundManagerName" : {
-          "key" : "AborConfiguration/MyScope/FundManagerName",
+        "Abor/MyScope/FundManagerName" : {
+          "key" : "Abor/MyScope/FundManagerName",
           "value" : {
             "labelValue" : "Smith"
           },

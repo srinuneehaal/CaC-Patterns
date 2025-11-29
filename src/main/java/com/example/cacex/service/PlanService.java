@@ -10,6 +10,7 @@ import com.example.cacex.service.plan.stratagy.FileParsingStrategy;
 import com.example.cacex.service.plan.stratagy.FileParsingStrategyFactory;
 import com.example.cacex.util.PathUtils;
 import com.finbourne.lusid.model.AborConfigurationRequest;
+import com.finbourne.lusid.model.AborRequest;
 import com.finbourne.lusid.model.Account;
 import com.finbourne.lusid.model.CreateDerivedTransactionPortfolioRequest;
 import com.finbourne.lusid.model.CreatePortfolioGroupRequest;
@@ -70,6 +71,27 @@ public class PlanService {
         String scope = deriveScope(path, fileLocationProperties.getChangedFilesDir());
         log.debug("Processing scope {} for category {}", scope, category);
         String key = deriveKeyFromFilename(path);
+
+        if (category == FileCategory.ABOR) {
+            Set<String> filesSeen = new HashSet<>();
+            filesSeen.add(scopeKey(scope, key));
+            processPlanEntries(path, scope, key, plan, FileCategory.ABOR, AborFile.class,
+                    this::toAborMap);
+            try {
+                addDeletesForMissingChanges(
+                        DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
+                                "abor",
+                                FileCategory.ABOR,
+                                AborFile.class,
+                                this::toAborMap),
+                        filesSeen,
+                        plan,
+                        scope);
+            } catch (Exception e) {
+                log.error("Failed to scan ABOR state files for scope {}: {}", scope, e.getMessage(), e);
+            }
+            return;
+        }
 
         if (category == FileCategory.ABOR_CONFIGURATION) {
             Set<String> filesSeen = new HashSet<>();
@@ -274,6 +296,9 @@ public class PlanService {
             case ABOR_CONFIGURATION:
                 folder = "aborconfigs";
                 break;
+            case ABOR:
+                folder = "abor";
+                break;
             default:
                 throw new UnsupportedFileCategoryException("Unsupported category " + category);
         }
@@ -367,6 +392,19 @@ public class PlanService {
                 String accountCode = account.getCode();
                 String key = chartOfAccountsCode != null ? chartOfAccountsCode + "-" + accountCode : accountCode;
                 map.put(key, account);
+            }
+        }
+        return map;
+    }
+
+    private Map<String, AborRequest> toAborMap(AborFile file) {
+        Map<String, AborRequest> map = new HashMap<>();
+        if (file == null || file.getAborRequests() == null) {
+            return map;
+        }
+        for (AborRequest request : file.getAborRequests()) {
+            if (request != null && request.getCode() != null) {
+                map.put(request.getCode(), request);
             }
         }
         return map;
