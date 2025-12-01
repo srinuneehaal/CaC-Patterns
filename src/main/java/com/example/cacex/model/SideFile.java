@@ -12,26 +12,56 @@ public class SideFile {
     @JsonProperty("sideDefinitionRequest")
     private SideDefinitionRequest sideDefinition;
 
+    /**
+     * Returns the scope for the side definition.
+     *
+     * @return scope value
+     */
     public String getScope() {
         return scope;
     }
 
+    /**
+     * Sets the scope for the side definition.
+     *
+     * @param scope scope value
+     */
     public void setScope(String scope) {
         this.scope = scope;
     }
 
+    /**
+     * Returns the side name (e.g., BUY or SELL).
+     *
+     * @return side name
+     */
     public String getSide() {
         return side;
     }
 
+    /**
+     * Sets the side name (e.g., BUY or SELL).
+     *
+     * @param side side name
+     */
     public void setSide(String side) {
         this.side = side;
     }
 
+    /**
+     * Returns the side definition payload.
+     *
+     * @return side definition
+     */
     public SideDefinitionRequest getSideDefinition() {
         return sideDefinition;
     }
 
+    /**
+     * Sets the side definition payload.
+     *
+     * @param sideDefinition side definition
+     */
     public void setSideDefinition(SideDefinitionRequest sideDefinition) {
         this.sideDefinition = sideDefinition;
     }

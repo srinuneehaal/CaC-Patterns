@@ -8,10 +8,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransactionPlanItemApplier extends AbstractPlanItemApplier<TransactionFile> {
 
+    /**
+     * Creates a transaction plan item applier.
+     *
+     * @param apiService service that performs transaction type operations
+     */
     public TransactionPlanItemApplier(TransactionTypeApiService apiService) {
         super(TransactionFile.class, apiService);
     }
 
+    /**
+     * Supported file category for this applier.
+     *
+     * @return TRANSACTION
+     */
     @Override
     public FileCategory supportedCategory() {
         return FileCategory.TRANSACTION;

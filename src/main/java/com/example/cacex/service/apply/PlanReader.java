@@ -38,6 +38,12 @@ public class PlanReader {
                 .setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
+    /**
+     * Reads and converts the configured master plan file into a {@link MasterPlan}.
+     *
+     * @return populated master plan
+     * @throws IllegalStateException if the plan file is missing or cannot be parsed
+     */
     public MasterPlan read() {
         Path inputPath = fileLocationProperties.masterPlanPath();
         if (!Files.exists(inputPath)) {

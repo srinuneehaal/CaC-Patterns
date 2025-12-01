@@ -19,6 +19,12 @@ public class TransactionFileParsingStrategy implements FileParsingStrategy {
     private final JsonModelMapper mapper;
     private final String folderMarker;
 
+    /**
+     * Creates a transaction file parsing strategy.
+     *
+     * @param mapper                 JSON mapper
+     * @param fileLocationProperties file location properties
+     */
     public TransactionFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
         this.folderMarker = fileLocationProperties.getTransactionsDirName().toLowerCase(Locale.ROOT);
@@ -29,12 +35,25 @@ public class TransactionFileParsingStrategy implements FileParsingStrategy {
         return FileCategory.TRANSACTION;
     }
 
+    /**
+     * Determines whether the given path points to a supported transaction file.
+     *
+     * @param path candidate path
+     * @return true if supported
+     */
     @Override
     public boolean supports(Path path) {
         String value = path.toString().toLowerCase(Locale.ROOT);
         return value.contains(folderMarker) && value.endsWith(".json");
     }
 
+    /**
+     * Parses a transaction JSON file into a {@link LoadedFile}.
+     *
+     * @param path path to parse
+     * @return loaded file wrapper containing the transaction payload
+     * @throws IOException if reading fails
+     */
     @Override
     public LoadedFile parse(Path path) throws IOException {
         TransactionFile transactionFile = mapper.read(path, TransactionFile.class);

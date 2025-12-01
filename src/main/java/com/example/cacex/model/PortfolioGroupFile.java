@@ -12,20 +12,40 @@ public class PortfolioGroupFile {
     private String scope;
 
     @JsonProperty("createPortfolioGroupRequestList")
-    private List<CreatePortfolioGroupRequest> groups = new ArrayList<>();
+   private List<CreatePortfolioGroupRequest> groups = new ArrayList<>();
 
+    /**
+     * Returns the scope for the portfolio groups.
+     *
+     * @return scope value
+     */
     public String getScope() {
         return scope;
     }
 
+    /**
+     * Sets the scope for the portfolio groups.
+     *
+     * @param scope scope value
+     */
     public void setScope(String scope) {
         this.scope = scope;
     }
 
+    /**
+     * Returns the list of portfolio group requests.
+     *
+     * @return portfolio group requests
+     */
     public List<CreatePortfolioGroupRequest> getGroups() {
         return groups;
     }
 
+    /**
+     * Sets the list of portfolio group requests.
+     *
+     * @param groups portfolio group requests
+     */
     public void setGroups(List<CreatePortfolioGroupRequest> groups) {
         this.groups = groups;
     }

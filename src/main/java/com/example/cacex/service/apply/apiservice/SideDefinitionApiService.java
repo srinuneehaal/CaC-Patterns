@@ -10,18 +10,39 @@ public class SideDefinitionApiService implements PlanItemActionService<SideFile>
 
     private static final Logger log = LoggerFactory.getLogger(SideDefinitionApiService.class);
 
+    /**
+     * Creates a side definition in the given scope.
+     *
+     * @param scope   scope name
+     * @param key     side key
+     * @param payload side definition payload
+     */
     @Override
     public void create(String scope, String key, SideFile payload) {
         log.info("Create side {} in scope {} using request {}", key, scope, payload);
         // Wire real LUSID SDK call here (e.g., TransactionConfigurationApi for sides).
     }
 
+    /**
+     * Updates a side definition in the given scope.
+     *
+     * @param scope   scope name
+     * @param key     side key
+     * @param payload side definition payload
+     */
     @Override
     public void update(String scope, String key, SideFile payload) {
         log.info("Update side {} in scope {} using request {}", key, scope, payload);
         // Wire real LUSID SDK call here (e.g., TransactionConfigurationApi for sides).
     }
 
+    /**
+     * Deletes a side definition in the given scope.
+     *
+     * @param scope   scope name
+     * @param key     side key
+     * @param payload side definition payload
+     */
     @Override
     public void delete(String scope, String key, SideFile payload) {
         log.info("Delete side {} in scope {}", key, scope);

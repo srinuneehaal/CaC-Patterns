@@ -16,10 +16,20 @@ public class ApplyRunner implements CommandLineRunner {
 
     private final PlanApplyService planApplyService;
 
+    /**
+     * Creates an apply runner with the given apply service.
+     *
+     * @param planApplyService service that applies plan items
+     */
     public ApplyRunner(PlanApplyService planApplyService) {
         this.planApplyService = planApplyService;
     }
 
+    /**
+     * Executes plan application when the --apply flag is present.
+     *
+     * @param args command-line arguments
+     */
     @Override
     public void run(String... args) {
         if (!CommandLineFlags.hasFlag(args, ARG_APPLY)) {

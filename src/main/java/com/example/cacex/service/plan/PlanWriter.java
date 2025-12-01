@@ -27,6 +27,13 @@ public class PlanWriter {
                 .enable(SerializationFeature.INDENT_OUTPUT);
     }
 
+    /**
+     * Writes the given master plan to the configured output path.
+     *
+     * @param masterPlan plan to persist
+     * @return path to the written file
+     * @throws IllegalStateException if writing fails
+     */
     public Path write(MasterPlan masterPlan) {
         Path outputPath = fileLocationProperties.masterPlanPath();
         try {

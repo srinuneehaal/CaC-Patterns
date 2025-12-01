@@ -9,10 +9,20 @@ import org.springframework.stereotype.Component;
 public class DerivedPortfolioPlanItemApplier
         extends AbstractPlanItemApplier<CreateDerivedTransactionPortfolioRequest> {
 
+    /**
+     * Creates a derived portfolio plan item applier.
+     *
+     * @param apiService service that performs derived portfolio operations
+     */
     public DerivedPortfolioPlanItemApplier(DerivedPortfolioApiService apiService) {
         super(CreateDerivedTransactionPortfolioRequest.class, apiService);
     }
 
+    /**
+     * Supported file category for this applier.
+     *
+     * @return DERIVED_PORTFOLIO
+     */
     @Override
     public FileCategory supportedCategory() {
         return FileCategory.DERIVED_PORTFOLIO;

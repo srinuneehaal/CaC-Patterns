@@ -31,6 +31,15 @@ public class JsonModelMapper {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
+    /**
+     * Reads and converts JSON content at the provided path into the requested model type.
+     *
+     * @param path path to a JSON file
+     * @param type target model class
+     * @return deserialized model instance
+     * @param <T>  model type
+     * @throws IOException if reading or parsing fails
+     */
     public <T> T read(Path path, Class<T> type) throws IOException {
         String content = Files.readString(path, StandardCharsets.UTF_8);
         if (type == SideFile.class) {

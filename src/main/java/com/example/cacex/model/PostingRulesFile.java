@@ -13,34 +13,74 @@ public class PostingRulesFile {
     @JsonProperty("postingModuleRequest")
     private PostingModuleRequest postingModuleRequest;
 
+    /**
+     * Returns the scope for the posting rules file.
+     *
+     * @return scope value
+     */
     public String getScope() {
         return scope;
     }
 
+    /**
+     * Sets the scope for the posting rules file.
+     *
+     * @param scope scope value
+     */
     public void setScope(String scope) {
         this.scope = scope;
     }
 
+    /**
+     * Returns the chart of accounts code associated with the posting rules.
+     *
+     * @return chart of accounts code
+     */
     public String getChartOfAccountsCode() {
         return chartOfAccountsCode;
     }
 
+    /**
+     * Sets the chart of accounts code associated with the posting rules.
+     *
+     * @param chartOfAccountsCode chart of accounts code
+     */
     public void setChartOfAccountsCode(String chartOfAccountsCode) {
         this.chartOfAccountsCode = chartOfAccountsCode;
     }
 
+    /**
+     * Returns the posting module code.
+     *
+     * @return posting module code
+     */
     public String getPostingModuleCode() {
         return postingModuleCode;
     }
 
+    /**
+     * Sets the posting module code.
+     *
+     * @param postingModuleCode posting module code
+     */
     public void setPostingModuleCode(String postingModuleCode) {
         this.postingModuleCode = postingModuleCode;
     }
 
+    /**
+     * Returns the posting module request payload.
+     *
+     * @return posting module request
+     */
     public PostingModuleRequest getPostingModuleRequest() {
         return postingModuleRequest;
     }
 
+    /**
+     * Sets the posting module request payload.
+     *
+     * @param postingModuleRequest posting module request
+     */
     public void setPostingModuleRequest(PostingModuleRequest postingModuleRequest) {
         this.postingModuleRequest = postingModuleRequest;
     }

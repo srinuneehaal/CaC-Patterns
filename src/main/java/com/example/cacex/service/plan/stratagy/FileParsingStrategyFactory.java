@@ -15,6 +15,11 @@ public class FileParsingStrategyFactory {
 
     private final Map<FileCategory, FileParsingStrategy> strategies = new EnumMap<>(FileCategory.class);
 
+    /**
+     * Builds a factory with discovered parsing strategies.
+     *
+     * @param discoveredStrategies strategies to register
+     */
     public FileParsingStrategyFactory(List<FileParsingStrategy> discoveredStrategies) {
 
         for (FileParsingStrategy strategy : discoveredStrategies) {
@@ -22,6 +27,13 @@ public class FileParsingStrategyFactory {
         }
     }
 
+    /**
+     * Resolves the parsing strategy that supports the given path.
+     *
+     * @param path file path to parse
+     * @return matching parsing strategy
+     * @throws com.example.cacex.exception.UnsupportedFilePathException if none match
+     */
     public FileParsingStrategy resolve(Path path) {
 
         for (FileParsingStrategy strategy : strategies.values()) {
@@ -32,6 +44,13 @@ public class FileParsingStrategyFactory {
         throw new UnsupportedFilePathException("Unsupported file path: " + path);
     }
 
+    /**
+     * Resolves a parsing strategy by category.
+     *
+     * @param category file category to resolve
+     * @return parsing strategy for the category
+     * @throws UnsupportedFileCategoryException if no strategy is registered
+     */
     public FileParsingStrategy resolve(FileCategory category) {
         FileParsingStrategy strategy = strategies.get(category);
         if (strategy == null) {

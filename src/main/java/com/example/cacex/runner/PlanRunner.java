@@ -23,12 +23,24 @@ public class PlanRunner implements CommandLineRunner {
     private final PlanService planService;
     private final PlanWriter planWriter;
 
+    /**
+     * Creates a plan runner with required collaborators.
+     *
+     * @param changedFilesProvider provider for changed paths
+     * @param planService          builder for master plans
+     * @param planWriter           writer for output plans
+     */
     public PlanRunner(ChangedFilesProvider changedFilesProvider, PlanService planService, PlanWriter planWriter) {
         this.changedFilesProvider = changedFilesProvider;
         this.planService = planService;
         this.planWriter = planWriter;
     }
 
+    /**
+     * Executes plan generation when the --plan flag is present.
+     *
+     * @param args command-line arguments
+     */
     @Override
     public void run(String... args) {
         if (!CommandLineFlags.hasFlag(args, ARG_PLAN)) {
@@ -45,6 +57,9 @@ public class PlanRunner implements CommandLineRunner {
         }
     }
 
+    /**
+     * Builds and writes a master plan using changed file inputs.
+     */
     private void executePlan() {
         List<Path> changedPaths = changedFilesProvider.getChangedPaths();
         log.info("Received {} changed file path(s) from CHANGED_FILES", changedPaths.size());

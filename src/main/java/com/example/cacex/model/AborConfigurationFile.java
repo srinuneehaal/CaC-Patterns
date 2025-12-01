@@ -14,18 +14,38 @@ public class AborConfigurationFile {
     @JsonProperty("aborConfigurationRequestList")
     private List<AborConfigurationRequest> aborConfigurations = new ArrayList<>();
 
+    /**
+     * Returns the scope that the ABOR configuration belongs to.
+     *
+     * @return scope value
+     */
     public String getScope() {
         return scope;
     }
 
+    /**
+     * Sets the scope for the ABOR configuration.
+     *
+     * @param scope scope value
+     */
     public void setScope(String scope) {
         this.scope = scope;
     }
 
+    /**
+     * Returns the list of ABOR configuration requests.
+     *
+     * @return configuration requests
+     */
     public List<AborConfigurationRequest> getAborConfigurations() {
         return aborConfigurations;
     }
 
+    /**
+     * Sets the list of ABOR configuration requests.
+     *
+     * @param aborConfigurations configuration requests
+     */
     public void setAborConfigurations(List<AborConfigurationRequest> aborConfigurations) {
         this.aborConfigurations = aborConfigurations;
     }

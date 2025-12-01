@@ -5,6 +5,11 @@ package com.example.cacex.exception;
  */
 public class UnsupportedFilePathException extends RuntimeException {
 
+    /**
+     * Creates an exception for an unsupported file path.
+     *
+     * @param message description of the unsupported path
+     */
     public UnsupportedFilePathException(String message) {
         super(message);
     }

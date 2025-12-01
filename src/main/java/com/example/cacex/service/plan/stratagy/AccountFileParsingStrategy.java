@@ -18,6 +18,12 @@ public class AccountFileParsingStrategy implements FileParsingStrategy {
     private final JsonModelMapper mapper;
     private final String folderMarker;
 
+    /**
+     * Creates an account file parsing strategy.
+     *
+     * @param mapper                 JSON mapper
+     * @param fileLocationProperties file location properties
+     */
     public AccountFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
         this.folderMarker = fileLocationProperties.getAccountsDirName().toLowerCase(Locale.ROOT);
@@ -28,6 +34,12 @@ public class AccountFileParsingStrategy implements FileParsingStrategy {
         return FileCategory.ACCOUNT;
     }
 
+    /**
+     * Determines whether the given path is an account file under the configured directory.
+     *
+     * @param path candidate path
+     * @return true if supported
+     */
     @Override
     public boolean supports(Path path) {
         String value = path.toString().toLowerCase(Locale.ROOT);
@@ -42,6 +54,13 @@ public class AccountFileParsingStrategy implements FileParsingStrategy {
         return false;
     }
 
+    /**
+     * Parses an account JSON file into a {@link LoadedFile}.
+     *
+     * @param path path to parse
+     * @return loaded file wrapper containing the account payload
+     * @throws IOException if reading fails
+     */
     @Override
     public LoadedFile parse(Path path) throws IOException {
         AccountFile file = mapper.read(path, AccountFile.class);

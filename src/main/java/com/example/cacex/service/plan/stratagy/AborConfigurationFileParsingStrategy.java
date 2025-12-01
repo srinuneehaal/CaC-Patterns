@@ -18,6 +18,12 @@ public class AborConfigurationFileParsingStrategy implements FileParsingStrategy
     private final JsonModelMapper mapper;
     private final String folderMarker;
 
+    /**
+     * Creates an ABOR configuration parsing strategy.
+     *
+     * @param mapper                 JSON mapper
+     * @param fileLocationProperties file location properties
+     */
     public AborConfigurationFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
         this.folderMarker = fileLocationProperties.getAborConfigurationsDirName().toLowerCase(Locale.ROOT);
@@ -28,12 +34,25 @@ public class AborConfigurationFileParsingStrategy implements FileParsingStrategy
         return FileCategory.ABOR_CONFIGURATION;
     }
 
+    /**
+     * Determines whether the given path belongs to an ABOR configuration file.
+     *
+     * @param path candidate path
+     * @return true if supported
+     */
     @Override
     public boolean supports(Path path) {
         String value = path.toString().toLowerCase(Locale.ROOT);
         return value.contains(folderMarker) && value.endsWith(".json");
     }
 
+    /**
+     * Parses an ABOR configuration JSON file into a {@link LoadedFile}.
+     *
+     * @param path path to parse
+     * @return loaded file wrapper containing the configuration payload
+     * @throws IOException if reading fails
+     */
     @Override
     public LoadedFile parse(Path path) throws IOException {
         AborConfigurationFile file = mapper.read(path, AborConfigurationFile.class);

@@ -32,6 +32,12 @@ public class StateFileService {
     private final JsonModelMapper jsonModelMapper;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Creates a state file service for reading and writing plan state.
+     *
+     * @param fileLocationProperties filesystem configuration
+     * @param jsonModelMapper        mapper for domain payloads
+     */
     public StateFileService(FileLocationProperties fileLocationProperties, JsonModelMapper jsonModelMapper) {
         this.fileLocationProperties = fileLocationProperties;
         this.jsonModelMapper = jsonModelMapper;
@@ -41,6 +47,11 @@ public class StateFileService {
                 .enable(SerializationFeature.INDENT_OUTPUT);
     }
 
+    /**
+     * Applies the given plan item to the state files (create/update/delete).
+     *
+     * @param item plan item to apply; null items are ignored
+     */
     public void applyStateChange(PlanItem item) {
         if (item == null) {
             return;
@@ -63,6 +74,12 @@ public class StateFileService {
         }
     }
 
+    /**
+     * Derives the logical key from a file path, stripping any scope suffix.
+     *
+     * @param path file path
+     * @return derived key
+     */
     public String deriveKeyFromFilename(Path path) {
         if (path == null) {
             throw new PlanApplyException("Cannot derive key from null path");
@@ -75,6 +92,14 @@ public class StateFileService {
         return base;
     }
 
+    /**
+     * Resolves the state file path for the given category, scope, and key.
+     *
+     * @param category file category
+     * @param scope    scope value
+     * @param key      logical key (may be missing scope suffix)
+     * @return path to the state file
+     */
     public Path resolveStatePath(FileCategory category, String scope, String key) {
         String folder = folderFor(category);
         boolean hasScope = scope != null && !scope.isBlank();

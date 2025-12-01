@@ -8,10 +8,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccountPlanItemApplier extends AbstractPlanItemApplier<Account> {
 
+    /**
+     * Creates an account plan item applier.
+     *
+     * @param apiService service that performs account operations
+     */
     public AccountPlanItemApplier(AccountApiService apiService) {
         super(Account.class, apiService);
     }
 
+    /**
+     * Supported file category for this applier.
+     *
+     * @return ACCOUNT
+     */
     @Override
     public FileCategory supportedCategory() {
         return FileCategory.ACCOUNT;

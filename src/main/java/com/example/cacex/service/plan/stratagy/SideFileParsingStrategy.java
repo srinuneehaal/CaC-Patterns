@@ -19,6 +19,12 @@ public class SideFileParsingStrategy implements FileParsingStrategy {
     private final JsonModelMapper mapper;
     private final String folderMarker;
 
+    /**
+     * Creates a side file parsing strategy.
+     *
+     * @param mapper                 JSON mapper
+     * @param fileLocationProperties file location properties
+     */
     public SideFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
         this.folderMarker = fileLocationProperties.getSidesDirName().toLowerCase(Locale.ROOT);
@@ -29,12 +35,25 @@ public class SideFileParsingStrategy implements FileParsingStrategy {
         return FileCategory.SIDE;
     }
 
+    /**
+     * Determines whether the given path belongs to a side file.
+     *
+     * @param path candidate path
+     * @return true if supported
+     */
     @Override
     public boolean supports(Path path) {
         String value = path.toString().toLowerCase(Locale.ROOT);
         return value.contains(folderMarker) && value.endsWith(".json");
     }
 
+    /**
+     * Parses a side JSON file into a {@link LoadedFile}.
+     *
+     * @param path path to parse
+     * @return loaded file wrapper containing the side payload
+     * @throws IOException if reading fails
+     */
     @Override
     public LoadedFile parse(Path path) throws IOException {
         SideFile sideFile = mapper.read(path, SideFile.class);

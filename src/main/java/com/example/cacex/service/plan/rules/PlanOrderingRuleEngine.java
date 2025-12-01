@@ -19,10 +19,21 @@ public class PlanOrderingRuleEngine {
 
     private final PlanOrderingProperties properties;
 
+    /**
+     * Creates an ordering engine configured with the supplied properties.
+     *
+     * @param properties ordering configuration
+     */
     public PlanOrderingRuleEngine(PlanOrderingProperties properties) {
         this.properties = properties;
     }
 
+    /**
+     * Applies ordering rules to the supplied master plan, returning the same instance with sorted items.
+     *
+     * @param plan master plan to order
+     * @return the ordered plan (or the original plan when null/empty)
+     */
     public MasterPlan applyOrdering(MasterPlan plan) {
         if (plan == null || plan.getItems() == null || plan.getItems().isEmpty()) {
             return plan;

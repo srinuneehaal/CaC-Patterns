@@ -8,10 +8,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class SidePlanItemApplier extends AbstractPlanItemApplier<SideFile> {
 
+    /**
+     * Creates a side plan item applier.
+     *
+     * @param apiService service that performs side definition operations
+     */
     public SidePlanItemApplier(SideDefinitionApiService apiService) {
         super(SideFile.class, apiService);
     }
 
+    /**
+     * Supported file category for this applier.
+     *
+     * @return SIDE
+     */
     @Override
     public FileCategory supportedCategory() {
         return FileCategory.SIDE;

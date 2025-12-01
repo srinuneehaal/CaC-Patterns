@@ -5,6 +5,11 @@ package com.example.cacex.exception;
  */
 public class UnsupportedFileCategoryException extends RuntimeException {
 
+    /**
+     * Creates an exception for an unsupported file category.
+     *
+     * @param message description of the unsupported category
+     */
     public UnsupportedFileCategoryException(String message) {
         super(message);
     }

@@ -19,6 +19,12 @@ public class PostingRulesFileParsingStrategy implements FileParsingStrategy {
     private final JsonModelMapper mapper;
     private final String folderMarker;
 
+    /**
+     * Creates a posting rules parsing strategy.
+     *
+     * @param mapper                 JSON mapper
+     * @param fileLocationProperties file location properties
+     */
     public PostingRulesFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
         this.folderMarker = fileLocationProperties.getPostingRulesDirName().toLowerCase(Locale.ROOT);
@@ -29,12 +35,25 @@ public class PostingRulesFileParsingStrategy implements FileParsingStrategy {
         return FileCategory.POSTING_RULE;
     }
 
+    /**
+     * Determines whether the path represents a posting rules file.
+     *
+     * @param path candidate path
+     * @return true if supported
+     */
     @Override
     public boolean supports(Path path) {
         String value = path.toString().toLowerCase(Locale.ROOT);
         return value.contains(folderMarker) && value.endsWith(".json");
     }
 
+    /**
+     * Parses a posting rules JSON file into a {@link LoadedFile}.
+     *
+     * @param path path to the JSON file
+     * @return loaded file wrapper
+     * @throws IOException when reading fails
+     */
     @Override
     public LoadedFile parse(Path path) throws IOException {
         PostingRulesFile file = mapper.read(path, PostingRulesFile.class);

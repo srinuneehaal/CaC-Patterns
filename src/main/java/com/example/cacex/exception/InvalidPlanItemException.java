@@ -5,6 +5,11 @@ package com.example.cacex.exception;
  */
 public class InvalidPlanItemException extends PlanApplyException {
 
+    /**
+     * Creates an exception for an invalid plan item.
+     *
+     * @param message description of the validation failure
+     */
     public InvalidPlanItemException(String message) {
         super(message);
     }

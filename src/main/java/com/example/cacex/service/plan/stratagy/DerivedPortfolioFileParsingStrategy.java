@@ -18,6 +18,12 @@ public class DerivedPortfolioFileParsingStrategy implements FileParsingStrategy 
     private final JsonModelMapper mapper;
     private final String folderMarker;
 
+    /**
+     * Creates a derived portfolio file parsing strategy.
+     *
+     * @param mapper                 JSON mapper
+     * @param fileLocationProperties file location properties
+     */
     public DerivedPortfolioFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {
         this.mapper = mapper;
         this.folderMarker = fileLocationProperties.getDerivedPortfoliosDirName().toLowerCase(Locale.ROOT);
@@ -28,12 +34,25 @@ public class DerivedPortfolioFileParsingStrategy implements FileParsingStrategy 
         return FileCategory.DERIVED_PORTFOLIO;
     }
 
+    /**
+     * Determines whether the given path belongs to a derived portfolio file.
+     *
+     * @param path candidate path
+     * @return true if supported
+     */
     @Override
     public boolean supports(Path path) {
         String value = path.toString().toLowerCase(Locale.ROOT);
         return value.contains(folderMarker) && value.endsWith(".json");
     }
 
+    /**
+     * Parses a derived portfolio JSON file into a {@link LoadedFile}.
+     *
+     * @param path path to parse
+     * @return loaded file wrapper
+     * @throws IOException if reading fails
+     */
     @Override
     public LoadedFile parse(Path path) throws IOException {
         DerivedPortfolioFile file = mapper.read(path, DerivedPortfolioFile.class);

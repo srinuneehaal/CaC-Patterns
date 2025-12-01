@@ -12,26 +12,56 @@ public class ChartOfAccountsFile {
     @JsonProperty("chartOfAccountsRequest")
     private ChartOfAccountsRequest chartOfAccountsRequest;
 
+    /**
+     * Returns the scope for the chart of accounts.
+     *
+     * @return scope value
+     */
     public String getScope() {
         return scope;
     }
 
+    /**
+     * Sets the scope for the chart of accounts.
+     *
+     * @param scope scope value
+     */
     public void setScope(String scope) {
         this.scope = scope;
     }
 
+    /**
+     * Returns the chart of accounts code.
+     *
+     * @return chart of accounts code
+     */
     public String getChartOfAccountsCode() {
         return chartOfAccountsCode;
     }
 
+    /**
+     * Sets the chart of accounts code.
+     *
+     * @param chartOfAccountsCode chart of accounts code
+     */
     public void setChartOfAccountsCode(String chartOfAccountsCode) {
         this.chartOfAccountsCode = chartOfAccountsCode;
     }
 
+    /**
+     * Returns the chart of accounts request payload.
+     *
+     * @return chart of accounts request
+     */
     public ChartOfAccountsRequest getChartOfAccountsRequest() {
         return chartOfAccountsRequest;
     }
 
+    /**
+     * Sets the chart of accounts request payload.
+     *
+     * @param chartOfAccountsRequest chart of accounts request
+     */
     public void setChartOfAccountsRequest(ChartOfAccountsRequest chartOfAccountsRequest) {
         this.chartOfAccountsRequest = chartOfAccountsRequest;
     }

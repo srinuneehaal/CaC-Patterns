@@ -10,18 +10,39 @@ public class AccountApiService implements PlanItemActionService<Account> {
 
     private static final Logger log = LoggerFactory.getLogger(AccountApiService.class);
 
+    /**
+     * Creates an account in the given scope.
+     *
+     * @param scope   scope name
+     * @param key     account key
+     * @param payload account payload
+     */
     @Override
     public void create(String scope, String key, Account payload) {
         log.info("Create account {} in scope {} using payload {}", key, scope, payload);
         // Wire real LUSID SDK call here (e.g., AccountsApi.createAccount).
     }
 
+    /**
+     * Updates an account in the given scope.
+     *
+     * @param scope   scope name
+     * @param key     account key
+     * @param payload account payload
+     */
     @Override
     public void update(String scope, String key, Account payload) {
         log.info("Update account {} in scope {} using payload {}", key, scope, payload);
         // Wire real LUSID SDK call here (e.g., AccountsApi.upsertAccount).
     }
 
+    /**
+     * Deletes an account in the given scope.
+     *
+     * @param scope   scope name
+     * @param key     account key
+     * @param payload account payload
+     */
     @Override
     public void delete(String scope, String key, Account payload) {
         log.info("Delete account {} in scope {}", key, scope);

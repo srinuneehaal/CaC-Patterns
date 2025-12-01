@@ -8,10 +8,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class AborPlanItemApplier extends AbstractPlanItemApplier<AborRequest> {
 
+    /**
+     * Creates an ABOR plan item applier.
+     *
+     * @param apiService service that performs ABOR operations
+     */
     public AborPlanItemApplier(AborApiService apiService) {
         super(AborRequest.class, apiService);
     }
 
+    /**
+     * Supported file category for this applier.
+     *
+     * @return ABOR
+     */
     @Override
     public FileCategory supportedCategory() {
         return FileCategory.ABOR;

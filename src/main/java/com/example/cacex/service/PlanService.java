@@ -35,6 +35,14 @@ public class PlanService {
     private final PlanOrderingRuleEngine planOrderingRuleEngine;
     private final StateFileService stateFileService;
 
+    /**
+     * Creates a plan service that builds master plans from changed files.
+     *
+     * @param strategyFactory       factory to resolve parsing strategies
+     * @param planOrderingRuleEngine engine that orders plan items
+     * @param fileLocationProperties filesystem configuration
+     * @param stateFileService      service for reading existing state files
+     */
     public PlanService(FileParsingStrategyFactory strategyFactory,
                        PlanOrderingRuleEngine planOrderingRuleEngine,
                        FileLocationProperties fileLocationProperties,
@@ -45,6 +53,12 @@ public class PlanService {
         this.stateFileService = stateFileService;
     }
 
+    /**
+     * Builds an ordered master plan for the given set of changed file paths.
+     *
+     * @param changedPaths paths under the configured changed files root
+     * @return ordered master plan
+     */
     public MasterPlan buildPlan(List<Path> changedPaths) {
         Map<String, LoadedFile> stateFiles = new HashMap<>();
 

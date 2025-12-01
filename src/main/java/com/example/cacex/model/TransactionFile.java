@@ -16,48 +16,108 @@ public class TransactionFile {
     @JsonProperty("transactionTypeRequest")
     private TransactionTypeRequest transactionTypeRequest;
 
+    /**
+     * Returns the scope for the transaction type.
+     *
+     * @return scope value
+     */
     public String getScope() {
         return scope;
     }
 
+    /**
+     * Sets the scope for the transaction type.
+     *
+     * @param scope scope value
+     */
     public void setScope(String scope) {
         this.scope = scope;
     }
 
+    /**
+     * Returns the transaction type code.
+     *
+     * @return type code
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Sets the transaction type code.
+     *
+     * @param type type code
+     */
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * Returns the transaction class.
+     *
+     * @return transaction class
+     */
     public String getTransactionClass() {
         return transactionClass;
     }
 
+    /**
+     * Sets the transaction class.
+     *
+     * @param transactionClass transaction class
+     */
     public void setTransactionClass(String transactionClass) {
         this.transactionClass = transactionClass;
     }
 
+    /**
+     * Returns the transaction source identifier.
+     *
+     * @return source identifier
+     */
     public String getSource() {
         return source;
     }
 
+    /**
+     * Sets the transaction source identifier.
+     *
+     * @param source source identifier
+     */
     public void setSource(String source) {
         this.source = source;
     }
+    /**
+     * Returns the transaction sequence weight.
+     *
+     * @return transaction sequence or null
+     */
     public Integer getTransactionSequence() {
         return transactionSequence;
     }
 
+    /**
+     * Sets the transaction sequence weight.
+     *
+     * @param transactionSequence transaction sequence
+     */
     public void setTransactionSequence(Integer transactionSequence) {
         this.transactionSequence = transactionSequence;
     }
+    /**
+     * Returns the transaction type request payload.
+     *
+     * @return transaction type request
+     */
     public TransactionTypeRequest getTransactionTypeRequest() {
         return transactionTypeRequest;
     }
 
+    /**
+     * Sets the transaction type request payload.
+     *
+     * @param sideDefinition transaction type request
+     */
     public void setSideDefinition(TransactionTypeRequest sideDefinition) {
         this.transactionTypeRequest = sideDefinition;
     }

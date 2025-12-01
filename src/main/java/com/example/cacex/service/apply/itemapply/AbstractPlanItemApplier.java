@@ -16,11 +16,22 @@ public abstract class AbstractPlanItemApplier<T> implements PlanItemApplier {
     private final Class<T> payloadType;
     private final PlanItemActionService<T> apiService;
 
+    /**
+     * Builds an applier that delegates CRUD actions to the provided API service.
+     *
+     * @param payloadType expected payload type
+     * @param apiService  service performing the underlying API calls
+     */
     protected AbstractPlanItemApplier(Class<T> payloadType, PlanItemActionService<T> apiService) {
         this.payloadType = payloadType;
         this.apiService = apiService;
     }
 
+    /**
+     * Applies the plan item, delegating to create/update/delete and enforcing payload type safety.
+     *
+     * @param item plan item to apply
+     */
     @Override
     public void apply(PlanItem item) {
         try {

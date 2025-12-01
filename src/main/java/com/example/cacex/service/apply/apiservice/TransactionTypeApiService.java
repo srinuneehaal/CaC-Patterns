@@ -10,18 +10,39 @@ public class TransactionTypeApiService implements PlanItemActionService<Transact
 
     private static final Logger log = LoggerFactory.getLogger(TransactionTypeApiService.class);
 
+    /**
+     * Creates a transaction type in the given scope.
+     *
+     * @param scope   scope name
+     * @param key     transaction type key
+     * @param payload transaction definition
+     */
     @Override
     public void create(String scope, String key, TransactionFile payload) {
         log.info("Create transaction type {} in scope {} using request {}", key, scope, payload);
         // Wire real LUSID SDK call here (e.g., TransactionConfigurationApi for transaction types).
     }
 
+    /**
+     * Updates a transaction type in the given scope.
+     *
+     * @param scope   scope name
+     * @param key     transaction type key
+     * @param payload transaction definition
+     */
     @Override
     public void update(String scope, String key, TransactionFile payload) {
         log.info("Update transaction type {} in scope {} using request {}", key, scope, payload);
         // Wire real LUSID SDK call here (e.g., TransactionConfigurationApi for transaction types).
     }
 
+    /**
+     * Deletes a transaction type in the given scope.
+     *
+     * @param scope   scope name
+     * @param key     transaction type key
+     * @param payload transaction definition
+     */
     @Override
     public void delete(String scope, String key, TransactionFile payload) {
         log.info("Delete transaction type {} in scope {}", key, scope);

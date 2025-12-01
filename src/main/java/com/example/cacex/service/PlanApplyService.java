@@ -25,6 +25,13 @@ public class PlanApplyService {
     private final Map<FileCategory, PlanItemApplier> appliers;
     private final StateFileService stateFileService;
 
+    /**
+     * Creates a plan apply service with discovered appliers and state updates.
+     *
+     * @param planReader         reader for the master plan
+     * @param stateFileService   state file updater
+     * @param discoveredAppliers appliers keyed by category
+     */
     public PlanApplyService(PlanReader planReader,
                             StateFileService stateFileService,
                             List<PlanItemApplier> discoveredAppliers) {
@@ -35,6 +42,9 @@ public class PlanApplyService {
                         (a, b) -> a, () -> new EnumMap<>(FileCategory.class)));
     }
 
+    /**
+     * Reads the master plan and applies each plan item using the matching applier and state updater.
+     */
     public void applyPlan() {
         MasterPlan masterPlan = readMasterPlan();
         if (masterPlan.getItems().isEmpty()) {

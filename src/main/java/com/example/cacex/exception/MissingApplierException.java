@@ -5,6 +5,11 @@ package com.example.cacex.exception;
  */
 public class MissingApplierException extends PlanApplyException {
 
+    /**
+     * Creates an exception for a missing applier.
+     *
+     * @param message description of the missing applier
+     */
     public MissingApplierException(String message) {
         super(message);
     }
