@@ -15,7 +15,7 @@ public class FileLocationProperties {
 
     private String changedFilesDir ;
     private String stateFilesDir;
-    private String planDir ;
+    private String planDir;
     private String masterPlanFile;
     private String sidesDirName = "sides";
     private String transactionsDirName = "transactions";
@@ -140,10 +140,16 @@ public class FileLocationProperties {
     }
 
     public Path planDirPath() {
-        return Path.of(planDir);
+        return Path.of(resolveFromEnv("PLAN_DIR", planDir));
     }
 
     public Path masterPlanPath() {
-        return planDirPath().resolve(masterPlanFile);
+        String fileName = resolveFromEnv("MASTER_PLAN_FILE", masterPlanFile);
+        return planDirPath().resolve(fileName);
+    }
+
+    private String resolveFromEnv(String envKey, String fallback) {
+        String value = System.getenv(envKey);
+        return value != null && !value.isBlank() ? value : fallback;
     }
 }

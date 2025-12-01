@@ -4,7 +4,7 @@
   "chartOfAccountsRequest" : {
     "code" : "ChartOfAccounts",
     "displayName" : "ChartOfAccountsName",
-    "description" : "Standard COA",
+    "description" : "Standard COA changed",
     "properties" : {
       "ChartOfAccounts/MyScope/FundManagerName" : {
         "key" : "ChartOfAccounts/MyScope/FundManagerName",
