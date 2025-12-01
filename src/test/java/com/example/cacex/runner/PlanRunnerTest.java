@@ -13,9 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PlanRunnerTest {
@@ -34,7 +33,7 @@ class PlanRunnerTest {
 
     @Test
     void skipsWhenFlagMissing() {
-        runner.run("--apply");
+        assertDoesNotThrow(() -> runner.run("--apply"));
 
         verifyNoInteractions(changedFilesProvider, planService, planWriter);
     }

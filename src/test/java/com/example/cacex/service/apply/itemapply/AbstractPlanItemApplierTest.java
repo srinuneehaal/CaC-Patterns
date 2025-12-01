@@ -11,14 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractPlanItemApplierTest {
@@ -64,7 +60,7 @@ class AbstractPlanItemApplierTest {
     @Test
     void wrapsRuntimeExceptionsFromApiService() {
         PlanItem item = new PlanItem(Action.NEW, FileCategory.SIDE, "S", "K", "p", "payload");
-        doThrow(new IllegalStateException("boom")).when(apiService).create(eq("S"), eq("K"), eq("payload"));
+        doThrow(new IllegalStateException("boom")).when(apiService).create("S", "K", "payload");
 
         assertThrows(PlanApplyException.class, () -> applier.apply(item));
     }
@@ -75,7 +71,7 @@ class AbstractPlanItemApplierTest {
 
         applier.apply(delete);
 
-        Mockito.verify(apiService).delete("S", "K", null);
+        verify(apiService).delete("S", "K", null);
     }
 
     private static class TestApplier extends AbstractPlanItemApplier<String> {

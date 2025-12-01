@@ -7,6 +7,7 @@ import com.example.cacex.service.plan.JsonModelMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -18,7 +19,7 @@ class PostingRulesFileParsingStrategyTest {
     Path tempDir;
 
     @Test
-    void supportsAndParsesPostingRules() throws Exception {
+    void supportsAndParsesPostingRules() throws IOException {
         Path path = tempDir.resolve("postingrules/rules.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, """
@@ -40,7 +41,7 @@ class PostingRulesFileParsingStrategyTest {
     }
 
     @Test
-    void derivesModuleFromRequestWhenCodesMissing() throws Exception {
+    void derivesModuleFromRequestWhenCodesMissing() throws IOException {
         Path path = tempDir.resolve("postingrules/rules2.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, """
@@ -57,7 +58,7 @@ class PostingRulesFileParsingStrategyTest {
     }
 
     @Test
-    void fallsBackToFilenameWhenCodesAbsent() throws Exception {
+    void fallsBackToFilenameWhenCodesAbsent() throws IOException {
         Path path = tempDir.resolve("postingrules/rules3.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, "{ \"scope\": \"S\" }");

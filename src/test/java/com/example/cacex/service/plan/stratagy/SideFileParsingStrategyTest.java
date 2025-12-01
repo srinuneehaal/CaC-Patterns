@@ -7,6 +7,7 @@ import com.example.cacex.service.plan.JsonModelMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -18,7 +19,7 @@ class SideFileParsingStrategyTest {
     Path tempDir;
 
     @Test
-    void supportsAndParsesSideFile() throws Exception {
+    void supportsAndParsesSideFile() throws IOException {
         Path path = tempDir.resolve("sides/side1.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, """
@@ -36,7 +37,7 @@ class SideFileParsingStrategyTest {
     }
 
     @Test
-    void fallsBackToFilenameWhenSideMissing() throws Exception {
+    void fallsBackToFilenameWhenSideMissing() throws IOException {
         Path path = tempDir.resolve("sides/side2.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, "{ \"scope\": \"S\" }");

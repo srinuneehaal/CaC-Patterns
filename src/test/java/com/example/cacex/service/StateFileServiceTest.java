@@ -1,11 +1,11 @@
 package com.example.cacex.service;
 
 import com.example.cacex.config.FileLocationProperties;
+import com.example.cacex.exception.PlanApplyException;
 import com.example.cacex.model.Action;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.PlanItem;
 import com.example.cacex.model.SideFile;
-import com.example.cacex.exception.PlanApplyException;
 import com.example.cacex.service.plan.JsonModelMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,7 +35,7 @@ class StateFileServiceTest {
         props.setChangedFilesDir(tempDir.resolve("changedfiles").toString());
         props.setPlanDir(tempDir.resolve("plan").toString());
         props.setMasterPlanFile("masterplan.json");
-        props.setEnvLookup(__ -> null);
+        props.setEnvLookup(env -> null);
         stateFileService = new StateFileService(props, new JsonModelMapper());
         objectMapper = new ObjectMapper();
     }
@@ -53,7 +54,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void applySideCreateWritesFile() throws Exception {
+    void applySideCreateWritesFile() throws IOException {
         SideFile payload = new SideFile();
         payload.setScope("S1");
         payload.setSide("BUY");
@@ -68,7 +69,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void applyTransactionDeleteRemovesFileIfPresent() throws Exception {
+    void applyTransactionDeleteRemovesFileIfPresent() throws IOException {
         Path state = tempDir.resolve("S2/transactions/txn-S2.json");
         Files.createDirectories(state.getParent());
         Files.writeString(state, "{}");
@@ -80,7 +81,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void applyChartOfAccountsWritesFile() throws Exception {
+    void applyChartOfAccountsWritesFile() throws IOException {
         ChartOfAccountsRequest payload = new ChartOfAccountsRequest();
         payload.setCode("COA1");
         PlanItem item = new PlanItem(Action.NEW, FileCategory.CHART_OF_ACCOUNTS, "S3", "COA1-S3", null, payload);
@@ -93,7 +94,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void applyPostingRulesCreateAndDelete() throws Exception {
+    void applyPostingRulesCreateAndDelete() {
         PostingModuleRequest payload = new PostingModuleRequest();
         payload.setCode("PM1");
         PlanItem create = new PlanItem(Action.NEW, FileCategory.POSTING_RULE, "S4", "PM1-COA1-S4", null, payload);
@@ -107,7 +108,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void applyAborAddAndDelete() throws Exception {
+    void applyAborAddAndDelete() {
         AborRequest payload = new AborRequest();
         payload.setCode("AB1");
         PlanItem create = new PlanItem(Action.NEW, FileCategory.ABOR, "S5", "AB1", null, payload);
@@ -121,7 +122,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void applyAborConfigurationCreatesEntry() throws Exception {
+    void applyAborConfigurationCreatesEntry() throws IOException {
         AborConfigurationRequest payload = new AborConfigurationRequest();
         payload.setCode("CFG1");
         PlanItem item = new PlanItem(Action.NEW, FileCategory.ABOR_CONFIGURATION, "S6", "CFG1", null, payload);
@@ -132,7 +133,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void applyDerivedPortfolioCreatesEntry() throws Exception {
+    void applyDerivedPortfolioCreatesEntry() throws IOException {
         CreateDerivedTransactionPortfolioRequest payload = new CreateDerivedTransactionPortfolioRequest();
         payload.setCode("DP1");
         PlanItem item = new PlanItem(Action.NEW, FileCategory.DERIVED_PORTFOLIO, "S7", "DP1", null, payload);
@@ -143,7 +144,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void applyPortfolioGroupCreatesEntry() throws Exception {
+    void applyPortfolioGroupCreatesEntry() throws IOException {
         CreatePortfolioGroupRequest payload = new CreatePortfolioGroupRequest();
         payload.setCode("G1");
         PlanItem item = new PlanItem(Action.NEW, FileCategory.PORTFOLIO_GROUP, "S8", "G1", null, payload);
@@ -154,7 +155,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void applyAccountAddAndDelete() throws Exception {
+    void applyAccountAddAndDelete() {
         Account payload = new Account();
         payload.setCode("AC1");
         payload.setDescription("desc");
@@ -186,7 +187,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void applySideBackfillsScopeWhenMissing() throws Exception {
+    void applySideBackfillsScopeWhenMissing() throws IOException {
         SideFile payload = new SideFile();
         payload.setSide("SELL");
         PlanItem item = new PlanItem(Action.NEW, FileCategory.SIDE, "S10", "SELL", null, payload);
@@ -205,7 +206,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void postingRuleKeyWithoutCoaUsesModuleAsFallback() throws Exception {
+    void postingRuleKeyWithoutCoaUsesModuleAsFallback() throws IOException {
         PostingModuleRequest payload = new PostingModuleRequest();
         payload.setCode("PMX");
         PlanItem create = new PlanItem(Action.NEW, FileCategory.POSTING_RULE, "S11", "PMX-S11", null, payload);
@@ -218,7 +219,7 @@ class StateFileServiceTest {
     }
 
     @Test
-    void accountChartCodeDerivedWhenMissing() throws Exception {
+    void accountChartCodeDerivedWhenMissing() throws IOException {
         Account payload = new Account();
         payload.setCode("AC2");
         PlanItem item = new PlanItem(Action.NEW, FileCategory.ACCOUNT, "S12", "COA2-AC2-S12", null, payload);

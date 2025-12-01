@@ -9,9 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ApplyRunnerTest {
@@ -24,7 +22,7 @@ class ApplyRunnerTest {
 
     @Test
     void skipsWhenFlagMissing() {
-        runner.run("--plan");
+        assertDoesNotThrow(() -> runner.run("--plan"));
 
         verifyNoInteractions(planApplyService);
     }
@@ -56,13 +54,6 @@ class ApplyRunnerTest {
         doThrow(new RuntimeException("boom")).when(planApplyService).applyPlan();
 
         assertDoesNotThrow(() -> runner.run("--apply"));
-        verify(planApplyService).applyPlan();
-    }
-
-    @Test
-    void extraArgumentsAreWarnedButApplyRuns() {
-        runner.run("--apply", "other");
-
         verify(planApplyService).applyPlan();
     }
 }

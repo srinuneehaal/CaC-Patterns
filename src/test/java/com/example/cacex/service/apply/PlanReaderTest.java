@@ -80,7 +80,7 @@ class PlanReaderTest {
     }
 
     @Test
-    void convertsAllPayloadTypes() throws Exception {
+    void convertsAllPayloadTypes() throws IOException {
         Path planFile = tempDir.resolve("masterplan.json");
         String json = """
                 {
@@ -118,7 +118,7 @@ class PlanReaderTest {
     }
 
     @Test
-    void malformedJsonThrowsIllegalStateException() throws Exception {
+    void malformedJsonThrowsIllegalStateException() throws IOException {
         Path planFile = tempDir.resolve("masterplan.json");
         Files.writeString(planFile, "{not-json");
         FileLocationProperties props = new FileLocationProperties();
@@ -131,7 +131,7 @@ class PlanReaderTest {
     }
 
     @Test
-    void nullCategoryPayloadReturnsNull() throws Exception {
+    void nullCategoryPayloadReturnsNull() throws IOException {
         Path planFile = tempDir.resolve("masterplan.json");
         Files.writeString(planFile, """
                 {

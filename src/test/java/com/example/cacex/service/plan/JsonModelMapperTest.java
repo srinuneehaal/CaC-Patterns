@@ -3,6 +3,7 @@ package com.example.cacex.service.plan;
 import com.example.cacex.model.*;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -13,7 +14,7 @@ class JsonModelMapperTest {
     private final JsonModelMapper mapper = new JsonModelMapper();
 
     @Test
-    void parsesSideFile() throws Exception {
+    void parsesSideFile() throws IOException {
         Path temp = Files.createTempFile("side", ".json");
         Files.writeString(temp, """
                 {
@@ -29,7 +30,7 @@ class JsonModelMapperTest {
     }
 
     @Test
-    void parsesTransactionFile() throws Exception {
+    void parsesTransactionFile() throws IOException {
         Path temp = Files.createTempFile("txn", ".json");
         Files.writeString(temp, """
                 {
@@ -48,7 +49,7 @@ class JsonModelMapperTest {
     }
 
     @Test
-    void parsesAccountFile() throws Exception {
+    void parsesAccountFile() throws IOException {
         Path temp = Files.createTempFile("acct", ".json");
         Files.writeString(temp, """
                 {
@@ -63,7 +64,7 @@ class JsonModelMapperTest {
     }
 
     @Test
-    void parsesDerivedPortfolioFile() throws Exception {
+    void parsesDerivedPortfolioFile() throws IOException {
         Path temp = Files.createTempFile("derived", ".json");
         Files.writeString(temp, """
                 {
@@ -79,7 +80,7 @@ class JsonModelMapperTest {
     }
 
     @Test
-    void parsesPortfolioGroupFile() throws Exception {
+    void parsesPortfolioGroupFile() throws IOException {
         Path temp = Files.createTempFile("group", ".json");
         Files.writeString(temp, """
                 {
@@ -95,7 +96,7 @@ class JsonModelMapperTest {
     }
 
     @Test
-    void parsesAborConfigurationFile() throws Exception {
+    void parsesAborConfigurationFile() throws IOException {
         Path temp = Files.createTempFile("aborcfg", ".json");
         Files.writeString(temp, """
                 {
@@ -111,7 +112,7 @@ class JsonModelMapperTest {
     }
 
     @Test
-    void parsesAborFile() throws Exception {
+    void parsesAborFile() throws IOException {
         Path temp = Files.createTempFile("abor", ".json");
         Files.writeString(temp, """
                 {
@@ -127,7 +128,7 @@ class JsonModelMapperTest {
     }
 
     @Test
-    void missingCollectionsAreHandledGracefully() throws Exception {
+    void missingCollectionsAreHandledGracefully() throws IOException {
         Path sidePath = Files.createTempFile("side-missing", ".json");
         Files.writeString(sidePath, """
                 { "scope": "S", "side": "SELL" }
@@ -160,7 +161,7 @@ class JsonModelMapperTest {
     }
 
     @Test
-    void fallsBackToGenericMapping() throws Exception {
+    void fallsBackToGenericMapping() throws IOException {
         Path planItemPath = Files.createTempFile("planitem", ".json");
         Files.writeString(planItemPath, """
                 {

@@ -8,6 +8,7 @@ import com.example.cacex.model.PlanItem;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -20,7 +21,7 @@ class PlanWriterTest {
     Path tempDir;
 
     @Test
-    void writesPlanToConfiguredLocation() throws Exception {
+    void writesPlanToConfiguredLocation() throws IOException {
         FileLocationProperties props = new FileLocationProperties();
         props.setPlanDir(tempDir.toString());
         props.setMasterPlanFile("plan.json");
@@ -38,11 +39,11 @@ class PlanWriterTest {
     }
 
     @Test
-    void handlesWritingWhenParentIsNull() throws Exception {
+    void handlesWritingWhenParentIsNull() throws IOException {
         FileLocationProperties props = new FileLocationProperties();
         props.setPlanDir("");
         props.setMasterPlanFile("standalone.json");
-        props.setEnvLookup(__ -> null);
+        props.setEnvLookup(env -> null);
 
         PlanWriter writer = new PlanWriter(props);
         MasterPlan plan = new MasterPlan();
@@ -53,16 +54,17 @@ class PlanWriterTest {
     }
 
     @Test
-    void writeThrowsIllegalStateExceptionOnIoFailure() throws Exception {
+    void writeThrowsIllegalStateExceptionOnIoFailure() throws IOException {
         Path tempFile = Files.createTempFile("plan-writer", ".tmp");
         FileLocationProperties props = new FileLocationProperties();
         // planDir points to a file, so parent of master plan path is the file path and directory creation will fail
         props.setPlanDir(tempFile.toString());
         props.setMasterPlanFile("plan.json");
-        props.setEnvLookup(__ -> null);
+        props.setEnvLookup(env -> null);
 
         PlanWriter writer = new PlanWriter(props);
 
-        assertThrows(IllegalStateException.class, () -> writer.write(new MasterPlan()));
+        MasterPlan plan = new MasterPlan();
+        assertThrows(IllegalStateException.class, () -> writer.write(plan));
     }
 }

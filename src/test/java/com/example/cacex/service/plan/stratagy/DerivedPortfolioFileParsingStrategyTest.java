@@ -7,6 +7,7 @@ import com.example.cacex.service.plan.JsonModelMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -18,7 +19,7 @@ class DerivedPortfolioFileParsingStrategyTest {
     Path tempDir;
 
     @Test
-    void supportsAndParsesDerivedPortfolio() throws Exception {
+    void supportsAndParsesDerivedPortfolio() throws IOException {
         Path path = tempDir.resolve("derivedportfolios/derived.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, """

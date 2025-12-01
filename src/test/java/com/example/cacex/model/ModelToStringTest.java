@@ -1,13 +1,6 @@
 package com.example.cacex.model;
 
-import com.finbourne.lusid.model.AborConfigurationRequest;
-import com.finbourne.lusid.model.AborRequest;
-import com.finbourne.lusid.model.Account;
-import com.finbourne.lusid.model.ChartOfAccountsRequest;
-import com.finbourne.lusid.model.CreateDerivedTransactionPortfolioRequest;
-import com.finbourne.lusid.model.CreatePortfolioGroupRequest;
-import com.finbourne.lusid.model.PostingModuleRequest;
-import com.finbourne.lusid.model.TransactionTypeRequest;
+import com.finbourne.lusid.model.*;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -24,8 +17,8 @@ class ModelToStringTest {
 
         assertTrue(loadedFile.toString().contains("k1"));
         assertEquals(loadedFile, loadedFile);
-        assertNotEquals(loadedFile, null);
-        assertNotEquals(loadedFile, "other");
+        assertNotEquals(null, loadedFile);
+        assertNotEquals("other", loadedFile);
     }
 
     @Test
@@ -44,8 +37,8 @@ class ModelToStringTest {
         second.setPostingModuleRequest(request);
 
         assertEquals(first, second);
-        assertNotEquals(first, null);
-        assertNotEquals(first, "x");
+        assertNotEquals(null, first);
+        assertNotEquals("x", first);
         assertTrue(first.toString().contains("PM"));
     }
 
@@ -87,7 +80,7 @@ class ModelToStringTest {
         second.setSideDefinition(request);
 
         assertEquals(first, second);
-        assertNotEquals(first, "other");
+        assertNotEquals("other", first);
         assertTrue(first.toString().contains("CLASS"));
     }
 
@@ -96,7 +89,7 @@ class ModelToStringTest {
         SideFile side = new SideFile();
         side.setScope("S");
         side.setSide("BUY");
-        assertNotEquals(side, "different");
+        assertNotEquals("different", side);
         assertTrue(side.toString().contains("BUY"));
 
         Account account = new Account();

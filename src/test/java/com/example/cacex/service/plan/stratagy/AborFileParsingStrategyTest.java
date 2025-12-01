@@ -7,6 +7,7 @@ import com.example.cacex.service.plan.JsonModelMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -18,7 +19,7 @@ class AborFileParsingStrategyTest {
     Path tempDir;
 
     @Test
-    void supportsAndParsesAborFile() throws Exception {
+    void supportsAndParsesAborFile() throws IOException {
         Path path = tempDir.resolve("abor/abor.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, """

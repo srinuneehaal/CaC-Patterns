@@ -6,12 +6,10 @@ import com.example.cacex.model.Action;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.PlanItem;
 import com.example.cacex.service.apply.apiservice.PlanItemActionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPlanItemApplier<T> implements PlanItemApplier {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractPlanItemApplier.class);
+
 
     private final Class<T> payloadType;
     private final PlanItemActionService<T> apiService;
@@ -47,11 +45,8 @@ public abstract class AbstractPlanItemApplier<T> implements PlanItemApplier {
                 default -> throw new InvalidPlanItemException("Unsupported action " + action);
             }
         } catch (InvalidPlanItemException ex) {
-            log.error("Invalid plan item {} for category {}: {}", item.getKey(), item.getFileCategory(),
-                    ex.getMessage());
             throw ex;
         } catch (RuntimeException ex) {
-            log.error("Failed to apply plan item {} for category {}", item.getKey(), item.getFileCategory(), ex);
             throw new PlanApplyException("Failed to apply plan item " + item.getKey(), ex);
         }
     }

@@ -3,9 +3,7 @@ package com.example.cacex.model;
 import com.finbourne.lusid.model.TransactionTypeRequest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TransactionFileTest {
 

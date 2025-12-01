@@ -7,6 +7,7 @@ import com.example.cacex.service.plan.JsonModelMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -18,7 +19,7 @@ class TransactionFileParsingStrategyTest {
     Path tempDir;
 
     @Test
-    void supportsAndParsesTransactionFile() throws Exception {
+    void supportsAndParsesTransactionFile() throws IOException {
         Path path = tempDir.resolve("transactions/txn.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, """
@@ -39,7 +40,7 @@ class TransactionFileParsingStrategyTest {
     }
 
     @Test
-    void fallsBackToFilenameWhenTypeMissing() throws Exception {
+    void fallsBackToFilenameWhenTypeMissing() throws IOException {
         Path path = tempDir.resolve("transactions/txn2.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, """

@@ -1,21 +1,11 @@
 package com.example.cacex.model;
 
-import com.finbourne.lusid.model.AborConfigurationRequest;
-import com.finbourne.lusid.model.AborRequest;
-import com.finbourne.lusid.model.Account;
-import com.finbourne.lusid.model.ChartOfAccountsRequest;
-import com.finbourne.lusid.model.CreateDerivedTransactionPortfolioRequest;
-import com.finbourne.lusid.model.CreatePortfolioGroupRequest;
-import com.finbourne.lusid.model.PostingModuleRequest;
-import com.finbourne.lusid.model.SideDefinitionRequest;
+import com.finbourne.lusid.model.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ModelFilesEqualityTest {
 
@@ -180,25 +170,25 @@ class ModelFilesEqualityTest {
 
     @Test
     void modelEqualityHandlesNullAndDifferentTypes() {
-        assertNotEquals(new AborFile(), null);
-        assertNotEquals(new AborFile(), "other");
-        assertNotEquals(new AborConfigurationFile(), null);
-        assertNotEquals(new AborConfigurationFile(), "other");
+        assertNotEquals(null, new AborFile());
+        assertNotEquals("other", new AborFile());
+        assertNotEquals(null, new AborConfigurationFile());
+        assertNotEquals("other", new AborConfigurationFile());
         assertNotEquals(new DerivedPortfolioFile(), new Object());
-        assertNotEquals(new PortfolioGroupFile(), null);
-        assertNotEquals(new PostingRulesFile(), null);
-        assertNotEquals(new ChartOfAccountsFile(), null);
-        assertNotEquals(new AccountFile(), null);
-        assertNotEquals(new TransactionFile(), null);
+        assertNotEquals(null, new PortfolioGroupFile());
+        assertNotEquals(null, new PostingRulesFile());
+        assertNotEquals(null, new ChartOfAccountsFile());
+        assertNotEquals(null, new AccountFile());
+        assertNotEquals(null, new TransactionFile());
         assertEquals(new SideFile(), new SideFile());
-        assertTrue(new TransactionFile().equals(new TransactionFile()));
-        assertTrue(new ChartOfAccountsFile().equals(new ChartOfAccountsFile()));
-        assertTrue(new PortfolioGroupFile().equals(new PortfolioGroupFile()));
-        assertTrue(new DerivedPortfolioFile().equals(new DerivedPortfolioFile()));
-        assertTrue(new PostingRulesFile().equals(new PostingRulesFile()));
-        assertTrue(new AborConfigurationFile().equals(new AborConfigurationFile()));
-        assertTrue(new AborFile().equals(new AborFile()));
-        assertTrue(new AccountFile().equals(new AccountFile()));
+        assertEquals(new TransactionFile(), new TransactionFile());
+        assertEquals(new ChartOfAccountsFile(), new ChartOfAccountsFile());
+        assertEquals(new PortfolioGroupFile(), new PortfolioGroupFile());
+        assertEquals(new DerivedPortfolioFile(), new DerivedPortfolioFile());
+        assertEquals(new PostingRulesFile(), new PostingRulesFile());
+        assertEquals(new AborConfigurationFile(), new AborConfigurationFile());
+        assertEquals(new AborFile(), new AborFile());
+        assertEquals(new AccountFile(), new AccountFile());
     }
 
     @Test

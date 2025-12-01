@@ -16,7 +16,7 @@ class FileLocationPropertiesTest {
         props.setStateFilesDir("statefiles");
         props.setPlanDir("plan");
         props.setMasterPlanFile("masterplan.json");
-        props.setEnvLookup(__ -> null);
+        props.setEnvLookup(env -> null);
 
         assertEquals(Path.of("plan"), props.planDirPath());
         assertEquals(Path.of("plan").resolve("masterplan.json"), props.masterPlanPath());

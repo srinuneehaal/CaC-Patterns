@@ -7,6 +7,7 @@ import com.example.cacex.service.plan.JsonModelMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -18,7 +19,7 @@ class ChartOfAccountsFileParsingStrategyTest {
     Path tempDir;
 
     @Test
-    void supportsAndParsesChartOfAccounts() throws Exception {
+    void supportsAndParsesChartOfAccounts() throws IOException {
         Path path = tempDir.resolve("coa/coa.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, """
@@ -42,7 +43,7 @@ class ChartOfAccountsFileParsingStrategyTest {
     }
 
     @Test
-    void usesRequestCodeWhenChartCodeMissing() throws Exception {
+    void usesRequestCodeWhenChartCodeMissing() throws IOException {
         Path path = tempDir.resolve("coa/coa2.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, """
@@ -57,7 +58,7 @@ class ChartOfAccountsFileParsingStrategyTest {
     }
 
     @Test
-    void fallsBackToFilenameWhenCodesAbsent() throws Exception {
+    void fallsBackToFilenameWhenCodesAbsent() throws IOException {
         Path path = tempDir.resolve("other/chartofaccounts/unknown.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, "{ \"scope\": \"S\" }");
@@ -68,7 +69,7 @@ class ChartOfAccountsFileParsingStrategyTest {
     }
 
     @Test
-    void returnsCodeWithoutScopeWhenScopeMissing() throws Exception {
+    void returnsCodeWithoutScopeWhenScopeMissing() throws IOException {
         Path path = tempDir.resolve("coa/coa3.json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, """
