@@ -1,15 +1,15 @@
 package com.example.cacex.service.plan;
 
+import com.example.cacex.config.JacksonConfiguration;
 import com.example.cacex.model.*;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.finbourne.lusid.model.AborConfigurationRequest;
 import com.finbourne.lusid.model.AborRequest;
 import com.finbourne.lusid.model.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -26,9 +26,12 @@ public class JsonModelMapper {
     private final ObjectMapper objectMapper;
 
     public JsonModelMapper() {
-        this.objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this(JacksonConfiguration.createObjectMapper());
+    }
+
+    @Autowired
+    public JsonModelMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     /**

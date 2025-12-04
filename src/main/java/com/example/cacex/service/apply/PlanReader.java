@@ -2,11 +2,8 @@ package com.example.cacex.service.apply;
 
 import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.model.*;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.finbourne.lusid.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +21,9 @@ public class PlanReader {
     private final FileLocationProperties fileLocationProperties;
     private final ObjectMapper objectMapper;
 
-    public PlanReader(FileLocationProperties fileLocationProperties) {
+    public PlanReader(FileLocationProperties fileLocationProperties, ObjectMapper objectMapper) {
         this.fileLocationProperties = fileLocationProperties;
-        this.objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        this.objectMapper = objectMapper;
     }
 
     /**

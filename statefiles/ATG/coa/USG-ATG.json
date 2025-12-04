@@ -11,7 +11,7 @@
         "value" : {
           "labelValue" : "Smith"
         },
-        "effectiveFrom" : 1520208000.000000000
+        "effectiveFrom" : "2018-03-05T18:00:00.001Z"
       }
     }
   }

@@ -1,6 +1,7 @@
 package com.example.cacex.service.plan;
 
 import com.example.cacex.config.FileLocationProperties;
+import com.example.cacex.config.JacksonConfiguration;
 import com.example.cacex.model.Action;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.MasterPlan;
@@ -26,7 +27,7 @@ class PlanWriterTest {
         props.setPlanDir(tempDir.toString());
         props.setMasterPlanFile("plan.json");
 
-        PlanWriter writer = new PlanWriter(props);
+        PlanWriter writer = new PlanWriter(props, JacksonConfiguration.createObjectMapper());
         MasterPlan plan = new MasterPlan();
         plan.addItem(new PlanItem(Action.NEW, FileCategory.SIDE, "S", "K", "path", null));
 
@@ -45,7 +46,7 @@ class PlanWriterTest {
         props.setMasterPlanFile("standalone.json");
         props.setEnvLookup(env -> null);
 
-        PlanWriter writer = new PlanWriter(props);
+        PlanWriter writer = new PlanWriter(props, JacksonConfiguration.createObjectMapper());
         MasterPlan plan = new MasterPlan();
 
         Path out = writer.write(plan);
@@ -62,7 +63,7 @@ class PlanWriterTest {
         props.setMasterPlanFile("plan.json");
         props.setEnvLookup(env -> null);
 
-        PlanWriter writer = new PlanWriter(props);
+        PlanWriter writer = new PlanWriter(props, JacksonConfiguration.createObjectMapper());
 
         MasterPlan plan = new MasterPlan();
         assertThrows(IllegalStateException.class, () -> writer.write(plan));

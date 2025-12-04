@@ -2,10 +2,7 @@ package com.example.cacex.service.plan;
 
 import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.model.MasterPlan;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -18,13 +15,9 @@ public class PlanWriter {
     private final FileLocationProperties fileLocationProperties;
     private final ObjectMapper objectMapper;
 
-    public PlanWriter(FileLocationProperties fileLocationProperties) {
+    public PlanWriter(FileLocationProperties fileLocationProperties, ObjectMapper objectMapper) {
         this.fileLocationProperties = fileLocationProperties;
-        this.objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .enable(SerializationFeature.INDENT_OUTPUT);
+        this.objectMapper = objectMapper;
     }
 
     /**

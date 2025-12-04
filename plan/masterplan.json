@@ -8,14 +8,14 @@
     "payload" : {
       "code" : "ChartOfAccounts",
       "displayName" : "ChartOfAccountsName",
-      "description" : "Standard COA changed",
+      "description" : "Standard COA",
       "properties" : {
         "ChartOfAccounts/MyScope/FundManagerName" : {
           "key" : "ChartOfAccounts/MyScope/FundManagerName",
           "value" : {
             "labelValue" : "Smith"
           },
-          "effectiveFrom" : "2018-03-05T00:00:00Z"
+          "effectiveFrom" : "2018-03-05T18:00:00.001Z"
         }
       }
     }

@@ -6,10 +6,7 @@ import com.example.cacex.exception.UnsupportedFileCategoryException;
 import com.example.cacex.model.*;
 import com.example.cacex.service.plan.JsonModelMapper;
 import com.example.cacex.util.PathUtils;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.finbourne.lusid.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +34,14 @@ public class StateFileService {
      *
      * @param fileLocationProperties filesystem configuration
      * @param jsonModelMapper        mapper for domain payloads
+     * @param objectMapper           shared Jackson mapper
      */
-    public StateFileService(FileLocationProperties fileLocationProperties, JsonModelMapper jsonModelMapper) {
+    public StateFileService(FileLocationProperties fileLocationProperties,
+                            JsonModelMapper jsonModelMapper,
+                            ObjectMapper objectMapper) {
         this.fileLocationProperties = fileLocationProperties;
         this.jsonModelMapper = jsonModelMapper;
-        this.objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .enable(SerializationFeature.INDENT_OUTPUT);
+        this.objectMapper = objectMapper;
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.example.cacex.service;
 
 import com.example.cacex.config.FileLocationProperties;
+import com.example.cacex.config.JacksonConfiguration;
 import com.example.cacex.exception.PlanApplyException;
 import com.example.cacex.model.Action;
 import com.example.cacex.model.FileCategory;
@@ -14,9 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,8 +37,8 @@ class StateFileServiceTest {
         props.setPlanDir(tempDir.resolve("plan").toString());
         props.setMasterPlanFile("masterplan.json");
         props.setEnvLookup(env -> null);
-        stateFileService = new StateFileService(props, new JsonModelMapper());
-        objectMapper = new ObjectMapper();
+        stateFileService = new StateFileService(props, new JsonModelMapper(), JacksonConfiguration.createObjectMapper());
+        objectMapper = JacksonConfiguration.createObjectMapper();
     }
 
     @Test

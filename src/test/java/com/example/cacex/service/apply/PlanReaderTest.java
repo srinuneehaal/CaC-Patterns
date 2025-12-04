@@ -1,6 +1,7 @@
 package com.example.cacex.service.apply;
 
 import com.example.cacex.config.FileLocationProperties;
+import com.example.cacex.config.JacksonConfiguration;
 import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.MasterPlan;
 import com.example.cacex.model.PlanItem;
@@ -45,7 +46,7 @@ class PlanReaderTest {
         props.setPlanDir(tempDir.toString());
         props.setMasterPlanFile("masterplan.json");
 
-        PlanReader reader = new PlanReader(props);
+        PlanReader reader = new PlanReader(props, JacksonConfiguration.createObjectMapper());
 
         MasterPlan plan = reader.read();
         assertEquals(1, plan.getItems().size());
@@ -63,7 +64,7 @@ class PlanReaderTest {
         props.setPlanDir(tempDir.toString());
         props.setMasterPlanFile("masterplan.json");
 
-        PlanReader reader = new PlanReader(props);
+        PlanReader reader = new PlanReader(props, JacksonConfiguration.createObjectMapper());
 
         MasterPlan plan = reader.read();
         assertTrue(plan.getItems().isEmpty());
@@ -74,7 +75,7 @@ class PlanReaderTest {
         FileLocationProperties props = new FileLocationProperties();
         props.setPlanDir(tempDir.toString());
         props.setMasterPlanFile("missing.json");
-        PlanReader reader = new PlanReader(props);
+        PlanReader reader = new PlanReader(props, JacksonConfiguration.createObjectMapper());
 
         assertThrows(IllegalStateException.class, reader::read);
     }
@@ -103,7 +104,7 @@ class PlanReaderTest {
         props.setPlanDir(tempDir.toString());
         props.setMasterPlanFile("masterplan.json");
 
-        MasterPlan plan = new PlanReader(props).read();
+        MasterPlan plan = new PlanReader(props, JacksonConfiguration.createObjectMapper()).read();
 
         assertEquals(9, plan.getItems().size());
         assertTrue(plan.getItems().stream().anyMatch(i -> i.getPayload() instanceof com.finbourne.lusid.model.AborConfigurationRequest));
@@ -125,7 +126,7 @@ class PlanReaderTest {
         props.setPlanDir(tempDir.toString());
         props.setMasterPlanFile("masterplan.json");
 
-        PlanReader reader = new PlanReader(props);
+        PlanReader reader = new PlanReader(props, JacksonConfiguration.createObjectMapper());
 
         assertThrows(IllegalStateException.class, reader::read);
     }
@@ -150,7 +151,7 @@ class PlanReaderTest {
         props.setPlanDir(tempDir.toString());
         props.setMasterPlanFile("masterplan.json");
 
-        MasterPlan plan = new PlanReader(props).read();
+        MasterPlan plan = new PlanReader(props, JacksonConfiguration.createObjectMapper()).read();
 
         assertNull(plan.getItems().get(0).getPayload());
     }

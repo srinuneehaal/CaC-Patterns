@@ -3,7 +3,7 @@
   "createPortfolioGroupRequestList": [
     {
       "code": "MyGroupCode-1",
-      "created": "2019-10-04T00:00:00.0000000+00:00",
+      "created": "2018-03-05T18:00:00.001Z",
       "values": [
         {
           "scope": "MyScope",
@@ -25,7 +25,7 @@
       "description": "My group description"
     },{
       "code": "MyGroupCode-2",
-      "created": "2019-10-04T00:00:00.0000000+00:00",
+      "created": "2018-03-05T18:00:00.001Z",
       "values": [
         {
           "scope": "MyScope",
@@ -47,7 +47,7 @@
       "description": "My group description changed"
     },{
       "code": "MyGroupCode-3",
-      "created": "2019-10-04T00:00:00.0000000+00:00",
+      "created": "2018-03-05T18:00:00.001Z",
       "values": [
         {
           "scope": "MyScope",
