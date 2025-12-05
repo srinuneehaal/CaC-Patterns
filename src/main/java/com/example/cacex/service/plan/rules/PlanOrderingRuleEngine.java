@@ -124,6 +124,8 @@ public class PlanOrderingRuleEngine {
         defaults.add(new PlanOrderingRule(FileCategory.PORTFOLIO_GROUP, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
         // 11. delete portfolios
         defaults.add(new PlanOrderingRule(FileCategory.DERIVED_PORTFOLIO, List.of(Action.DELETE), false));
+        // 12. create/update/delete general ledger profile
+        defaults.add(new PlanOrderingRule(FileCategory.GENERAL_LEDGER_PROFILE, List.of(Action.NEW, Action.UPDATE, Action.DELETE), false));
         return defaults;
     }
 

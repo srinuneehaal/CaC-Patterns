@@ -68,6 +68,7 @@ class PlanServiceSpecialCategoriesTest {
                 case TRANSACTION -> properties.getTransactionsDirName();
                 case CHART_OF_ACCOUNTS -> properties.getChartOfAccountsDirName();
                 case POSTING_RULE -> properties.getPostingRulesDirName();
+                case GENERAL_LEDGER_PROFILE -> properties.getGeneralLedgerProfilesDirName();
             };
             Path base = (scope == null || scope.isBlank())
                     ? properties.stateFilesRoot()

@@ -1,23 +1,23 @@
 {
   "items" : [ {
-    "action" : "UPDATE",
-    "fileCategory" : "CHART_OF_ACCOUNTS",
+    "action" : "NEW",
+    "fileCategory" : "GENERAL_LEDGER_PROFILE",
     "scope" : "ATG",
-    "key" : "USG",
-    "sourcePath" : "changedfiles\\ATG\\coa\\USG-ATG.json",
+    "key" : "USG-USG_GP",
+    "sourcePath" : "changedfiles\\ATG\\glprofile\\USG-USG_GP-ATG.json",
     "payload" : {
-      "code" : "ChartOfAccounts",
-      "displayName" : "ChartOfAccountsName",
-      "description" : "Standard COA",
-      "properties" : {
-        "ChartOfAccounts/MyScope/FundManagerName" : {
-          "key" : "ChartOfAccounts/MyScope/FundManagerName",
-          "value" : {
-            "labelValue" : "Smith"
-          },
-          "effectiveFrom" : "2018-03-05T18:00:00.001Z"
-        }
-      }
+      "generalLedgerProfileCode" : "USG_GP",
+      "displayName" : "USGAAP",
+      "generalLedgerProfileMappings" : [ {
+        "mappingFilter" : "GeneralLedgerAccountCode eq 'INVESTMENTS'",
+        "levels" : [ "EconomicBucket", "Instrument.Identifiers['ClientInternal']" ]
+      }, {
+        "mappingFilter" : "Properties['Account/default/Profile'] eq 'CCY'",
+        "levels" : [ "DefaultCurrency" ]
+      }, {
+        "mappingFilter" : "true",
+        "levels" : [ "DefaultCurrency" ]
+      } ]
     }
   } ]
 }

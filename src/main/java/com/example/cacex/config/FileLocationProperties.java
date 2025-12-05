@@ -28,6 +28,7 @@ public class FileLocationProperties {
     private String postingRulesDirName = "postingrules";
     private String aborConfigurationsDirName = "aborconfigs";
     private String aborDirName = "abor";
+    private String generalLedgerProfilesDirName = "glprofile";
     private Function<String, String> envLookup = System::getenv;
 
     /**
@@ -226,6 +227,24 @@ public class FileLocationProperties {
      */
     public void setPostingRulesDirName(String postingRulesDirName) {
         this.postingRulesDirName = postingRulesDirName;
+    }
+
+    /**
+     * Returns the directory name for general ledger profile files.
+     *
+     * @return general ledger profile directory name
+     */
+    public String getGeneralLedgerProfilesDirName() {
+        return generalLedgerProfilesDirName;
+    }
+
+    /**
+     * Sets the directory name for general ledger profile files.
+     *
+     * @param generalLedgerProfilesDirName directory name
+     */
+    public void setGeneralLedgerProfilesDirName(String generalLedgerProfilesDirName) {
+        this.generalLedgerProfilesDirName = generalLedgerProfilesDirName;
     }
 
     /**

@@ -132,4 +132,19 @@ class ModelToStringTest {
         cfgFile.setAborConfigurations(List.of(cfgReq));
         assertEquals(cfgReq, cfgFile.getAborConfigurations().getFirst());
     }
+
+    @Test
+    void generalLedgerProfileFileToStringAndEquality() {
+        GeneralLedgerProfileRequest request = new GeneralLedgerProfileRequest();
+        request.setGeneralLedgerProfileCode("GLP1");
+        GeneralLedgerProfileFile file = new GeneralLedgerProfileFile();
+        file.setScope("S");
+        file.setChartOfAccountsCode("COA");
+        file.setGeneralLedgerProfileCode("GLP1");
+        file.setGeneralLedgerProfileRequest(request);
+
+        assertEquals(file, file);
+        assertNotEquals(null, file);
+        assertTrue(file.toString().contains("GLP1"));
+    }
 }

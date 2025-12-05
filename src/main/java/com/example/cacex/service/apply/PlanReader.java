@@ -75,6 +75,8 @@ public class PlanReader {
                     objectMapper.convertValue(payloadNode, ChartOfAccountsRequest.class);
             case ACCOUNT -> objectMapper.convertValue(payloadNode, Account.class);
             case POSTING_RULE -> objectMapper.convertValue(payloadNode, PostingModuleRequest.class);
+            case GENERAL_LEDGER_PROFILE ->
+                    objectMapper.convertValue(payloadNode, GeneralLedgerProfileRequest.class);
         };
     }
 }

@@ -1,0 +1,19 @@
+{
+  "scope" : "ATG",
+  "chartOfAccountsCode" : "USG_GP",
+  "generalLedgerProfileCode" : "USG_GP",
+  "generalLedgerProfileRequest" : {
+    "generalLedgerProfileCode" : "USG_GP",
+    "displayName" : "USGAAP",
+    "generalLedgerProfileMappings" : [ {
+      "mappingFilter" : "GeneralLedgerAccountCode eq 'INVESTMENTS'",
+      "levels" : [ "EconomicBucket", "Instrument.Identifiers['ClientInternal']" ]
+    }, {
+      "mappingFilter" : "Properties['Account/default/Profile'] eq 'CCY'",
+      "levels" : [ "DefaultCurrency" ]
+    }, {
+      "mappingFilter" : "true",
+      "levels" : [ "DefaultCurrency" ]
+    } ]
+  }
+}

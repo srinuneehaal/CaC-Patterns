@@ -9,5 +9,6 @@ public enum FileCategory {
     ACCOUNT,
     POSTING_RULE,
     ABOR_CONFIGURATION,
-    ABOR
+    ABOR,
+    GENERAL_LEDGER_PROFILE
 }

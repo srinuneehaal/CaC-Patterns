@@ -5,7 +5,7 @@
   "postingModuleRequest": {
     "code": "USG",
     "displayName": "PostingModuleName",
-    "description": "PostingModuleDescription change",
+    "description": "PostingModuleDescription",
     "rules": [
       {
         "ruleId": "rule1Id-1",

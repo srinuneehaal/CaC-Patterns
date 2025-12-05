@@ -169,6 +169,29 @@ class ModelFilesEqualityTest {
     }
 
     @Test
+    void generalLedgerProfileFileEqualityMatchesAllFields() {
+        GeneralLedgerProfileRequest request = new GeneralLedgerProfileRequest();
+        request.setGeneralLedgerProfileCode("GLP");
+        GeneralLedgerProfileFile first = new GeneralLedgerProfileFile();
+        first.setScope("S");
+        first.setChartOfAccountsCode("COA");
+        first.setGeneralLedgerProfileCode("GLP");
+        first.setGeneralLedgerProfileRequest(request);
+
+        GeneralLedgerProfileFile second = new GeneralLedgerProfileFile();
+        second.setScope("S");
+        second.setChartOfAccountsCode("COA");
+        second.setGeneralLedgerProfileCode("GLP");
+        second.setGeneralLedgerProfileRequest(request);
+
+        assertEquals(first, second);
+        assertEquals(first.hashCode(), second.hashCode());
+
+        second.setGeneralLedgerProfileCode("OTHER");
+        assertNotEquals(first, second);
+    }
+
+    @Test
     void modelEqualityHandlesNullAndDifferentTypes() {
         assertNotEquals(null, new AborFile());
         assertNotEquals("other", new AborFile());

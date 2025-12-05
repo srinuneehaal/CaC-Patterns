@@ -30,6 +30,7 @@ class PlanItemAppliersTest {
         PostingModuleApiService postingService = mock(PostingModuleApiService.class);
         SideDefinitionApiService sideService = mock(SideDefinitionApiService.class);
         TransactionTypeApiService txnService = mock(TransactionTypeApiService.class);
+        GeneralLedgerProfileApiService glProfileService = mock(GeneralLedgerProfileApiService.class);
 
         return Stream.of(
                 new ApplierCase<>(FileCategory.ABOR, new AborPlanItemApplier(aborService), aborService, new AborRequest()),
@@ -48,7 +49,11 @@ class PlanItemAppliersTest {
                 new ApplierCase<>(FileCategory.SIDE, new SidePlanItemApplier(sideService),
                         sideService, new SideFile()),
                 new ApplierCase<>(FileCategory.TRANSACTION, new TransactionPlanItemApplier(txnService),
-                        txnService, new TransactionFile())
+                        txnService, new TransactionFile()),
+                new ApplierCase<>(FileCategory.GENERAL_LEDGER_PROFILE,
+                        new GeneralLedgerProfilePlanItemApplier(glProfileService),
+                        glProfileService,
+                        new GeneralLedgerProfileRequest())
         );
     }
 

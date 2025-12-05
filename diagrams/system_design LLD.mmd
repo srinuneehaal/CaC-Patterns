@@ -1,0 +1,11 @@
+
+graph TD
+  A[ChangedFilesProvider] --> B[PlanRunner]
+  B --> C[PlanService]
+  C --> D[PlanOrderingRuleEngine]
+  D --> E[PlanWriter]
+  E --> F[MasterPlan]
+  F --> G[PlanReader]
+  G --> H[PlanApplyService]
+  H --> I[StateFileService]
+

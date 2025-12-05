@@ -1,0 +1,9 @@
+graph LR
+ChangedFilesProvider --> PlanRunner
+PlanRunner --> PlanService
+PlanService --> PlanOrderingRuleEngine
+PlanOrderingRuleEngine --> PlanWriter
+PlanRunner --> PlanApplyService
+PlanApplyService --> PlanItemApplier
+PlanItemApplier --> PlanItemActionService
+PlanItemActionService --> StateFileService

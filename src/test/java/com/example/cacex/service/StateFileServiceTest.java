@@ -109,6 +109,27 @@ class StateFileServiceTest {
     }
 
     @Test
+    void applyGeneralLedgerProfileCreatesAndDeletesEntry() throws IOException {
+        GeneralLedgerProfileRequest payload = new GeneralLedgerProfileRequest();
+        payload.setGeneralLedgerProfileCode("GLP1");
+        payload.setDisplayName("GL Profile");
+        PlanItem create = new PlanItem(Action.NEW, FileCategory.GENERAL_LEDGER_PROFILE,
+                "S13", "GLP1-COA1", null, payload);
+        stateFileService.applyStateChange(create);
+        Path path = tempDir.resolve("S13/glprofile/GLP1-COA1-S13.json");
+        assertTrue(Files.exists(path));
+        JsonNode node = objectMapper.readTree(path.toFile());
+        assertEquals("COA1", node.get("chartOfAccountsCode").asText());
+        assertEquals("GLP1", node.get("generalLedgerProfileCode").asText());
+        assertEquals("GLP1", node.get("generalLedgerProfileRequest").get("generalLedgerProfileCode").asText());
+
+        PlanItem delete = new PlanItem(Action.DELETE, FileCategory.GENERAL_LEDGER_PROFILE,
+                "S13", "GLP1-COA1", null, payload);
+        stateFileService.applyStateChange(delete);
+        assertFalse(Files.exists(path));
+    }
+
+    @Test
     void applyAborAddAndDelete() {
         AborRequest payload = new AborRequest();
         payload.setCode("AB1");

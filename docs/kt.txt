@@ -1,0 +1,49 @@
+Knowledge Share Options
+
+Project Overview: Expand README.md (currently describing the Spring Boot plan generator) with sections on goals, architecture, and how the pieces (plan reader, writer, state service, ordering rules) interact; note JacksonConfiguration, PlanApplyService, and ordering strategy role.
+Configuration Guide: Document src/main/resources/application.properties + FileLocationProperties settings (changed files, state files, directory mappings, rule ordering) so teammates know how to tailor environments or add new directories (e.g., the new glprofile support).
+Module/Flow Diagram: Given the service/runner layout (PlanRunner, PlanService, PlanApplyService, state handlers, appliers), publish a short architecture note or sequence diagram describing how changed files become plan items and how plan application executes.
+Testing Overview: Summarize key test suites (PlanServiceCoreTest, PlanOrderingRuleEngineTest, StateFileServiceTest, PlanItemAppliersTest, etc.), including what each covers and how to run them (mvn test), plus mention the explicit plans generated via --plan.
+Contribution/Onboarding Checklist: Provide a doc outlining steps for adding new file types (parse strategy, FileCategory, state handling, planner rules, applier, tests) referencing existing patterns; this helps future knowledge transfers.
+
+
+Knowledge‑Share Ideas
+
+Architecture Overview: High-level diagram (sequence/flow) showing how ChangedFilesProvider ➜ PlanService (parsing, ordering, state diffs) ➜ PlanWriter ➜ PlanApplyService connects with StateFileService and the various appliers. Include a short narrative in docs/architecture.md referencing PlanRunner, PlanApplyService, and the rule engine.
+Configuration Cheat Sheet: Document src/main/resources/application.properties + FileLocationProperties entries (changed/state paths, directory names, ordering rules). A table explaining how to add new directories like glprofile helps future extensions.
+File Processing Catalogue: List each file category (Side, Transaction, Account, etc.), the parsing strategy class (e.g., SideFileParsingStrategy), the JSON layout (fields in sample snippet), and the payload type used when building PlanItem. Could live in docs/file-processing.md or similar.
+State & Plan Lifecycle: Diagram showing how plan items move from changed files into PlanItems, how ordering rules reorder them, and how apply runners + StateFileService update persisted state. Annotate with references to PlanOrderingRuleEngine, StateFileService, and PlanItemApplier subclasses.
+Testing Matrix: Table summarizing key test bundles (PlanServiceCoreTest, PlanRunnerTest, StateFileServiceTest, Model* tests, etc.), what they cover, and how to run mvn test. Include notes on the GeneralLedgerProfile tests you added.
+Onboarding/How‑to Guide: Step-by-step for adding a new category (FileCategory, strategy, state handler, API applier, plan ordering rule, tests). Point to patterns in existing code (e.g., posting rules to GL profiles).
+
+Architecture Overview
+
+Added docs/architecture.md describing the end-to-end lifecycle: changed-file discovery (ChangedFilesProvider → PlanRunner → PlanService with parsing via strategy/mappers → ordering via PlanOrderingRuleEngine → PlanWriter), apply execution (PlanReader → PlanApplyService → category-specific appliers/PlanItemActionService → StateFileService), key directories/config, and a “how to extend” checklist.
+Includes a simple ASCII diagram showing component interactions and references to the new GeneralLedgerProfile support.
+You can extend this doc with visuals (drawn from diagrams in the repo) or cross-link to other docs (e.g., configuration guides) for more context if helpful.
+
+System Design
+
+Changed file intake: ChangedFilesProvider normalizes CHANGED_FILES input → PlanRunner (triggered by --plan) feeds paths to PlanService.
+Plan assembly: PlanService uses FileParsingStrategyFactory (one strategy per domain dir) + JsonModelMapper to deserialize JSON into models (SideFile, GeneralLedgerProfileFile, etc.). Special categories consult StateFileService for delete detection. Results are accumulated into PlanItems.
+Ordering: PlanOrderingRuleEngine applies configured rules (see application.properties) to sort items before PlanWriter persists plan/masterplan.json.
+Apply phase: PlanApplyService (run via --apply) reads the master plan through PlanReader, converts payloads, resolves the right PlanItemApplier, and delegates to the matching PlanItemActionService (e.g., GeneralLedgerProfileApiService) which currently logs the intended LUSID call. Each successful apply updates the persisted JSON in statefiles/ via StateFileService.
+Supporting layers: FileLocationProperties wires directory names, JacksonConfiguration configures Jackson, tests cover models/ordering/state handling, and logging traces the lifecycle (PlanRunner logs, PlanApplyService errors, etc.).
+
+
+Low-level design notes
+
+Input layer: ChangedFilesProvider reads CHANGED_FILES; each path is normalized (PathUtils) and passed to PlanService.
+Parsing & mapping:
+PlanService consults FileParsingStrategyFactory (one bean per directory, e.g., SideFileParsingStrategy, GeneralLedgerProfileFileParsingStrategy).
+Each strategy uses JsonModelMapper → this class applies custom parsing for structured lists (e.g., SideFile, AccountFile, AborFile, etc.) and falls back to Jackson for simple payloads.
+Plan construction:
+PlanService maps parsed payloads to PlanItems, comparing against statefiles/ via StateFileService to emit CREATE/UPDATE/DELETE entries (special flows for list-based files scan for missing entries).
+PlanOrderingRuleEngine sorts PlanItems using configured rules (PlanOrderingProperties + defaults that specify action order and optional transactionSequence sorting).
+PlanWriter writes MasterPlan.
+Apply phase:
+PlanApplyService reads the master plan (PlanReader), converts payload nodes to typed requests, resolves PlanItemApplier by FileCategory, and calls PlanItemActionService (e.g., GeneralLedgerProfileApiService, PostingModuleApiService).
+Each action logs the intended SDK call and then StateFileService updates the persisted JSON (write/delete logic per category).
+State tracking: FileLocationProperties centralizes folder names; StateFileService handles tag-based filenames (key-scope.json) and ensures GeneralLedgerProfile files use glprofile folder.
+
+

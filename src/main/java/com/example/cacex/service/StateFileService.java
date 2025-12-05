@@ -11,6 +11,7 @@ import com.finbourne.lusid.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -62,6 +63,7 @@ public class StateFileService {
             case TRANSACTION -> applyTransaction(item, statePath);
             case CHART_OF_ACCOUNTS -> applyChartOfAccounts(item, statePath);
             case POSTING_RULE -> applyPostingRule(item, statePath);
+            case GENERAL_LEDGER_PROFILE -> applyGeneralLedgerProfile(item, statePath);
             case ABOR -> applyAbor(item, statePath);
             case ABOR_CONFIGURATION -> applyAborConfiguration(item, statePath);
             case DERIVED_PORTFOLIO -> applyDerivedPortfolio(item, statePath);
@@ -172,6 +174,25 @@ public class StateFileService {
         file.setPostingModuleCode(moduleCode);
         file.setChartOfAccountsCode(coaCode);
         file.setPostingModuleRequest(payload);
+        writeStateFile(statePath, file);
+    }
+
+    private void applyGeneralLedgerProfile(PlanItem item, Path statePath) {
+        if (item.getAction() == Action.DELETE) {
+            deleteStateFile(statePath);
+            return;
+        }
+        GeneralLedgerProfileRequest payload = castPayload(item, GeneralLedgerProfileRequest.class);
+        GeneralLedgerProfileFile file = new GeneralLedgerProfileFile();
+        file.setScope(item.getScope());
+        String trimmedKey = stripScopeSuffix(item.getKey(), item.getScope());
+        file.setChartOfAccountsCode(extractChartOfAccountsFromGeneralLedgerProfileKey(trimmedKey));
+        String profileCode = payload.getGeneralLedgerProfileCode();
+        if (!StringUtils.hasText(profileCode)) {
+            profileCode = extractGeneralLedgerProfileCodeFromKey(trimmedKey);
+        }
+        file.setGeneralLedgerProfileCode(profileCode);
+        file.setGeneralLedgerProfileRequest(payload);
         writeStateFile(statePath, file);
     }
 
@@ -291,6 +312,7 @@ public class StateFileService {
             case CHART_OF_ACCOUNTS -> fileLocationProperties.getChartOfAccountsDirName();
             case ACCOUNT -> fileLocationProperties.getAccountsDirName();
             case POSTING_RULE -> fileLocationProperties.getPostingRulesDirName();
+            case GENERAL_LEDGER_PROFILE -> fileLocationProperties.getGeneralLedgerProfilesDirName();
             case ABOR_CONFIGURATION -> fileLocationProperties.getAborConfigurationsDirName();
             case ABOR -> fileLocationProperties.getAborDirName();
             default -> throw new UnsupportedFileCategoryException("Unsupported category " + category);
@@ -398,6 +420,28 @@ public class StateFileService {
         Account payload = item.getPayload() instanceof Account ? (Account) item.getPayload() : null;
         if (payload != null) {
             return payload.getCode();
+        }
+        return key;
+    }
+
+    private String extractChartOfAccountsFromGeneralLedgerProfileKey(String key) {
+        if (key == null) {
+            return "";
+        }
+        int dash = key.indexOf('-');
+        if (dash >= 0 && dash + 1 < key.length()) {
+            return key.substring(dash + 1);
+        }
+        return key;
+    }
+
+    private String extractGeneralLedgerProfileCodeFromKey(String key) {
+        if (key == null) {
+            return "";
+        }
+        int dash = key.indexOf('-');
+        if (dash > 0) {
+            return key.substring(0, dash);
         }
         return key;
     }

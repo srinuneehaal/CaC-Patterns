@@ -1,0 +1,28 @@
+graph TD
+CF[ChangedFilesProvider]
+PR[PlanRunner --plan]
+PS[PlanService]
+SS[StateFileService]
+factory[FileParsingStrategyFactory]
+mapper[JsonModelMapper]
+order[PlanOrderingRuleEngine]
+writer[PlanWriter]
+MR[MasterPlan]
+PA[PlanApplyService --apply]
+reader[PlanReader]
+planitems[PlanItemApplier registry]
+action[PlanItemActionService GeneralLedgerProfileApiService, PostingModuleApiService, ...]
+
+CF --> PR
+PR --> PS
+PS --> factory
+factory --> mapper
+PS --> SS
+PS --> order
+order --> writer
+writer --> MR
+MR --> PA
+PA --> reader
+reader --> planitems
+planitems --> action
+action --> SS
