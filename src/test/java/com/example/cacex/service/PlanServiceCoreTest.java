@@ -47,7 +47,6 @@ class PlanServiceCoreTest {
         MockitoAnnotations.openMocks(this);
         properties = new FileLocationProperties();
         properties.setChangedFilesDir("changedfiles");
-        properties.setStateFilesDir("statefiles");
 
         when(planOrderingRuleEngine.applyOrdering(any())).thenAnswer(inv -> inv.getArgument(0, MasterPlan.class));
 
@@ -61,8 +60,8 @@ class PlanServiceCoreTest {
         Files.createFile(changed);
 
         when(stateFileService.deriveKeyFromFilename(changed)).thenReturn("tx1");
-        when(stateFileService.resolveStatePath(FileCategory.TRANSACTION, "S1", "tx1"))
-                .thenReturn(tempDir.resolve("statefiles/S1/transactions/tx1.json"));
+        when(stateFileService.loadPayload(FileCategory.TRANSACTION, "S1", "tx1", TransactionFile.class))
+                .thenReturn(null);
 
         StubParsingStrategy strategy = new StubParsingStrategy(FileCategory.TRANSACTION);
         strategy.addPayload(changed, new LoadedFile(FileCategory.TRANSACTION, "tx1", changed, "new-payload"));
@@ -82,18 +81,14 @@ class PlanServiceCoreTest {
     @Test
     void addsUpdateWhenChangedPayloadDiffersFromState() throws IOException {
         Path changed = tempDir.resolve("changedfiles/S1/transactions/tx2.json");
-        Path state = tempDir.resolve("statefiles/S1/transactions/tx2.json");
         Files.createDirectories(changed.getParent());
         Files.createFile(changed);
-        Files.createDirectories(state.getParent());
-        Files.createFile(state);
 
         when(stateFileService.deriveKeyFromFilename(changed)).thenReturn("tx2");
-        when(stateFileService.deriveKeyFromFilename(state)).thenReturn("tx2");
-        when(stateFileService.resolveStatePath(FileCategory.TRANSACTION, "S1", "tx2")).thenReturn(state);
+        when(stateFileService.loadPayload(FileCategory.TRANSACTION, "S1", "tx2", TransactionFile.class))
+                .thenReturn(new TransactionFile());
 
         StubParsingStrategy strategy = new StubParsingStrategy(FileCategory.TRANSACTION);
-        strategy.addPayload(state, new LoadedFile(FileCategory.TRANSACTION, "tx2-S1", state, "state-payload"));
         strategy.addPayload(changed, new LoadedFile(FileCategory.TRANSACTION, "tx2", changed, "changed-payload"));
         when(strategyFactory.resolve(any(Path.class))).thenReturn(strategy);
 
@@ -108,16 +103,12 @@ class PlanServiceCoreTest {
     @Test
     void addsDeleteWhenChangedFileMissingButStateExists() throws IOException {
         Path changed = tempDir.resolve("changedfiles/S1/transactions/tx3.json");
-        Path state = tempDir.resolve("statefiles/S1/transactions/tx3.json");
-        Files.createDirectories(state.getParent());
-        Files.createFile(state);
-
+        TransactionFile statePayload = new TransactionFile();
         when(stateFileService.deriveKeyFromFilename(changed)).thenReturn("tx3");
-        when(stateFileService.deriveKeyFromFilename(state)).thenReturn("tx3");
-        when(stateFileService.resolveStatePath(FileCategory.TRANSACTION, "S1", "tx3")).thenReturn(state);
+        when(stateFileService.loadPayload(FileCategory.TRANSACTION, "S1", "tx3", TransactionFile.class))
+                .thenReturn(statePayload);
 
         StubParsingStrategy strategy = new StubParsingStrategy(FileCategory.TRANSACTION);
-        strategy.addPayload(state, new LoadedFile(FileCategory.TRANSACTION, "tx3-S1", state, "state-payload"));
         when(strategyFactory.resolve(any(Path.class))).thenReturn(strategy);
 
         MasterPlan plan = planService.buildPlan(List.of(changed));
@@ -125,7 +116,7 @@ class PlanServiceCoreTest {
         assertEquals(1, plan.getItems().size());
         PlanItem item = plan.getItems().get(0);
         assertEquals(Action.DELETE, item.getAction());
-        assertEquals("state-payload", item.getPayload());
+        assertEquals(statePayload, item.getPayload());
     }
 
     @Test

@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 @Service
 public class PlanService {
@@ -56,13 +55,13 @@ public class PlanService {
      * @return ordered master plan
      */
     public MasterPlan buildPlan(List<Path> changedPaths) {
-        Map<String, LoadedFile> stateFiles = new HashMap<>();
+        Map<String, Object> statePayloads = new HashMap<>();
 
         MasterPlan plan = new MasterPlan();
 
         for (Path path : changedPaths) {
             try {
-                processChangedFile(path, plan, stateFiles);
+                processChangedFile(path, plan, statePayloads);
             } catch (UnsupportedFilePathException | UnsupportedFileCategoryException e) {
                 log.warn("Skipping unsupported file {}: {}", path, e.getMessage());
             } catch (PlanProcessingException e) {
@@ -74,7 +73,7 @@ public class PlanService {
         return planOrderingRuleEngine.applyOrdering(plan);
     }
 
-    private void processChangedFile(Path path, MasterPlan plan, Map<String, LoadedFile> stateFiles) {
+    private void processChangedFile(Path path, MasterPlan plan, Map<String, Object> statePayloads) {
         if (!isChangedFilePath(path)) {
             return;
         }
@@ -85,121 +84,68 @@ public class PlanService {
         String key = stateFileService.deriveKeyFromFilename(path);
 
         if (category == FileCategory.ABOR) {
-            Set<String> filesSeen = new HashSet<>();
-            filesSeen.add(scopeKey(scope, key));
-            processPlanEntries(path, scope, key, plan, FileCategory.ABOR, AborFile.class,
-                    this::toAborMap);
-            try {
-                addDeletesForMissingChanges(
-                        DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
-                                fileLocationProperties.getAborDirName().toLowerCase(Locale.ROOT),
-                                FileCategory.ABOR,
-                                AborFile.class,
-                                this::toAborMap),
-                        filesSeen,
-                        plan,
-                        scope);
-            } catch (Exception e) {
-                log.error("Failed to scan ABOR state files for scope {}: {}", scope, e.getMessage(), e);
-            }
+            processScopedListCategory(path, plan, category, scope, key, AborFile.class,
+                    this::toAborMap, "Failed to scan ABOR state files for scope {}: {}");
             return;
         }
 
         if (category == FileCategory.ABOR_CONFIGURATION) {
-            Set<String> filesSeen = new HashSet<>();
-            filesSeen.add(scopeKey(scope, key));
-            processPlanEntries(path, scope, key, plan, FileCategory.ABOR_CONFIGURATION, AborConfigurationFile.class,
-                    this::toAborConfigurationMap);
-            try {
-                addDeletesForMissingChanges(
-                        DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
-                                fileLocationProperties.getAborConfigurationsDirName().toLowerCase(Locale.ROOT),
-                                FileCategory.ABOR_CONFIGURATION,
-                                AborConfigurationFile.class,
-                                this::toAborConfigurationMap),
-                        filesSeen,
-                        plan,
-                        scope);
-            } catch (Exception e) {
-                log.error("Failed to scan ABOR configuration state files for scope {}: {}", scope, e.getMessage(), e);
-            }
+            processScopedListCategory(path, plan, category, scope, key, AborConfigurationFile.class,
+                    this::toAborConfigurationMap, "Failed to scan ABOR configuration state files for scope {}: {}");
             return;
         }
 
         if (category == FileCategory.DERIVED_PORTFOLIO) {
-            Set<String> filesSeen = new HashSet<>();
-            filesSeen.add(scopeKey(scope, key));
-            processPlanEntries(path, scope, key, plan, FileCategory.DERIVED_PORTFOLIO, DerivedPortfolioFile.class,
-                    this::toDerivedMap);
-            try {
-                addDeletesForMissingChanges(
-                        DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
-                                fileLocationProperties.getDerivedPortfoliosDirName().toLowerCase(Locale.ROOT),
-                                FileCategory.DERIVED_PORTFOLIO,
-                                DerivedPortfolioFile.class,
-                                this::toDerivedMap),
-                        filesSeen,
-                        plan,
-                        scope);
-            } catch (Exception e) {
-                log.error("Failed to scan derived portfolio state files for scope {}: {}", scope, e.getMessage(), e);
-            }
+            processScopedListCategory(path, plan, category, scope, key, DerivedPortfolioFile.class,
+                    this::toDerivedMap, "Failed to scan derived portfolio state files for scope {}: {}");
             return;
         }
 
         if (category == FileCategory.PORTFOLIO_GROUP) {
-            Set<String> filesSeen = new HashSet<>();
-            filesSeen.add(scopeKey(scope, key));
-            processPlanEntries(path, scope, key, plan, FileCategory.PORTFOLIO_GROUP, PortfolioGroupFile.class,
-                    this::toPortfolioGroupMap);
-            try {
-                addDeletesForMissingChanges(
-                        DeleteScanSpec.of(fileLocationProperties.stateFilesRoot(),
-                                fileLocationProperties.getPortfolioGroupsDirName().toLowerCase(Locale.ROOT),
-                                FileCategory.PORTFOLIO_GROUP,
-                                PortfolioGroupFile.class,
-                                this::toPortfolioGroupMap),
-                        filesSeen,
-                        plan,
-                        scope);
-            } catch (Exception e) {
-                log.error("Failed to scan portfolio group state files for scope {}: {}", scope, e.getMessage(), e);
-            }
+            processScopedListCategory(path, plan, category, scope, key, PortfolioGroupFile.class,
+                    this::toPortfolioGroupMap, "Failed to scan portfolio group state files for scope {}: {}");
             return;
         }
 
         if (category == FileCategory.ACCOUNT) {
-            Set<String> filesSeen = new HashSet<>();
-            filesSeen.add(scopeKey(scope, key));
-            System.out.println("Account------>1  "+key);
-            processPlanEntries(path, scope, key, plan, FileCategory.ACCOUNT, AccountFile.class,
-                    this::toAccountMap);
-            try {
-                addDeletesForMissingChanges(
-                        DeleteScanSpec.of(fileLocationProperties.stateFilesRoot().resolve(scope),
-                                fileLocationProperties.getAccountsDirName().toLowerCase(Locale.ROOT),
-                                FileCategory.ACCOUNT,
-                                AccountFile.class,
-                                this::toAccountMap),
-                        filesSeen,
-                        plan,
-                        scope);
-            } catch (Exception e) {
-                log.error("Failed to scan account state files for scope {}: {}", scope, e.getMessage(), e);
-            }
+            processScopedListCategory(path, plan, category, scope, key, AccountFile.class,
+                    this::toAccountMap, "Failed to scan account state files for scope {}: {}");
             return;
         }
 
-        String stateKey = mapKey(category, scope, key);
+        handleGeneralCategory(path, plan, statePayloads, category, scope, key);
+    }
 
-        if (!stateFiles.containsKey(stateKey)) {
-            LoadedFile loaded = loadStateFile(scope, category, key);
-            if (loaded != null) {
-                stateFiles.put(mapKey(loaded), loaded);
-            }
+    private <F> void processScopedListCategory(Path path,
+                                               MasterPlan plan,
+                                               FileCategory category,
+                                               String scope,
+                                               String key,
+                                               Class<F> payloadType,
+                                               Function<F, Map<String, ?>> mapExtractor,
+                                               String errorMessage) {
+        Set<String> filesSeen = new HashSet<>();
+        filesSeen.add(scopeKey(scope, key));
+        processPlanEntries(path, scope, key, plan, category, payloadType, mapExtractor);
+        try {
+            addDeletesForMissingChanges(category, filesSeen, plan, scope, payloadType, mapExtractor);
+        } catch (Exception e) {
+            log.error(errorMessage, scope, e.getMessage(), e);
         }
+    }
 
-        LoadedFile state = stateFiles.get(stateKey);
+    private void handleGeneralCategory(Path path,
+                                       MasterPlan plan,
+                                       Map<String, Object> statePayloads,
+                                       FileCategory category,
+                                       String scope,
+                                       String key) {
+        String stateKey = mapKey(category, scope, key);
+        if (!statePayloads.containsKey(stateKey)) {
+            Object payload = stateFileService.loadPayload(category, scope, key, generalPayloadType(category));
+            statePayloads.put(stateKey, payload);
+        }
+        Object state = statePayloads.get(stateKey);
 
         if (Files.exists(path)) {
             LoadedFile changed = parsePath(path);
@@ -209,22 +155,60 @@ public class PlanService {
             if (state == null) {
                 plan.addItem(new PlanItem(Action.NEW, changed.getCategory(), scope, key,
                         changed.getPath().toString(), changed.getPayload()));
-            } else if (!Objects.equals(changed.getPayload(), state.getPayload())) {
+            } else if (!Objects.equals(changed.getPayload(), state)) {
                 plan.addItem(new PlanItem(Action.UPDATE, changed.getCategory(), scope, key,
                         changed.getPath().toString(), changed.getPayload()));
             }
         } else if (state != null) {
-            plan.addItem(new PlanItem(Action.DELETE, state.getCategory(), scope, key,
-                    state.getPath().toString(), state.getPayload()));
+            plan.addItem(new PlanItem(Action.DELETE, category, scope, key,
+                    cosmosStateReference(category, scope, key), state));
         }
     }
 
-    private LoadedFile loadStateFile(String scope, FileCategory category, String key) {
-        Path statePath = stateFileService.resolveStatePath(category, scope, key);
-        if (!Files.exists(statePath)) {
-            return null;
+    private <F> void addDeletesForMissingChanges(FileCategory category,
+                                                    Set<String> filesSeen,
+                                                    MasterPlan plan,
+                                                    String scope,
+                                                    Class<F> payloadType,
+                                                    Function<F, Map<String, ?>> mapExtractor) {
+        List<StateDocument> documents = stateFileService.listStateDocuments(category, scope);
+        for (StateDocument document : documents) {
+            String docKey = stateFileService.deriveKeyFromFilename(Path.of(document.getId()));
+            String scopedKey = scopeKey(scope, docKey);
+            if (filesSeen.contains(scopedKey)) {
+                continue;
+            }
+            F statePayload = stateFileService.payloadFromDocument(document, payloadType);
+            if (statePayload == null) {
+                continue;
+            }
+            Map<String, ?> stateMap = mapExtractor.apply(statePayload);
+            for (Map.Entry<String, ?> entry : stateMap.entrySet()) {
+                plan.addItem(new PlanItem(Action.DELETE, category, scope, entry.getKey(),
+                        formatDocumentReference(document), entry.getValue()));
+            }
         }
-        return parsePath(statePath);
+    }
+
+    private Class<?> generalPayloadType(FileCategory category) {
+        return switch (category) {
+            case SIDE -> SideFile.class;
+            case TRANSACTION -> TransactionFile.class;
+            case CHART_OF_ACCOUNTS -> ChartOfAccountsFile.class;
+            case POSTING_RULE -> PostingRulesFile.class;
+            case GENERAL_LEDGER_PROFILE -> GeneralLedgerProfileFile.class;
+            default -> Object.class;
+        };
+    }
+
+    private String cosmosStateReference(FileCategory category, String scope, String key) {
+        String normalizedScope = scope == null ? "" : scope;
+        return String.format("cosmos://%s/%s/%s", category.name(), normalizedScope, key);
+    }
+
+    private String formatDocumentReference(StateDocument document) {
+        String normalizedScope = document.getScope() == null ? "" : document.getScope();
+        return String.format("cosmos://%s/%s/%s", document.getTypeOfItem(), normalizedScope, document.getId());
     }
 
     private LoadedFile parsePath(Path path) {
@@ -251,13 +235,6 @@ public class PlanService {
         return normalized.endsWith(JSON_EXTENSION);
     }
 
-    private String mapKey(LoadedFile file) {
-        String root = detectRoot(file.getPath());
-        String scope = deriveScope(file.getPath(), root);
-        String normalizedKey = normalizeKey(file.getKey(), scope);
-        return mapKey(file.getCategory(), scope, normalizedKey);
-    }
-
     private String mapKey(FileCategory category, String scope, String key) {
         return category.name() + ":" + scope + ":" + key;
     }
@@ -282,31 +259,8 @@ public class PlanService {
         return "";
     }
 
-    private String detectRoot(Path path) {
-        String lower = path.toString().toLowerCase(Locale.ROOT);
-        String changedRoot = changedFilesRootName();
-        if (!changedRoot.isEmpty() && lower.contains(changedRoot.toLowerCase(Locale.ROOT))) {
-            return changedRoot;
-        }
-        String stateRoot = stateFilesRootName();
-        if (!stateRoot.isEmpty() && lower.contains(stateRoot.toLowerCase(Locale.ROOT))) {
-            return stateRoot;
-        }
-        return "";
-    }
-
     private String scopeKey(String scope, String key) {
         return scope + ":" + key;
-    }
-
-    private String normalizeKey(String key, String scope) {
-        if (scope != null && !scope.isEmpty()) {
-            String suffix = "-" + scope;
-            if (key != null && key.endsWith(suffix)) {
-                return key.substring(0, key.length() - suffix.length());
-            }
-        }
-        return key;
     }
 
     private Map<String, CreateDerivedTransactionPortfolioRequest> toDerivedMap(DerivedPortfolioFile file) {
@@ -380,58 +334,24 @@ public class PlanService {
         return map;
     }
 
-    private <T> void addDeletesForMissingChanges(DeleteScanSpec<T> spec,
-                                                 Set<String> filesSeen,
-                                                 MasterPlan plan,
-                                                 String scope) {
-        if (!Files.exists(spec.stateRoot())) {
-            return;
-        }
-        try (Stream<Path> stream = Files.walk(spec.stateRoot())) {
-            stream.filter(path -> Files.isRegularFile(path)
-                            && path.toString().toLowerCase().contains(spec.folderMarker())
-                            && path.toString().toLowerCase().endsWith(JSON_EXTENSION))
-                    .forEach(statePath -> {
-                        String key = stateFileService.deriveKeyFromFilename(statePath);
-                        String scopedKey = scopeKey(scope, key);
-                        if (filesSeen.contains(scopedKey)) {
-                            return;
-                        }
-                        LoadedFile state = parsePath(statePath);
-                        if (state == null || !spec.payloadType().isInstance(state.getPayload())) {
-                            return;
-                        }
-                        Map<String, ?> stateMap = spec.mapExtractor().apply(spec.payloadType().cast(state.getPayload()));
-                        for (Map.Entry<String, ?> entry : stateMap.entrySet()) {
-                            plan.addItem(new PlanItem(Action.DELETE, spec.category(), scope, entry.getKey(),
-                                    statePath.toString(), entry.getValue()));
-                        }
-                    });
-        } catch (IOException e) {
-            throw new PlanProcessingException("Failed to scan " + spec.folderMarker() + " state files", e);
-        }
-    }
-
-    private <F, R> void processPlanEntries(
+    private <F> void processPlanEntries(
             Path changedPath,
             String scope,
             String key,
             MasterPlan plan,
             FileCategory category,
             Class<F> payloadType,
-            Function<F, Map<String, R>> mapExtractor) {
-        Path statePath = stateFileService.resolveStatePath(category, scope, key);
-
+            Function<F, Map<String, ?>> mapExtractor) {
         F changedFile = parsePayload(changedPath, payloadType);
-        F stateFile = parsePayload(statePath, payloadType);
+        F stateFile = stateFileService.loadPayload(category, scope, key, payloadType);
 
-        Map<String, R> changedMap = mapExtractor.apply(changedFile);
-        Map<String, R> stateMap = mapExtractor.apply(stateFile);
+        Map<String, ?> changedMap = mapExtractor.apply(changedFile);
+        Map<String, ?> stateMap = mapExtractor.apply(stateFile);
 
-        for (Map.Entry<String, R> entry : changedMap.entrySet()) {
+        for (Map.Entry<String, ?> entry : changedMap.entrySet()) {
             String code = entry.getKey();
-            R changed = entry.getValue();
-            R existing = stateMap.get(code);
+            Object changed = entry.getValue();
+            Object existing = stateMap.get(code);
             if (existing == null) {
                 plan.addItem(new PlanItem(Action.NEW, category, scope, code, changedPath.toString(), changed));
             } else if (!Objects.equals(changed, existing)) {
@@ -439,10 +359,10 @@ public class PlanService {
             }
         }
 
-        for (Map.Entry<String, R> entry : stateMap.entrySet()) {
+        for (Map.Entry<String, ?> entry : stateMap.entrySet()) {
             String code = entry.getKey();
             if (!changedMap.containsKey(code)) {
-                plan.addItem(new PlanItem(Action.DELETE, category, scope, code, statePath.toString(), entry.getValue()));
+                plan.addItem(new PlanItem(Action.DELETE, category, scope, code, cosmosStateReference(category, scope, key), entry.getValue()));
             }
         }
     }
@@ -463,24 +383,6 @@ public class PlanService {
 
     private String changedFilesRootName() {
         return Optional.ofNullable(fileLocationProperties.getChangedFilesDir()).orElse("");
-    }
-
-    private String stateFilesRootName() {
-        return Optional.ofNullable(fileLocationProperties.getStateFilesDir()).orElse("");
-    }
-
-    private record DeleteScanSpec<T>(Path stateRoot,
-                                     String folderMarker,
-                                     FileCategory category,
-                                     Class<T> payloadType,
-                                     Function<T, Map<String, ?>> mapExtractor) {
-        static <T> DeleteScanSpec<T> of(Path stateRoot,
-                                        String folderMarker,
-                                        FileCategory category,
-                                        Class<T> payloadType,
-                                        Function<T, Map<String, ?>> mapExtractor) {
-            return new DeleteScanSpec<>(stateRoot, folderMarker, category, payloadType, mapExtractor);
-        }
     }
 
 }

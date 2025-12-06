@@ -27,15 +27,15 @@ This document walks through the lifecycle of a plan from changed files to applie
 
 ## 4. State file maintenance
 
-- `StateFileService` tracks JSON snapshots under `statefiles/<scope>/<dir>`. The directory names are configured in `FileLocationProperties`.
+- `StateFileService` tracks JSON snapshots inside the Cosmos DB container `transaction_types_config`. The container uses `/typeOfItem` as the partition key, so each `FileCategory` shares a partition and documents follow the `<key>-<scope>` naming convention.
 - For simple resources (`ChartOfAccounts`, `PostingRule`, `GeneralLedgerProfile`), the service writes a single JSON file containing scope, key, and the request payload.
 - For list resources (`Abor`, `DerivedPortfolio`, `PortfolioGroup`, `Account`), it maintains aggregate files that contain the entire list; CRUD operations manipulate the list content (adding/removing entries) before writing back.
-- The service also performs delete scanning for list-based files. When building a plan, `PlanService.addDeletesForMissingChanges` walks the state directory (guided by `DeleteScanSpec`) and emits `DELETE` items for entries no longer present in changed files.
+- The service also performs delete scanning for list-based files. When building a plan, `PlanService.addDeletesForMissingChanges` queries the Cosmos container per category and scope and emits `DELETE` items for entries no longer present in changed files.
 
 ## 5. Tips for debugging
 
 - Inspect `plan/masterplan.json` after a `--plan` run to understand which actions will fire.
-- Check `statefiles/...` to verify that `StateFileService` wrote the expected JSON (new files for new resources, deletes for missing entries).
+- Check the Cosmos container `transaction_types_config` (e.g., via the emulator) to verify that `StateFileService` wrote the expected JSON (new documents for new resources, deletes for missing entries).
 - Logs from `PlanApplyService` and the API services detail each action taken; any errors include the plan item key.
 
 By keeping these components aligned, the project ensures each changed JSON file flows through parsing, diff detection, ordering, application, and state persistence.

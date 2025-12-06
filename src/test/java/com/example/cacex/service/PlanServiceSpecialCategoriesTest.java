@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 class PlanServiceSpecialCategoriesTest {
@@ -43,7 +44,6 @@ class PlanServiceSpecialCategoriesTest {
         MockitoAnnotations.openMocks(this);
         properties = new FileLocationProperties();
         properties.setChangedFilesDir(tempDir.resolve("changedfiles").toString());
-        properties.setStateFilesDir(tempDir.resolve("statefiles").toString());
         properties.setPlanDir(tempDir.resolve("plan").toString());
         properties.setMasterPlanFile("masterplan.json");
 
@@ -53,27 +53,6 @@ class PlanServiceSpecialCategoriesTest {
             String base = PathUtils.baseName(p);
             int dash = base.lastIndexOf('-');
             return dash > 0 ? base.substring(0, dash) : base;
-        });
-        when(stateFileService.resolveStatePath(any(FileCategory.class), any(), any())).thenAnswer(inv -> {
-            FileCategory category = inv.getArgument(0);
-            String scope = inv.getArgument(1);
-            String key = inv.getArgument(2);
-            String folder = switch (category) {
-                case ABOR -> properties.getAborDirName();
-                case ABOR_CONFIGURATION -> properties.getAborConfigurationsDirName();
-                case DERIVED_PORTFOLIO -> properties.getDerivedPortfoliosDirName();
-                case PORTFOLIO_GROUP -> properties.getPortfolioGroupsDirName();
-                case ACCOUNT -> properties.getAccountsDirName();
-                case SIDE -> properties.getSidesDirName();
-                case TRANSACTION -> properties.getTransactionsDirName();
-                case CHART_OF_ACCOUNTS -> properties.getChartOfAccountsDirName();
-                case POSTING_RULE -> properties.getPostingRulesDirName();
-                case GENERAL_LEDGER_PROFILE -> properties.getGeneralLedgerProfilesDirName();
-            };
-            Path base = (scope == null || scope.isBlank())
-                    ? properties.stateFilesRoot()
-                    : properties.stateFilesRoot().resolve(scope);
-            return base.resolve(folder).resolve(key + ".json");
         });
     }
 
@@ -87,51 +66,64 @@ class PlanServiceSpecialCategoriesTest {
         payloads.put(FileCategory.ACCOUNT, new HashMap<>());
 
         Path changedAbor = createFile("changedfiles/S/abor/main.json");
-        Path stateAbor = createFile("statefiles/S/abor/main.json");
-        Path orphanAbor = createFile("statefiles/S/abor/other.json");
         payloads.get(FileCategory.ABOR).put(changedAbor, new LoadedFile(FileCategory.ABOR, "main", changedAbor, aborFile("NEW")));
-        payloads.get(FileCategory.ABOR).put(stateAbor, new LoadedFile(FileCategory.ABOR, "main", stateAbor, aborFile("OLD")));
-        payloads.get(FileCategory.ABOR).put(orphanAbor, new LoadedFile(FileCategory.ABOR, "other", orphanAbor, aborFile("ORPHAN")));
 
         Path changedCfg = createFile("changedfiles/S/aborconfigs/cfg.json");
-        Path stateCfg = createFile("statefiles/S/aborconfigs/cfg.json");
-        Path orphanCfg = createFile("statefiles/S/aborconfigs/other.json");
         payloads.get(FileCategory.ABOR_CONFIGURATION)
                 .put(changedCfg, new LoadedFile(FileCategory.ABOR_CONFIGURATION, "cfg", changedCfg, aborConfigFile("NEWCFG")));
-        payloads.get(FileCategory.ABOR_CONFIGURATION)
-                .put(stateCfg, new LoadedFile(FileCategory.ABOR_CONFIGURATION, "cfg", stateCfg, aborConfigFile("OLDCFG")));
-        payloads.get(FileCategory.ABOR_CONFIGURATION)
-                .put(orphanCfg, new LoadedFile(FileCategory.ABOR_CONFIGURATION, "other", orphanCfg, aborConfigFile("ORPHANCFG")));
 
         Path changedDerived = createFile("changedfiles/S/derivedportfolios/derived.json");
-        Path stateDerived = createFile("statefiles/S/derivedportfolios/derived.json");
-        Path orphanDerived = createFile("statefiles/S/derivedportfolios/other.json");
         payloads.get(FileCategory.DERIVED_PORTFOLIO)
                 .put(changedDerived, new LoadedFile(FileCategory.DERIVED_PORTFOLIO, "derived", changedDerived, derivedFile("DP_NEW")));
-        payloads.get(FileCategory.DERIVED_PORTFOLIO)
-                .put(stateDerived, new LoadedFile(FileCategory.DERIVED_PORTFOLIO, "derived", stateDerived, derivedFile("DP_OLD")));
-        payloads.get(FileCategory.DERIVED_PORTFOLIO)
-                .put(orphanDerived, new LoadedFile(FileCategory.DERIVED_PORTFOLIO, "other", orphanDerived, derivedFile("DP_ORPHAN")));
 
         Path changedGroup = createFile("changedfiles/S/portfoliogroups/groups.json");
-        Path stateGroup = createFile("statefiles/S/portfoliogroups/groups.json");
-        Path orphanGroup = createFile("statefiles/portfoliogroups/other.json");
         payloads.get(FileCategory.PORTFOLIO_GROUP)
                 .put(changedGroup, new LoadedFile(FileCategory.PORTFOLIO_GROUP, "groups", changedGroup, groupFile("PG_NEW")));
-        payloads.get(FileCategory.PORTFOLIO_GROUP)
-                .put(stateGroup, new LoadedFile(FileCategory.PORTFOLIO_GROUP, "groups", stateGroup, groupFile("PG_OLD")));
-        payloads.get(FileCategory.PORTFOLIO_GROUP)
-                .put(orphanGroup, new LoadedFile(FileCategory.PORTFOLIO_GROUP, "other", orphanGroup, groupFile("PG_ORPHAN")));
 
         Path changedAccount = createFile("changedfiles/S/gla/accounts.json");
-        Path stateAccount = createFile("statefiles/S/gla/accounts.json");
-        Path orphanAccount = createFile("statefiles/S/gla/orphan.json");
         payloads.get(FileCategory.ACCOUNT)
                 .put(changedAccount, new LoadedFile(FileCategory.ACCOUNT, "accounts", changedAccount, accountFile("COA1", "ACC1")));
-        payloads.get(FileCategory.ACCOUNT)
-                .put(stateAccount, new LoadedFile(FileCategory.ACCOUNT, "accounts", stateAccount, accountFile("COA1", "ACC2")));
-        payloads.get(FileCategory.ACCOUNT)
-                .put(orphanAccount, new LoadedFile(FileCategory.ACCOUNT, "orphan", orphanAccount, accountFile("COA1", "ACC3")));
+
+        Map<FileCategory, List<StateDocument>> docMap = new EnumMap<>(FileCategory.class);
+        Map<String, Object> payloadMap = new HashMap<>();
+
+        docMap.put(FileCategory.ABOR, List.of(
+                stateDocument("ABOR", "main-S", "S"),
+                stateDocument("ABOR", "other-S", "S")));
+        payloadMap.put("ABOR:main-S", aborFile("OLD"));
+        payloadMap.put("ABOR:other-S", aborFile("ORPHAN"));
+
+        docMap.put(FileCategory.ABOR_CONFIGURATION, List.of(
+                stateDocument("ABOR_CONFIGURATION", "cfg-S", "S"),
+                stateDocument("ABOR_CONFIGURATION", "other-S", "S")));
+        payloadMap.put("ABOR_CONFIGURATION:cfg-S", aborConfigFile("OLDCFG"));
+        payloadMap.put("ABOR_CONFIGURATION:other-S", aborConfigFile("ORPHANCFG"));
+
+        docMap.put(FileCategory.DERIVED_PORTFOLIO, List.of(
+                stateDocument("DERIVED_PORTFOLIO", "derived-S", "S"),
+                stateDocument("DERIVED_PORTFOLIO", "other-S", "S")));
+        payloadMap.put("DERIVED_PORTFOLIO:derived-S", derivedFile("DP_OLD"));
+        payloadMap.put("DERIVED_PORTFOLIO:other-S", derivedFile("DP_ORPHAN"));
+
+        docMap.put(FileCategory.PORTFOLIO_GROUP, List.of(
+                stateDocument("PORTFOLIO_GROUP", "groups-S", "S"),
+                stateDocument("PORTFOLIO_GROUP", "other-S", "S")));
+        payloadMap.put("PORTFOLIO_GROUP:groups-S", groupFile("PG_OLD"));
+        payloadMap.put("PORTFOLIO_GROUP:other-S", groupFile("PG_ORPHAN"));
+
+        docMap.put(FileCategory.ACCOUNT, List.of(
+                stateDocument("ACCOUNT", "accounts-S", "S"),
+                stateDocument("ACCOUNT", "orphan-S", "S")));
+        payloadMap.put("ACCOUNT:accounts-S", accountFile("COA1", "ACC2"));
+        payloadMap.put("ACCOUNT:orphan-S", accountFile("COA1", "ACC3"));
+
+        when(stateFileService.listStateDocuments(any(FileCategory.class), anyString()))
+                .thenAnswer(inv -> docMap.getOrDefault(inv.getArgument(0), List.of()));
+        when(stateFileService.payloadFromDocument(any(StateDocument.class), any()))
+                .thenAnswer(inv -> {
+                    StateDocument document = inv.getArgument(0);
+                    return payloadMap.get(document.getTypeOfItem() + ":" + document.getId());
+                });
 
         FileParsingStrategyFactory factory = buildFactory(payloads);
         PlanService planService = new PlanService(factory, orderingRuleEngine, properties, stateFileService);
@@ -241,6 +233,14 @@ class PlanServiceSpecialCategoriesTest {
         }).toList();
         file.setAccounts(accounts);
         return file;
+    }
+
+    private StateDocument stateDocument(String typeOfItem, String id, String scope) {
+        StateDocument document = new StateDocument();
+        document.setTypeOfItem(typeOfItem);
+        document.setId(id);
+        document.setScope(scope);
+        return document;
     }
 
     private record MapBackedStrategy(FileCategory category, Map<Path, LoadedFile> payloads) implements FileParsingStrategy {

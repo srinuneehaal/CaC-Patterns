@@ -16,7 +16,6 @@ import java.util.function.Function;
 public class FileLocationProperties {
 
     private String changedFilesDir ;
-    private String stateFilesDir;
     private String planDir;
     private String masterPlanFile;
     private String sidesDirName = "sides";
@@ -47,24 +46,6 @@ public class FileLocationProperties {
      */
     public void setChangedFilesDir(String changedFilesDir) {
         this.changedFilesDir = changedFilesDir;
-    }
-
-    /**
-     * Returns the configured state files directory.
-     *
-     * @return state files directory
-     */
-    public String getStateFilesDir() {
-        return stateFilesDir;
-    }
-
-    /**
-     * Sets the root directory containing state files.
-     *
-     * @param stateFilesDir directory name or path
-     */
-    public void setStateFilesDir(String stateFilesDir) {
-        this.stateFilesDir = stateFilesDir;
     }
 
     /**
@@ -290,15 +271,6 @@ public class FileLocationProperties {
      */
     public Path changedFilesRoot() {
         return Path.of(changedFilesDir);
-    }
-
-    /**
-     * Resolves the state files root as a {@link Path}.
-     *
-     * @return path to state files
-     */
-    public Path stateFilesRoot() {
-        return Path.of(stateFilesDir);
     }
 
     /**

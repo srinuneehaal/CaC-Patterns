@@ -1,7 +1,7 @@
 # CaC-Ex Plan Generator
 
 Spring Boot utility that reads JSON files listed in `CHANGED_FILES`, 
-maps them to LUSID SDK models, compares them with statefiles, 
+maps them to LUSID SDK models, compares them with persisted Cosmos state documents, 
 and writes a master plan describing new, updated, or deleted objects.
 
 ## Requirements
@@ -20,7 +20,7 @@ mvn -q -DskipTests spring-boot:run -- --plan
 mvn -q -DskipTests spring-boot:run -- --apply
 ```
 
-Supported inputs live under `changedfiles/<scope>/` and include transactions, sides, derived portfolios, portfolio groups, chart of accounts (in `coa/`), general ledger accounts (in `gla/`), posting rules, ABOR configurations (in `aborconfigs/`), and ABORs (in `abor/`). State files are read from the matching structure under `statefiles/`.
+Supported inputs live under `changedfiles/<scope>/` and include transactions, sides, derived portfolios, portfolio groups, chart of accounts (in `coa/`), general ledger accounts (in `gla/`), posting rules, ABOR configurations (in `aborconfigs/`), and ABORs (in `abor/`). State comparisons now read from the Cosmos container `transaction_types_config` (partitioned by `typeOfItem`), whose document ids follow the same `<key>-<scope>` convention.
 
 Find the generated plan at `plan/masterplan.json`. Apply mode will read that file and dispatch each item to the relevant service (sides, transaction types, derived portfolios, portfolio groups, chart of accounts, accounts, posting rules, ABOR configurations, or ABORs).
 

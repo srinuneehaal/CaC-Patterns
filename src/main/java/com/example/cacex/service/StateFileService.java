@@ -1,20 +1,20 @@
 package com.example.cacex.service;
 
-import com.example.cacex.config.FileLocationProperties;
 import com.example.cacex.exception.PlanApplyException;
-import com.example.cacex.exception.UnsupportedFileCategoryException;
 import com.example.cacex.model.*;
-import com.example.cacex.service.plan.JsonModelMapper;
-import com.example.cacex.util.PathUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finbourne.lusid.model.*;
+import com.example.cacex.repository.StateRepository;
+import com.example.cacex.service.plan.JsonModelMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.cacex.util.PathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
@@ -24,32 +24,19 @@ import java.util.function.Supplier;
 public class StateFileService {
 
     private static final Logger log = LoggerFactory.getLogger(StateFileService.class);
-    private static final String JSON_EXTENSION = ".json";
 
-    private final FileLocationProperties fileLocationProperties;
+    private final StateRepository stateRepository;
     private final JsonModelMapper jsonModelMapper;
     private final ObjectMapper objectMapper;
 
-    /**
-     * Creates a state file service for reading and writing plan state.
-     *
-     * @param fileLocationProperties filesystem configuration
-     * @param jsonModelMapper        mapper for domain payloads
-     * @param objectMapper           shared Jackson mapper
-     */
-    public StateFileService(FileLocationProperties fileLocationProperties,
+    public StateFileService(StateRepository stateRepository,
                             JsonModelMapper jsonModelMapper,
                             ObjectMapper objectMapper) {
-        this.fileLocationProperties = fileLocationProperties;
+        this.stateRepository = stateRepository;
         this.jsonModelMapper = jsonModelMapper;
         this.objectMapper = objectMapper;
     }
 
-    /**
-     * Applies the given plan item to the state files (create/update/delete).
-     *
-     * @param item plan item to apply; null items are ignored
-     */
     public void applyStateChange(PlanItem item) {
         if (item == null) {
             return;
@@ -57,28 +44,41 @@ public class StateFileService {
         if (item.getFileCategory() == null || item.getAction() == null) {
             throw new PlanApplyException("Plan item missing category or action; cannot update state file");
         }
-        Path statePath = resolveStatePath(item);
-        switch (item.getFileCategory()) {
-            case SIDE -> applySide(item, statePath);
-            case TRANSACTION -> applyTransaction(item, statePath);
-            case CHART_OF_ACCOUNTS -> applyChartOfAccounts(item, statePath);
-            case POSTING_RULE -> applyPostingRule(item, statePath);
-            case GENERAL_LEDGER_PROFILE -> applyGeneralLedgerProfile(item, statePath);
-            case ABOR -> applyAbor(item, statePath);
-            case ABOR_CONFIGURATION -> applyAborConfiguration(item, statePath);
-            case DERIVED_PORTFOLIO -> applyDerivedPortfolio(item, statePath);
-            case PORTFOLIO_GROUP -> applyPortfolioGroup(item, statePath);
-            case ACCOUNT -> applyAccount(item, statePath);
-            default -> log.warn("State file update not implemented for category {}", item.getFileCategory());
+        FileCategory category = item.getFileCategory();
+        String scope = item.getScope();
+        String key = resolveStorageKey(item);
+        switch (category) {
+            case SIDE -> applySide(item, scope, key);
+            case TRANSACTION -> applyTransaction(item, scope, key);
+            case CHART_OF_ACCOUNTS -> applyChartOfAccounts(item, scope, key);
+            case POSTING_RULE -> applyPostingRule(item, scope, key);
+            case GENERAL_LEDGER_PROFILE -> applyGeneralLedgerProfile(item, scope, key);
+            case ABOR -> applyAbor(item, scope, key);
+            case ABOR_CONFIGURATION -> applyAborConfiguration(item, scope, key);
+            case DERIVED_PORTFOLIO -> applyDerivedPortfolio(item, scope, key);
+            case PORTFOLIO_GROUP -> applyPortfolioGroup(item, scope, key);
+            case ACCOUNT -> applyAccount(item, scope, key);
+            default -> log.warn("State file update not implemented for category {}", category);
         }
     }
 
-    /**
-     * Derives the logical key from a file path, stripping any scope suffix.
-     *
-     * @param path file path
-     * @return derived key
-     */
+    public <T> List<StateDocument> listStateDocuments(FileCategory category, String scope) {
+        return stateRepository.list(category.name(), scope);
+    }
+
+    public <T> T loadPayload(FileCategory category, String scope, String key, Class<T> payloadType) {
+        return loadStateDocument(category, scope, key)
+                .map(doc -> parseStatePayload(doc.getData(), payloadType))
+                .orElse(null);
+    }
+
+    public <T> T payloadFromDocument(StateDocument document, Class<T> payloadType) {
+        if (document == null) {
+            return null;
+        }
+        return parseStatePayload(document.getData(), payloadType);
+    }
+
     public String deriveKeyFromFilename(Path path) {
         if (path == null) {
             throw new PlanApplyException("Cannot derive key from null path");
@@ -91,101 +91,71 @@ public class StateFileService {
         return base;
     }
 
-    /**
-     * Resolves the state file path for the given category, scope, and key.
-     *
-     * @param category file category
-     * @param scope    scope value
-     * @param key      logical key (may be missing scope suffix)
-     * @return path to the state file
-     */
-    public Path resolveStatePath(FileCategory category, String scope, String key) {
-        String folder = folderFor(category);
-        boolean hasScope = scope != null && !scope.isBlank();
-        String normalizedKey = key == null ? "" : key.trim();
-        if (hasScope) {
-            String suffix = "-" + scope;
-            if (!normalizedKey.toLowerCase(Locale.ROOT).endsWith(suffix.toLowerCase(Locale.ROOT))) {
-                normalizedKey = normalizedKey + suffix;
-            }
-        }
-        String filename = normalizedKey + JSON_EXTENSION;
-        if (hasScope) {
-            return fileLocationProperties.stateFilesRoot()
-                    .resolve(scope)
-                    .resolve(folder)
-                    .resolve(filename);
-        }
-        return fileLocationProperties.stateFilesRoot()
-                .resolve(folder)
-                .resolve(filename);
-    }
-
-    private void applySide(PlanItem item, Path statePath) {
+    private void applySide(PlanItem item, String scope, String key) {
         if (item.getAction() == Action.DELETE) {
-            deleteStateFile(statePath);
+            deleteStateDocument(item.getFileCategory(), scope, key);
             return;
         }
         SideFile payload = castPayload(item, SideFile.class);
         if (payload.getScope() == null) {
-            payload.setScope(item.getScope());
+            payload.setScope(scope);
         }
-        writeStateFile(statePath, payload);
+        persistStateDocument(item.getFileCategory(), scope, key, payload);
     }
 
-    private void applyTransaction(PlanItem item, Path statePath) {
+    private void applyTransaction(PlanItem item, String scope, String key) {
         if (item.getAction() == Action.DELETE) {
-            deleteStateFile(statePath);
+            deleteStateDocument(item.getFileCategory(), scope, key);
             return;
         }
         TransactionFile payload = castPayload(item, TransactionFile.class);
         if (payload.getScope() == null) {
-            payload.setScope(item.getScope());
+            payload.setScope(scope);
         }
-        writeStateFile(statePath, payload);
+        persistStateDocument(item.getFileCategory(), scope, key, payload);
     }
 
-    private void applyChartOfAccounts(PlanItem item, Path statePath) {
+    private void applyChartOfAccounts(PlanItem item, String scope, String key) {
         if (item.getAction() == Action.DELETE) {
-            deleteStateFile(statePath);
+            deleteStateDocument(item.getFileCategory(), scope, key);
             return;
         }
         ChartOfAccountsRequest payload = castPayload(item, ChartOfAccountsRequest.class);
         ChartOfAccountsFile file = new ChartOfAccountsFile();
-        file.setScope(item.getScope());
-        file.setChartOfAccountsCode(stripScopeSuffix(item.getKey(), item.getScope()));
+        file.setScope(scope);
+        file.setChartOfAccountsCode(stripScopeSuffix(key, scope));
         file.setChartOfAccountsRequest(payload);
-        writeStateFile(statePath, file);
+        persistStateDocument(item.getFileCategory(), scope, key, file);
     }
 
-    private void applyPostingRule(PlanItem item, Path statePath) {
+    private void applyPostingRule(PlanItem item, String scope, String key) {
         if (item.getAction() == Action.DELETE) {
-            deleteStateFile(statePath);
+            deleteStateDocument(item.getFileCategory(), scope, key);
             return;
         }
         PostingModuleRequest payload = castPayload(item, PostingModuleRequest.class);
-        String trimmedKey = stripScopeSuffix(item.getKey(), item.getScope());
+        String trimmedKey = stripScopeSuffix(key, scope);
         String[] parts = trimmedKey.split("-");
         String moduleCode = parts.length > 0 ? parts[0] : trimmedKey;
         String coaCode = parts.length > 1 ? parts[1] : moduleCode;
 
         PostingRulesFile file = new PostingRulesFile();
-        file.setScope(item.getScope());
+        file.setScope(scope);
         file.setPostingModuleCode(moduleCode);
         file.setChartOfAccountsCode(coaCode);
         file.setPostingModuleRequest(payload);
-        writeStateFile(statePath, file);
+        persistStateDocument(item.getFileCategory(), scope, key, file);
     }
 
-    private void applyGeneralLedgerProfile(PlanItem item, Path statePath) {
+    private void applyGeneralLedgerProfile(PlanItem item, String scope, String key) {
         if (item.getAction() == Action.DELETE) {
-            deleteStateFile(statePath);
+            deleteStateDocument(item.getFileCategory(), scope, key);
             return;
         }
         GeneralLedgerProfileRequest payload = castPayload(item, GeneralLedgerProfileRequest.class);
         GeneralLedgerProfileFile file = new GeneralLedgerProfileFile();
-        file.setScope(item.getScope());
-        String trimmedKey = stripScopeSuffix(item.getKey(), item.getScope());
+        file.setScope(scope);
+        String trimmedKey = stripScopeSuffix(key, scope);
         file.setChartOfAccountsCode(extractChartOfAccountsFromGeneralLedgerProfileKey(trimmedKey));
         String profileCode = payload.getGeneralLedgerProfileCode();
         if (!StringUtils.hasText(profileCode)) {
@@ -193,13 +163,13 @@ public class StateFileService {
         }
         file.setGeneralLedgerProfileCode(profileCode);
         file.setGeneralLedgerProfileRequest(payload);
-        writeStateFile(statePath, file);
+        persistStateDocument(item.getFileCategory(), scope, key, file);
     }
 
-    private void applyAbor(PlanItem item, Path statePath) {
-        AborFile file = readOrDefault(statePath, AborFile.class, AborFile::new);
+    private void applyAbor(PlanItem item, String scope, String key) {
+        AborFile file = readOrDefault(item.getFileCategory(), scope, key, AborFile.class, AborFile::new);
         if (file.getScope() == null) {
-            file.setScope(item.getScope());
+            file.setScope(scope);
         }
         List<AborRequest> abors = new ArrayList<>(optionalList(file.getAborRequests()));
         if (item.getAction() == Action.DELETE) {
@@ -209,13 +179,14 @@ public class StateFileService {
             upsertByKey(abors, payload, AborRequest::getCode, item.getKey());
         }
         file.setAborRequests(abors);
-        persistListFile(statePath, file, abors);
+        persistListDocument(item.getFileCategory(), scope, key, file, abors);
     }
 
-    private void applyAborConfiguration(PlanItem item, Path statePath) {
-        AborConfigurationFile file = readOrDefault(statePath, AborConfigurationFile.class, AborConfigurationFile::new);
+    private void applyAborConfiguration(PlanItem item, String scope, String key) {
+        AborConfigurationFile file = readOrDefault(item.getFileCategory(), scope, key, AborConfigurationFile.class,
+                AborConfigurationFile::new);
         if (file.getScope() == null) {
-            file.setScope(item.getScope());
+            file.setScope(scope);
         }
         List<AborConfigurationRequest> configs = new ArrayList<>(optionalList(file.getAborConfigurations()));
         if (item.getAction() == Action.DELETE) {
@@ -225,13 +196,14 @@ public class StateFileService {
             upsertByKey(configs, payload, AborConfigurationRequest::getCode, item.getKey());
         }
         file.setAborConfigurations(configs);
-        persistListFile(statePath, file, configs);
+        persistListDocument(item.getFileCategory(), scope, key, file, configs);
     }
 
-    private void applyDerivedPortfolio(PlanItem item, Path statePath) {
-        DerivedPortfolioFile file = readOrDefault(statePath, DerivedPortfolioFile.class, DerivedPortfolioFile::new);
+    private void applyDerivedPortfolio(PlanItem item, String scope, String key) {
+        DerivedPortfolioFile file = readOrDefault(item.getFileCategory(), scope, key, DerivedPortfolioFile.class,
+                DerivedPortfolioFile::new);
         if (file.getScope() == null) {
-            file.setScope(item.getScope());
+            file.setScope(scope);
         }
         List<CreateDerivedTransactionPortfolioRequest> portfolios =
                 new ArrayList<>(optionalList(file.getDerivedPortfolios()));
@@ -243,13 +215,14 @@ public class StateFileService {
             upsertByKey(portfolios, payload, CreateDerivedTransactionPortfolioRequest::getCode, item.getKey());
         }
         file.setDerivedPortfolios(portfolios);
-        persistListFile(statePath, file, portfolios);
+        persistListDocument(item.getFileCategory(), scope, key, file, portfolios);
     }
 
-    private void applyPortfolioGroup(PlanItem item, Path statePath) {
-        PortfolioGroupFile file = readOrDefault(statePath, PortfolioGroupFile.class, PortfolioGroupFile::new);
+    private void applyPortfolioGroup(PlanItem item, String scope, String key) {
+        PortfolioGroupFile file = readOrDefault(item.getFileCategory(), scope, key, PortfolioGroupFile.class,
+                PortfolioGroupFile::new);
         if (file.getScope() == null) {
-            file.setScope(item.getScope());
+            file.setScope(scope);
         }
         List<CreatePortfolioGroupRequest> groups = new ArrayList<>(optionalList(file.getGroups()));
         if (item.getAction() == Action.DELETE) {
@@ -259,16 +232,16 @@ public class StateFileService {
             upsertByKey(groups, payload, CreatePortfolioGroupRequest::getCode, item.getKey());
         }
         file.setGroups(groups);
-        persistListFile(statePath, file, groups);
+        persistListDocument(item.getFileCategory(), scope, key, file, groups);
     }
 
-    private void applyAccount(PlanItem item, Path statePath) {
-        AccountFile file = readOrDefault(statePath, AccountFile.class, AccountFile::new);
+    private void applyAccount(PlanItem item, String scope, String key) {
+        AccountFile file = readOrDefault(item.getFileCategory(), scope, key, AccountFile.class, AccountFile::new);
         if (file.getScope() == null) {
-            file.setScope(item.getScope());
+            file.setScope(scope);
         }
         if (file.getChartOfAccountsCode() == null) {
-            file.setChartOfAccountsCode(extractChartOfAccounts(item.getKey(), item.getScope()));
+            file.setChartOfAccountsCode(extractChartOfAccounts(key, scope));
         }
         List<Account> accounts = new ArrayList<>(optionalList(file.getAccounts()));
         if (item.getAction() == Action.DELETE) {
@@ -280,9 +253,10 @@ public class StateFileService {
             accounts.add(payload);
         }
         file.setAccounts(accounts);
-        persistListFile(statePath, file, accounts);
+        persistListDocument(item.getFileCategory(), scope, key, file, accounts);
     }
 
+    @SuppressWarnings("unchecked")
     private <T> T castPayload(PlanItem item, Class<T> type) {
         Object payload = item.getPayload();
         if (payload == null) {
@@ -292,71 +266,91 @@ public class StateFileService {
             throw new PlanApplyException("Unexpected payload type for " + item.getKey()
                     + "; expected " + type.getSimpleName() + " but found " + payload.getClass().getSimpleName());
         }
-        return type.cast(payload);
+        return (T) payload;
     }
 
-    private Path resolveStatePath(PlanItem item) {
-        String key = item.getKey();
-        if (item.getSourcePath() != null && !item.getSourcePath().isBlank()) {
-            key = deriveKeyFromFilename(Path.of(item.getSourcePath()));
-        }
-        return resolveStatePath(item.getFileCategory(), item.getScope(), key);
+    private <T> T readOrDefault(FileCategory category,
+                               String scope,
+                               String key,
+                               Class<T> type,
+                               Supplier<T> fallback) {
+        T payload = loadPayload(category, scope, key, type);
+        return payload == null ? fallback.get() : payload;
     }
 
-    private String folderFor(FileCategory category) {
-        return switch (category) {
-            case SIDE -> fileLocationProperties.getSidesDirName();
-            case TRANSACTION -> fileLocationProperties.getTransactionsDirName();
-            case DERIVED_PORTFOLIO -> fileLocationProperties.getDerivedPortfoliosDirName();
-            case PORTFOLIO_GROUP -> fileLocationProperties.getPortfolioGroupsDirName();
-            case CHART_OF_ACCOUNTS -> fileLocationProperties.getChartOfAccountsDirName();
-            case ACCOUNT -> fileLocationProperties.getAccountsDirName();
-            case POSTING_RULE -> fileLocationProperties.getPostingRulesDirName();
-            case GENERAL_LEDGER_PROFILE -> fileLocationProperties.getGeneralLedgerProfilesDirName();
-            case ABOR_CONFIGURATION -> fileLocationProperties.getAborConfigurationsDirName();
-            case ABOR -> fileLocationProperties.getAborDirName();
-            default -> throw new UnsupportedFileCategoryException("Unsupported category " + category);
-        };
+    private Optional<StateDocument> loadStateDocument(FileCategory category, String scope, String key) {
+        String id = stateDocumentId(scope, key);
+        return stateRepository.find(id, category.name());
     }
 
-    private <T> T readOrDefault(Path path, Class<T> type, Supplier<T> fallback) {
-        if (Files.exists(path)) {
-            try {
-                return jsonModelMapper.read(path, type);
-            } catch (IOException e) {
-                throw new PlanApplyException("Failed to read state file " + path, e);
-            }
+    private <T> T parseStatePayload(JsonNode data, Class<T> type) {
+        if (data == null) {
+            return null;
         }
         try {
-            return fallback.get();
+            return jsonModelMapper.read(data.toString(), type);
+        } catch (IOException e) {
+            throw new PlanApplyException("Failed to parse state payload for type " + type.getSimpleName(), e);
+        }
+    }
+
+    private void persistStateDocument(FileCategory category, String scope, String key, Object content) {
+        try {
+            StateDocument document = new StateDocument();
+            document.setId(stateDocumentId(scope, key));
+            document.setTypeOfItem(category.name());
+            document.setScope(normalizeScope(scope));
+            document.setData(objectMapper.valueToTree(content));
+            stateRepository.upsert(document);
+            log.debug("State document {} persisted for category {}", document.getId(), category);
         } catch (Exception e) {
-            throw new PlanApplyException("Failed to create default state file holder", e);
+            throw new PlanApplyException("Failed to write state for " + category + "/" + key, e);
         }
     }
 
-    private void writeStateFile(Path path, Object content) {
-        try {
-            Path parent = path.getParent();
-            if (parent != null) {
-                Files.createDirectories(parent);
-            }
-            objectMapper.writeValue(path.toFile(), content);
-            log.debug("State file written to {}", path.toAbsolutePath());
-        } catch (IOException e) {
-            throw new PlanApplyException("Failed to write state file " + path, e);
+    private void deleteStateDocument(FileCategory category, String scope, String key) {
+        stateRepository.delete(stateDocumentId(scope, key), category.name());
+    }
+
+    private void persistListDocument(FileCategory category,
+                                     String scope,
+                                     String key,
+                                     Object file,
+                                     List<?> contents) {
+        if (contents == null || contents.isEmpty()) {
+            deleteStateDocument(category, scope, key);
+        } else {
+            persistStateDocument(category, scope, key, file);
         }
     }
 
-    private void deleteStateFile(Path path) {
-        try {
-            if (Files.deleteIfExists(path)) {
-                log.debug("Deleted state file {}", path.toAbsolutePath());
-            } else {
-                log.debug("State file {} not found for deletion", path.toAbsolutePath());
+    private String resolveStorageKey(PlanItem item) {
+        String key = item.getKey();
+        if (StringUtils.hasText(item.getSourcePath())) {
+            try {
+                key = deriveKeyFromFilename(Path.of(item.getSourcePath()));
+            } catch (InvalidPathException e) {
+                log.debug("Cannot derive storage key from {}: {}", item.getSourcePath(), e.getMessage());
             }
-        } catch (IOException e) {
-            throw new PlanApplyException("Failed to delete state file " + path, e);
         }
+        return key;
+    }
+
+    private String stateDocumentId(String scope, String key) {
+        String normalizedKey = key == null ? "" : key.trim();
+        String normalizedScope = normalizeScope(scope);
+        if (!normalizedScope.isEmpty()) {
+            String suffix = "-" + normalizedScope;
+            if (!normalizedKey.isEmpty() && normalizedKey.toLowerCase(Locale.ROOT).endsWith(suffix.toLowerCase(Locale.ROOT))) {
+                return normalizedKey;
+            }
+            return normalizedKey + suffix;
+        }
+        return normalizedKey;
+    }
+
+    private String normalizeScope(String scope) {
+        return scope == null ? "" : scope.trim();
     }
 
     private <T> void upsertByKey(List<T> list, T payload, Function<T, String> keyExtractor, String fallbackKey) {
@@ -371,14 +365,6 @@ public class StateFileService {
 
     private <T> void removeByKey(List<T> list, String key, Function<T, String> keyExtractor) {
         list.removeIf(existing -> Objects.equals(keyExtractor.apply(existing), key));
-    }
-
-    private void persistListFile(Path path, Object file, List<?> contents) {
-        if (contents == null || contents.isEmpty()) {
-            deleteStateFile(path);
-        } else {
-            writeStateFile(path, file);
-        }
     }
 
     private <T> List<T> optionalList(List<T> list) {
@@ -445,5 +431,4 @@ public class StateFileService {
         }
         return key;
     }
-
 }

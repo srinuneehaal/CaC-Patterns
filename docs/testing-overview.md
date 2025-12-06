@@ -6,7 +6,7 @@ This repository includes focused unit tests for the plan generator, state handli
 | --- | --- | --- |
 | **Services** | `PlanServiceCoreTest`, `PlanServiceSpecialCategoriesTest` | Verify plan construction logic: parsing categories, comparing to state files, handling special list-based categories, and ensuring the ordering engine is invoked. |
 | **Plan ordering** | `PlanOrderingRuleEngineTest` | Confirms configured rules sort items as expected, including `transactionSequence` support and fallback behavior when rules miss. |
-| **State persistence** | `StateFileServiceTest` | Covers per-category file writes/deletes (sides, transactions, COA, accounts, posting rules, GL profiles, derived portfolios, etc.) plus edge cases such as missing metadata, scope backfill, and chart/account derivation. |
+| **State persistence** | `StateFileServiceTest` | Covers per-category Cosmos document writes/deletes (sides, transactions, COA, accounts, posting rules, GL profiles, derived portfolios, etc.) plus edge cases such as missing metadata, scope backfill, and chart/account derivation. |
 | **Model coverage** | `ModelFilesEqualityTest`, `ModelToStringTest`, `LoadedFileTest`, `PlanItemTest`, `FileCategoryTest` | Ensure data model equality/hashCode, toString, and plan item getters/setters behave correctly, including the newly added `GeneralLedgerProfileFile`. |
 | **Parsing strategies** | `PostingRulesFileParsingStrategyTest`, `GeneralLedgerProfileFileParsingStrategyTest` | Validate that each strategy recognizes its folder, derives keys correctly, and populates payloads with necessary fields. |
 | **Appliers** | `PlanItemAppliersTest` | Confirms every applier delegates `create/update/delete` to the underlying API service and advertises the right `FileCategory`. |

@@ -17,7 +17,7 @@ This project converts a set of JSON configuration files into a ordered master pl
    Running `--apply` invokes `PlanApplyService`, which reads the master plan via `PlanReader` and converts each item’s payload (`GeneralLedgerProfileRequest`, `PostingModuleRequest`, etc.).  
    - It resolves the appropriate `PlanItemApplier` (e.g., `GeneralLedgerProfilePlanItemApplier`, `PostingModulePlanItemApplier`) via the `supportedCategory()` map.  
    - Each applier delegates to a `PlanItemActionService` (`GeneralLedgerProfileApiService`, `ChartOfAccountsApiService`, etc.) which currently log the intended LUSID SDK call but form the integration surface.
-   - After each successful action, `StateFileService` updates the persisted `statefiles/...` JSON so subsequent runs can detect deletions/updates.
+   - After each successful action, `StateFileService` updates the persisted Cosmos DB document in `transaction_types_config`, ensuring the next plan run can detect deletions/updates.
 
 ## Component relationships
 
@@ -51,7 +51,7 @@ PlanApplyService <-- PlanReader <-- MasterPlan
 - `src/main/java/com/example/cacex/service/plan/stratagy`: one strategy per ordered directory (sides, transactions, accounts, postingrules, glprofile, etc.).  
 - `src/main/java/com/example/cacex/model`: wrappers for each file type (`SideFile`, `AccountFile`, `GeneralLedgerProfileFile`), the `PlanItem`, `MasterPlan`, etc.  
 - `src/main/java/com/example/cacex/service/apply`: appliers + API services that perform the `create / update / delete` actions.  
-- `src/main/resources/application.properties` and `FileLocationProperties`: define root directories (`changedfiles`, `statefiles`) and plan ordering rules (`plan.ordering.rules[...]`).
+- `src/main/resources/application.properties`, `FileLocationProperties`, and the Azure Cosmos properties: define root directories (`changedfiles`), the Cosmos connection (`azure.cosmos.*`), and plan ordering rules (`plan.ordering.rules[...]`).
 
 ## Extending the architecture
 
@@ -63,4 +63,3 @@ To add a new file category:
 4. Provide a `PlanOrderingRule` to ensure the new category runs in the desired sequence.  
 5. Implement a `PlanItemApplier`/`PlanItemActionService` pair to handle SDK calls.  
 6. Add model tests and ordering/property coverage to the test suite (`Model*Test`, `PlanOrderingRuleEngineTest`, etc.).
-

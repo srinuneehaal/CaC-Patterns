@@ -7,13 +7,26 @@ This project relies on a small set of conventions defined in `src/main/resources
 | Property | Description | Default value |
 | --- | --- | --- |
 | `cacex.paths.changed-files-dir` | Root folder scanned for changed JSON files during `--plan`. Relative to the repository root (default `changedfiles`). | `changedfiles` |
-| `cacex.paths.state-files-dir` | Root where computed state files live. State files are updated while applying a plan to detect deletes later. | `statefiles` |
 | `cacex.paths.plan-dir` | Output directory for the master plan JSON produced by the runner. | `plan` |
 | `cacex.paths.master-plan-file` | Filename under `plan-dir` where the ordered `masterplan.json` is written. | `masterplan.json` |
 | `cacex.paths.sides-dir-name` … `cacex.paths.abor-dir-name` | Directory names under each scope (e.g., `changedfiles/ATG/sides`). Matching names must be used by the parsing strategies because they detect files by folder name (`PostingRulesFileParsingStrategy` looks for `/postingrules/`). | See property list in `application.properties`. |
 | `cacex.paths.general-ledger-profiles-dir-name` | New entry for the GL profile directory (`glprofile`) so the parser, state service, and plan service route those files correctly. |
 
-The combination of `changedfiles/<scope>/<dir>` and `statefiles/<scope>/<dir>` is used to find changed and previous versions; filenames typically include the key plus `-<scope>.json`.
+Changed files live under `changedfiles/<scope>/<dir>` while the persisted state lives in the Cosmos DB container `transaction_types_config` configured via Azure Cosmos properties. Filenames still follow the convention `<key>-<scope>` so Cosmos documents use the same ids when storing payload snapshots.
+
+## Cosmos state configuration
+
+State persistence now relies on Cosmos DB so the following properties must point to a writable Cosmos account (the emulator values shown in `application.properties` are safe for local development):
+
+| Property | Purpose |
+| --- | --- |
+| `azure.cosmos.uri` | Cosmos endpoint (e.g. `https://localhost:8081`). |
+| `azure.cosmos.key` | Primary key for authentication (use emulator key or service principal secret). |
+| `azure.cosmos.database` | Database name where the state container lives (`adaptor`). |
+| `azure.cosmos.container` | Container used to store state documents (`transaction_types_config`). |
+| `azure.cosmos.partition-key` | Partition key path (`/typeOfItem`) so each `FileCategory` shares a partition. |
+
+`StateFileService` stores documents whose `id` matches the filename conventions (e.g., `side1-S1`) and whose payload mirrors the JSON that would previously have been written to disk. Delete detection scans the Cosmos container per partition and scope so that missing entries can still emit `PlanItem.DELETE`s.
 
 ## Ordering rules
 

@@ -13,7 +13,6 @@ class FileLocationPropertiesTest {
     void usesPropertyValuesWhenEnvUnset() {
         FileLocationProperties props = new FileLocationProperties();
         props.setChangedFilesDir("changedfiles");
-        props.setStateFilesDir("statefiles");
         props.setPlanDir("plan");
         props.setMasterPlanFile("masterplan.json");
         props.setEnvLookup(env -> null);
@@ -21,7 +20,6 @@ class FileLocationPropertiesTest {
         assertEquals(Path.of("plan"), props.planDirPath());
         assertEquals(Path.of("plan").resolve("masterplan.json"), props.masterPlanPath());
         assertEquals(Path.of("changedfiles"), props.changedFilesRoot());
-        assertEquals(Path.of("statefiles"), props.stateFilesRoot());
     }
 
     @Test

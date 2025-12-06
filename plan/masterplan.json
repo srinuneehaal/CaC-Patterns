@@ -1,23 +1,22 @@
 {
   "items" : [ {
-    "action" : "NEW",
-    "fileCategory" : "GENERAL_LEDGER_PROFILE",
+    "action" : "DELETE",
+    "fileCategory" : "SIDE",
     "scope" : "ATG",
-    "key" : "USG-USG_GP",
-    "sourcePath" : "changedfiles\\ATG\\glprofile\\USG-USG_GP-ATG.json",
+    "key" : "side2",
+    "sourcePath" : "cosmos://SIDE/ATG/side2",
     "payload" : {
-      "generalLedgerProfileCode" : "USG_GP",
-      "displayName" : "USGAAP",
-      "generalLedgerProfileMappings" : [ {
-        "mappingFilter" : "GeneralLedgerAccountCode eq 'INVESTMENTS'",
-        "levels" : [ "EconomicBucket", "Instrument.Identifiers['ClientInternal']" ]
-      }, {
-        "mappingFilter" : "Properties['Account/default/Profile'] eq 'CCY'",
-        "levels" : [ "DefaultCurrency" ]
-      }, {
-        "mappingFilter" : "true",
-        "levels" : [ "DefaultCurrency" ]
-      } ]
+      "scope" : "ATG",
+      "side" : "side2",
+      "sideDefinitionRequest" : {
+        "security" : "Txn:LusidInstrumentId",
+        "currency" : "Txn:TradeCurrency",
+        "rate" : "Txn:Units",
+        "units" : "0",
+        "amount" : "Transaction/MyScope/TradeAmount",
+        "notionalAmount" : "Transaction/default/NotionalAmount",
+        "currentFace" : "Txn:CurrentFace"
+      }
     }
   } ]
 }

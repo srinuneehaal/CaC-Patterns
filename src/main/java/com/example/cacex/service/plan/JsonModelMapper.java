@@ -45,6 +45,10 @@ public class JsonModelMapper {
      */
     public <T> T read(Path path, Class<T> type) throws IOException {
         String content = Files.readString(path, StandardCharsets.UTF_8);
+        return read(content, type);
+    }
+
+    public <T> T read(String content, Class<T> type) throws IOException {
         if (type == SideFile.class) {
             return type.cast(readSideFile(content));
         }
