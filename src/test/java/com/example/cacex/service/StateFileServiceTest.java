@@ -145,6 +145,28 @@ class StateFileServiceTest {
     }
 
     @Test
+    void deleteAborConfigurationUsesFileKeyFromSourcePath() {
+        AborConfigurationRequest payload = new AborConfigurationRequest();
+        payload.setCode("AborCode-3");
+        AborConfigurationFile file = new AborConfigurationFile();
+        file.setScope("ATG");
+        file.setAborConfigurations(List.of(payload));
+
+        StateDocument document = new StateDocument();
+        document.setId("aborconfig-ATG");
+        document.setTypeOfItem(FileCategory.ABOR_CONFIGURATION.name());
+        document.setScope("ATG");
+        document.setData(objectMapper.valueToTree(file));
+        repository.upsert(document);
+
+        PlanItem delete = new PlanItem(Action.DELETE, FileCategory.ABOR_CONFIGURATION, "ATG",
+                payload.getCode(), "cosmos://ABOR_CONFIGURATION/ATG/aborconfig", payload);
+        stateFileService.applyStateChange(delete);
+
+        assertTrue(repository.find("aborconfig-ATG", FileCategory.ABOR_CONFIGURATION.name()).isEmpty());
+    }
+
+    @Test
     void applyDerivedPortfolioCreatesEntry() {
         CreateDerivedTransactionPortfolioRequest payload = new CreateDerivedTransactionPortfolioRequest();
         payload.setCode("DP1");
@@ -177,14 +199,14 @@ class StateFileServiceTest {
         PlanItem create = new PlanItem(Action.NEW, FileCategory.ACCOUNT, "S9", key, null, payload);
         stateFileService.applyStateChange(create);
 
-        StateDocument stored = repository.find(stateDocumentId(key, "S9"), FileCategory.ACCOUNT.name()).orElseThrow();
+        StateDocument stored = repository.find(stateDocumentId(FileCategory.ACCOUNT, key, "S9"), FileCategory.ACCOUNT.name()).orElseThrow();
         JsonNode body = stored.getData();
         assertEquals("COA1", body.get("chartOfAccountsCode").asText());
         assertEquals("AC1", body.get("glAccounts").get(0).get("code").asText());
 
         PlanItem delete = new PlanItem(Action.DELETE, FileCategory.ACCOUNT, "S9", key, null, payload);
         stateFileService.applyStateChange(delete);
-        assertTrue(repository.find(stateDocumentId(key, "S9"), FileCategory.ACCOUNT.name()).isEmpty());
+        assertTrue(repository.find(stateDocumentId(FileCategory.ACCOUNT, key, "S9"), FileCategory.ACCOUNT.name()).isEmpty());
     }
 
     @Test
@@ -238,7 +260,7 @@ class StateFileServiceTest {
 
         stateFileService.applyStateChange(item);
 
-        StateDocument stored = repository.find(stateDocumentId("COA2-AC2", "S12"), FileCategory.ACCOUNT.name()).orElseThrow();
+        StateDocument stored = repository.find(stateDocumentId(FileCategory.ACCOUNT, "COA2-AC2", "S12"), FileCategory.ACCOUNT.name()).orElseThrow();
         JsonNode body = stored.getData();
         assertEquals("COA2", body.get("chartOfAccountsCode").asText());
         assertEquals("AC2", body.get("glAccounts").get(0).get("code").asText());
@@ -247,11 +269,46 @@ class StateFileServiceTest {
     private String stateDocumentId(String key, String scope) {
         String normalizedKey = key == null ? "" : key.trim();
         if (scope != null && !scope.isBlank()) {
-            String suffix = "-" + scope;
+            String normalizedScope = scope.trim();
+            String suffix = "-" + normalizedScope;
             if (!normalizedKey.isEmpty() && normalizedKey.toLowerCase(Locale.ROOT).endsWith(suffix.toLowerCase(Locale.ROOT))) {
                 return normalizedKey;
             }
             return normalizedKey + suffix;
+        }
+        return normalizedKey;
+    }
+
+    private String stateDocumentId(FileCategory category, String key, String scope) {
+        if (category == FileCategory.ACCOUNT) {
+            String chartOfAccountsCode = chartOfAccountsFromKey(key, scope);
+            if (chartOfAccountsCode.isBlank()) {
+                return stateDocumentId(key, scope);
+            }
+            String normalizedScope = scope == null ? "" : scope.trim();
+            if (normalizedScope.isEmpty()) {
+                return chartOfAccountsCode;
+            }
+            return chartOfAccountsCode + "-" + normalizedScope;
+        }
+        return stateDocumentId(key, scope);
+    }
+
+    private String chartOfAccountsFromKey(String key, String scope) {
+        if (key == null) {
+            return "";
+        }
+        String normalizedKey = key.trim();
+        if (scope != null && !scope.isBlank()) {
+            String normalizedScope = scope.trim();
+            String suffix = "-" + normalizedScope;
+            if (normalizedKey.endsWith(suffix)) {
+                normalizedKey = normalizedKey.substring(0, normalizedKey.length() - suffix.length());
+            }
+        }
+        int dash = normalizedKey.indexOf('-');
+        if (dash > 0) {
+            return normalizedKey.substring(0, dash);
         }
         return normalizedKey;
     }

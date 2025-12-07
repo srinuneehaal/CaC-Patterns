@@ -1,0 +1,320 @@
+{
+  "items" : [ {
+    "action" : "DELETE",
+    "fileCategory" : "TRANSACTION",
+    "scope" : "ATG",
+    "key" : "Buy-default",
+    "sourcePath" : "cosmos://TRANSACTION/ATG/Buy-default",
+    "payload" : {
+      "scope" : "ATG",
+      "transactionClass" : "Buy",
+      "source" : "default",
+      "transactionSequence" : 1,
+      "transactionType" : "BuyAlias",
+      "transactionTypeRequest" : {
+        "aliases" : [ {
+          "type" : "BuyAlias",
+          "description" : "A similar buy type - updated",
+          "transactionClass" : "Buy",
+          "transactionRoles" : "Longer",
+          "isDefault" : false
+        } ],
+        "movements" : [ {
+          "movementTypes" : "StockMovement",
+          "side" : "Side1",
+          "direction" : -1,
+          "properties" : {
+            "TransactionConfiguration/default/TaxLotSelectionMethod" : {
+              "key" : "TransactionConfiguration/default/TaxLotSelectionMethod",
+              "value" : {
+                "labelValue" : "FirstInFirstOut"
+              }
+            }
+          },
+          "mappings" : [ ],
+          "movementOptions" : [ ]
+        }, {
+          "movementTypes" : "CashCommitment",
+          "side" : "Side1",
+          "direction" : 1,
+          "properties" : { },
+          "mappings" : [ {
+            "propertyKey" : "Transaction/scopeA/Strategy",
+            "setTo" : "Cash"
+          } ],
+          "movementOptions" : [ ],
+          "settlementDateOverride" : "Transaction/MyScope/SettlementDateOverride"
+        } ],
+        "properties" : {
+          "TransactionConfiguration/default/TotalConsiderationPolicy" : {
+            "key" : "TransactionConfiguration/default/TotalConsiderationPolicy",
+            "value" : {
+              "labelValue" : "Add"
+            }
+          }
+        },
+        "calculations" : [ {
+          "type" : "TaxAmounts",
+          "side" : "Side1"
+        } ]
+      }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "SIDE",
+    "scope" : "ATG",
+    "key" : "side2",
+    "sourcePath" : "cosmos://SIDE/ATG/side2",
+    "payload" : {
+      "scope" : "ATG",
+      "side" : "side2",
+      "sideDefinitionRequest" : {
+        "security" : "Txn:LusidInstrumentId",
+        "currency" : "Txn:TradeCurrency",
+        "rate" : "Txn:Units",
+        "units" : "1",
+        "amount" : "Transaction/MyScope/TradeAmount",
+        "notionalAmount" : "Transaction/default/NotionalAmount",
+        "currentFace" : "Txn:CurrentFace"
+      }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "CHART_OF_ACCOUNTS",
+    "scope" : "ATG",
+    "key" : "USG",
+    "sourcePath" : "cosmos://CHART_OF_ACCOUNTS/ATG/USG",
+    "payload" : {
+      "scope" : "ATG",
+      "chartOfAccountsCode" : "USG",
+      "chartOfAccountsRequest" : {
+        "code" : "ChartOfAccounts",
+        "displayName" : "ChartOfAccountsName",
+        "description" : "Standard COA updated",
+        "properties" : {
+          "ChartOfAccounts/MyScope/FundManagerName" : {
+            "key" : "ChartOfAccounts/MyScope/FundManagerName",
+            "value" : {
+              "labelValue" : "Smith"
+            },
+            "effectiveFrom" : "2018-03-05T18:00:00.001Z"
+          }
+        }
+      }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "ACCOUNT",
+    "scope" : "ATG",
+    "key" : "USG-123653",
+    "sourcePath" : "cosmos://ACCOUNT/ATG/USG",
+    "payload" : {
+      "code" : "123653",
+      "description" : "Cash New - updated",
+      "type" : "Revenue",
+      "status" : "ACTIVE",
+      "control" : "System",
+      "properties" : { }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "ACCOUNT",
+    "scope" : "ATG",
+    "key" : "USG-0016",
+    "sourcePath" : "cosmos://ACCOUNT/ATG/USG",
+    "payload" : {
+      "code" : "0016",
+      "description" : "Cash New - updated",
+      "type" : "Asset",
+      "status" : "ACTIVE",
+      "control" : "Manual",
+      "properties" : { }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "ACCOUNT",
+    "scope" : "ATG",
+    "key" : "USG-001458",
+    "sourcePath" : "cosmos://ACCOUNT/ATG/USG",
+    "payload" : {
+      "code" : "001458",
+      "description" : "Cash New - updated",
+      "type" : "Asset",
+      "status" : "ACTIVE",
+      "control" : "Manual",
+      "properties" : { }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "POSTING_RULE",
+    "scope" : "ATG",
+    "key" : "USG-USG",
+    "sourcePath" : "cosmos://POSTING_RULE/ATG/USG-USG",
+    "payload" : {
+      "scope" : "ATG",
+      "chartOfAccountsCode" : "USG",
+      "postingModuleCode" : "USG",
+      "postingModuleRequest" : {
+        "code" : "USG",
+        "displayName" : "PostingModuleName",
+        "description" : "PostingModuleDescription Updated",
+        "rules" : [ {
+          "ruleId" : "rule1Id-1",
+          "generalLedgerAccountCode" : "account1",
+          "ruleFilter" : "Transaction.TransactionId eq 'Transaction_1'"
+        }, {
+          "ruleId" : "rule1Id-2",
+          "generalLedgerAccountCode" : "account2",
+          "ruleFilter" : "Transaction.TransactionId eq 'Transaction_2'"
+        } ]
+      }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "ABOR_CONFIGURATION",
+    "scope" : "ATG",
+    "key" : "AborCode-1",
+    "sourcePath" : "cosmos://ABOR_CONFIGURATION/ATG/aborconfig",
+    "payload" : {
+      "code" : "AborCode-1",
+      "displayName" : "AborConfiguration Name-1",
+      "description" : "Standard AborConfigurationRequest - updated",
+      "recipeId" : {
+        "scope" : "RecipeScope",
+        "code" : "RecipeCode"
+      },
+      "chartOfAccountsId" : {
+        "scope" : "CoAScope",
+        "code" : "CoACode"
+      },
+      "postingModuleCodes" : [ "PostingModuleCode" ],
+      "cleardownModuleCodes" : [ "CleardownModuleCode" ],
+      "properties" : {
+        "AborConfiguration/MyScope/FundManagerName" : {
+          "key" : "AborConfiguration/MyScope/FundManagerName",
+          "value" : {
+            "labelValue" : "Smith"
+          },
+          "effectiveFrom" : "2018-03-05T18:00:00.001Z"
+        }
+      }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "ABOR_CONFIGURATION",
+    "scope" : "ATG",
+    "key" : "AborCode-2",
+    "sourcePath" : "cosmos://ABOR_CONFIGURATION/ATG/aborconfig",
+    "payload" : {
+      "code" : "AborCode-2",
+      "displayName" : "AborConfiguration Name-2",
+      "description" : "Standard AborConfigurationRequest - updated",
+      "recipeId" : {
+        "scope" : "RecipeScope",
+        "code" : "RecipeCode"
+      },
+      "chartOfAccountsId" : {
+        "scope" : "CoAScope",
+        "code" : "CoACode"
+      },
+      "postingModuleCodes" : [ "PostingModuleCode" ],
+      "cleardownModuleCodes" : [ "CleardownModuleCode" ],
+      "properties" : {
+        "AborConfiguration/MyScope/FundManagerName" : {
+          "key" : "AborConfiguration/MyScope/FundManagerName",
+          "value" : {
+            "labelValue" : "Smith"
+          },
+          "effectiveFrom" : "2018-03-05T18:00:00.001Z"
+        }
+      }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "ABOR",
+    "scope" : "ATG",
+    "key" : "AborCode3",
+    "sourcePath" : "cosmos://ABOR/ATG/abor",
+    "payload" : {
+      "code" : "AborCode3",
+      "displayName" : "Standard Abor 3",
+      "description" : "A standard Abor updated",
+      "portfolioIds" : [ {
+        "scope" : "portfolioScope3",
+        "code" : "portfolioCode3",
+        "portfolioEntityType" : "SinglePortfolio"
+      } ],
+      "aborConfigurationId" : {
+        "scope" : "ConfigScope3",
+        "code" : "ConfigCode3"
+      },
+      "properties" : {
+        "Abor/MyScope/FundManagerName" : {
+          "key" : "Abor/MyScope/FundManagerName",
+          "value" : {
+            "labelValue" : "Williams"
+          },
+          "effectiveFrom" : "2018-03-05T18:00:00.001Z"
+        }
+      }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "ABOR",
+    "scope" : "ATG",
+    "key" : "AborCode2",
+    "sourcePath" : "cosmos://ABOR/ATG/abor",
+    "payload" : {
+      "code" : "AborCode2",
+      "displayName" : "Standard Abor 2",
+      "description" : "A standard Abor updated",
+      "portfolioIds" : [ {
+        "scope" : "portfolioScope2",
+        "code" : "portfolioCode2",
+        "portfolioEntityType" : "SinglePortfolio"
+      } ],
+      "aborConfigurationId" : {
+        "scope" : "ConfigScope2",
+        "code" : "ConfigCode2"
+      },
+      "properties" : {
+        "Abor/MyScope/FundManagerName" : {
+          "key" : "Abor/MyScope/FundManagerName",
+          "value" : {
+            "labelValue" : "Johnson"
+          },
+          "effectiveFrom" : "2018-03-05T18:00:00.001Z"
+        }
+      }
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "ABOR",
+    "scope" : "ATG",
+    "key" : "AborCode",
+    "sourcePath" : "cosmos://ABOR/ATG/abor",
+    "payload" : {
+      "code" : "AborCode",
+      "displayName" : "Standard Abor",
+      "description" : "A standard Abor updated",
+      "portfolioIds" : [ {
+        "scope" : "portfolioScope",
+        "code" : "portfolioCode",
+        "portfolioEntityType" : "SinglePortfolio"
+      } ],
+      "aborConfigurationId" : {
+        "scope" : "ConfigScope",
+        "code" : "ConfigCode"
+      },
+      "properties" : {
+        "Abor/MyScope/FundManagerName" : {
+          "key" : "Abor/MyScope/FundManagerName",
+          "value" : {
+            "labelValue" : "Smith"
+          },
+          "effectiveFrom" : "2018-03-05T18:00:00.001Z"
+        }
+      }
+    }
+  } ]
+}

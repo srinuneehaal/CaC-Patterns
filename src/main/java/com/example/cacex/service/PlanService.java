@@ -155,14 +155,44 @@ public class PlanService {
             if (state == null) {
                 plan.addItem(new PlanItem(Action.NEW, changed.getCategory(), scope, key,
                         changed.getPath().toString(), changed.getPayload()));
-            } else if (!Objects.equals(changed.getPayload(), state)) {
-                plan.addItem(new PlanItem(Action.UPDATE, changed.getCategory(), scope, key,
-                        changed.getPath().toString(), changed.getPayload()));
+            } else {
+                Object comparableState = normalizeStatePayload(category, state);
+                if (!stateFileService.payloadsEqual(changed.getPayload(), comparableState)) {
+                    plan.addItem(new PlanItem(Action.UPDATE, changed.getCategory(), scope, key,
+                            changed.getPath().toString(), changed.getPayload()));
+                }
             }
         } else if (state != null) {
             plan.addItem(new PlanItem(Action.DELETE, category, scope, key,
                     cosmosStateReference(category, scope, key), state));
         }
+    }
+
+    private Object normalizeStatePayload(FileCategory category, Object state) {
+        if (state == null) {
+            return null;
+        }
+        return switch (category) {
+            case CHART_OF_ACCOUNTS -> {
+                if (state instanceof ChartOfAccountsFile file) {
+                    yield file.getChartOfAccountsRequest();
+                }
+                yield state;
+            }
+            case POSTING_RULE -> {
+                if (state instanceof PostingRulesFile file) {
+                    yield file.getPostingModuleRequest();
+                }
+                yield state;
+            }
+            case GENERAL_LEDGER_PROFILE -> {
+                if (state instanceof GeneralLedgerProfileFile file) {
+                    yield file.getGeneralLedgerProfileRequest();
+                }
+                yield state;
+            }
+            default -> state;
+        };
     }
 
     private <F> void addDeletesForMissingChanges(FileCategory category,

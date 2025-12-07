@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 public class CosmosStateConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = "azure.cosmos")
+
     public CosmosStateProperties cosmosStateProperties() {
         return new CosmosStateProperties();
     }

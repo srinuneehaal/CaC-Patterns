@@ -1,0 +1,32 @@
+# Integration Test Plan
+
+This repository exercises the full `--plan` + `--apply` loop against the Cosmos emulator. The automated checklist below walks through the prerequisites, repeatable script, and verification steps so you can run the collection of categories any number of times.
+
+## Prerequisites
+
+1. **Cosmos emulator is running** and listening on `https://localhost:8081`.
+2. **Emulator certificate is trusted by your JVM** (import it into `JAVA_HOME/lib/security/cacerts` or use a custom truststore + `-Djavax.net.ssl.trustStore=…`).
+3. **`CHANGED_FILES` environment variable is not set** or points to prior scenarios—you will overwrite it via the automation script.
+
+## Automated Plan + Apply Script
+
+Use the helper script under `integrated-test-plan/run-integration-tests.ps1` to:
+
+1. Build the jar without running unit tests.
+2. Collect one JSON file per major category from `changedfiles/<scope>`.
+3. Set `CHANGED_FILES` to the assembled list of paths.
+4. Run `java -jar … --plan` and `java -jar … --apply`, capturing each log in `integrated-test-plan/logs/`.
+
+```powershell
+.\integrated-test-plan\run-integration-tests.ps1
+```
+
+The script is idempotent: rerunning it rebuilds the jar, rewrites `CHANGED_FILES`, generates a fresh plan (`plan/masterplan.json`), and applies it. When you need a subset of categories, edit the `$categories` array near the top of the script.
+
+The automated collection now exercises the `sides`, `transactions`, `coa`, `gla`, `postingrules`, `aborconfigs`, and `abor` categories so each payload (including the posting rules, ABOR configurations, and ABOR entries under `changedfiles/ATG/`) is created, updated, and deleted in sequence.
+
+## Results & Verification
+
+1. Inspect `plan/masterplan.json` to ensure each category appeared (including the GLA `USG-ATG`, posting rules, ABOR configuration, and ABOR entries) and to see the plan location reported in `plan.log`.
+2. Confirm Cosmos documents in `adaptor.transaction_types_config` via the emulator Data Explorer.
+3. Optionally rerun the script: because it reuses the same `CHANGED_FILES`, you can verify the “no-change” path now produces zero plan items for unchanged documents.

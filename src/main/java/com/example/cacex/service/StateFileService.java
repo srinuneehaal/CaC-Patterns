@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Service
 public class StateFileService {
@@ -67,9 +67,25 @@ public class StateFileService {
     }
 
     public <T> T loadPayload(FileCategory category, String scope, String key, Class<T> payloadType) {
+        System.out.println("loadPayload-->"+category+"-->"+scope+"-->"+key+"-->"+payloadType);
         return loadStateDocument(category, scope, key)
                 .map(doc -> parseStatePayload(doc.getData(), payloadType))
                 .orElse(null);
+    }
+
+    public boolean payloadsEqual(Object left, Object right) {
+        if (left == null && right == null) {
+            return true;
+        }
+        if (left == null || right == null) {
+            return false;
+        }
+        try {
+            return objectMapper.valueToTree(left).equals(objectMapper.valueToTree(right));
+        } catch (IllegalArgumentException e) {
+            log.debug("Failed to compare payloads: {}", e.getMessage());
+            return false;
+        }
     }
 
     public <T> T payloadFromDocument(StateDocument document, Class<T> payloadType) {
@@ -236,6 +252,7 @@ public class StateFileService {
     }
 
     private void applyAccount(PlanItem item, String scope, String key) {
+        System.out.println();
         AccountFile file = readOrDefault(item.getFileCategory(), scope, key, AccountFile.class, AccountFile::new);
         if (file.getScope() == null) {
             file.setScope(scope);
@@ -243,10 +260,12 @@ public class StateFileService {
         if (file.getChartOfAccountsCode() == null) {
             file.setChartOfAccountsCode(extractChartOfAccounts(key, scope));
         }
+        System.out.println("accounts-->"+file.getAccounts());
         List<Account> accounts = new ArrayList<>(optionalList(file.getAccounts()));
         if (item.getAction() == Action.DELETE) {
-            String codeToRemove = extractAccountCode(item, file);
-            accounts.removeIf(acc -> Objects.equals(acc.getCode(), codeToRemove));
+            System.out.println("accounts-->"+accounts);
+            System.out.println("Removing account " + item.getKey() + " from file " + file.getChartOfAccountsCode());
+            removeAccountByCandidates(item, file, accounts);
         } else {
             Account payload = castPayload(item, Account.class);
             accounts.removeIf(acc -> Objects.equals(acc.getCode(), payload.getCode()));
@@ -274,12 +293,15 @@ public class StateFileService {
                                String key,
                                Class<T> type,
                                Supplier<T> fallback) {
+        System.out.println("readOrDefault-->"+category+"-->"+scope+"-->"+key+"-->"+type+"-->"+fallback);
         T payload = loadPayload(category, scope, key, type);
+        System.out.println("readOrDefault-->"+payload);
         return payload == null ? fallback.get() : payload;
     }
 
     private Optional<StateDocument> loadStateDocument(FileCategory category, String scope, String key) {
-        String id = stateDocumentId(scope, key);
+        String id = stateDocumentId(category, scope, key);
+        System.out.println("loadStateDocument-->"+category+"-->"+scope+"-->"+key+"-->"+id);
         return stateRepository.find(id, category.name());
     }
 
@@ -297,7 +319,7 @@ public class StateFileService {
     private void persistStateDocument(FileCategory category, String scope, String key, Object content) {
         try {
             StateDocument document = new StateDocument();
-            document.setId(stateDocumentId(scope, key));
+            document.setId(stateDocumentId(category, scope, key));
             document.setTypeOfItem(category.name());
             document.setScope(normalizeScope(scope));
             document.setData(objectMapper.valueToTree(content));
@@ -309,7 +331,7 @@ public class StateFileService {
     }
 
     private void deleteStateDocument(FileCategory category, String scope, String key) {
-        stateRepository.delete(stateDocumentId(scope, key), category.name());
+        stateRepository.delete(stateDocumentId(category, scope, key), category.name());
     }
 
     private void persistListDocument(FileCategory category,
@@ -327,16 +349,39 @@ public class StateFileService {
     private String resolveStorageKey(PlanItem item) {
         String key = item.getKey();
         if (StringUtils.hasText(item.getSourcePath())) {
-            try {
-                key = deriveKeyFromFilename(Path.of(item.getSourcePath()));
-            } catch (InvalidPathException e) {
-                log.debug("Cannot derive storage key from {}: {}", item.getSourcePath(), e.getMessage());
+            String derived = deriveKeyFromSourcePath(item.getSourcePath());
+            if (StringUtils.hasText(derived)) {
+                key = derived;
             }
         }
         return key;
     }
 
-    private String stateDocumentId(String scope, String key) {
+    private String deriveKeyFromSourcePath(String sourcePath) {
+        if (!StringUtils.hasText(sourcePath)) {
+            return null;
+        }
+        try {
+            return deriveKeyFromFilename(Path.of(sourcePath));
+        } catch (IllegalArgumentException e) {
+            log.debug("Falling back to manual key derivation for {}: {}", sourcePath, e.getMessage());
+            String normalized = sourcePath.replace('\\', '/');
+            int segmentIndex = normalized.lastIndexOf('/');
+            if (segmentIndex >= 0 && segmentIndex < normalized.length() - 1) {
+                return normalized.substring(segmentIndex + 1);
+            }
+            return normalized;
+        }
+    }
+
+    private String stateDocumentId(FileCategory category, String scope, String key) {
+        if (category == FileCategory.ACCOUNT) {
+            return accountStateDocumentId(scope, key);
+        }
+        return defaultStateDocumentId(scope, key);
+    }
+
+    private String defaultStateDocumentId(String scope, String key) {
         String normalizedKey = key == null ? "" : key.trim();
         String normalizedScope = normalizeScope(scope);
         if (!normalizedScope.isEmpty()) {
@@ -347,6 +392,18 @@ public class StateFileService {
             return normalizedKey + suffix;
         }
         return normalizedKey;
+    }
+
+    private String accountStateDocumentId(String scope, String key) {
+        String chartOfAccountsCode = extractChartOfAccounts(key, scope);
+        if (!StringUtils.hasText(chartOfAccountsCode)) {
+            return defaultStateDocumentId(scope, key);
+        }
+        String normalizedScope = normalizeScope(scope);
+        if (normalizedScope.isEmpty()) {
+            return chartOfAccountsCode;
+        }
+        return chartOfAccountsCode + "-" + normalizedScope;
     }
 
     private String normalizeScope(String scope) {
@@ -393,21 +450,33 @@ public class StateFileService {
         return trimmed;
     }
 
-    private String extractAccountCode(PlanItem item, AccountFile file) {
-        String chartCode = file.getChartOfAccountsCode();
-        String key = stripScopeSuffix(item.getKey(), item.getScope());
-        if (chartCode != null && key.startsWith(chartCode + "-")) {
-            return key.substring(chartCode.length() + 1);
-        }
-        int dash = key.indexOf('-');
-        if (dash >= 0 && dash + 1 < key.length()) {
-            return key.substring(dash + 1);
-        }
+    private void removeAccountByCandidates(PlanItem item, AccountFile file, List<Account> accounts) {
+        Set<String> codes = new LinkedHashSet<>();
         Account payload = item.getPayload() instanceof Account ? (Account) item.getPayload() : null;
-        if (payload != null) {
-            return payload.getCode();
+        if (payload != null && StringUtils.hasText(payload.getCode())) {
+            codes.add(payload.getCode());
         }
-        return key;
+        String strippedKey = stripScopeSuffix(item.getKey(), item.getScope());
+        if (StringUtils.hasText(strippedKey)) {
+            codes.add(strippedKey);
+        }
+        String chartCode = file.getChartOfAccountsCode();
+        if (StringUtils.hasText(chartCode) && StringUtils.hasText(strippedKey)
+                && strippedKey.startsWith(chartCode + "-")) {
+            codes.add(strippedKey.substring(chartCode.length() + 1));
+        }
+        Set<String> normalized = codes.stream()
+                .filter(StringUtils::hasText)
+                .map(this::normalizeAccountCode)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        accounts.removeIf(acc -> normalized.contains(normalizeAccountCode(acc.getCode())));
+    }
+
+    private String normalizeAccountCode(String code) {
+        if (code == null) {
+            return null;
+        }
+        return code.trim().replaceAll("\\s+", "").toUpperCase(Locale.ROOT);
     }
 
     private String extractChartOfAccountsFromGeneralLedgerProfileKey(String key) {
