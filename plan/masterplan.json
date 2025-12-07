@@ -1,3 +1,27 @@
 {
-  "items" : [ ]
+  "items" : [ {
+    "action" : "DELETE",
+    "fileCategory" : "PORTFOLIO_GROUP",
+    "scope" : "ATG",
+    "key" : "MyGroupCode-4",
+    "sourcePath" : "cosmos://PORTFOLIO_GROUP/ATG/portfoliogroups",
+    "payload" : {
+      "code" : "MyGroupCode-4",
+      "created" : "2018-03-05T18:00:00.001Z",
+      "values" : [ {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode1"
+      }, {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode2"
+      } ],
+      "subGroups" : [ {
+        "scope" : "MyScope",
+        "code" : "MySubGroupCode"
+      } ],
+      "properties" : { },
+      "displayName" : "MyGroupName4",
+      "description" : "My group description4"
+    }
+  } ]
 }

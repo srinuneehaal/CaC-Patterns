@@ -5,13 +5,19 @@
   "generalLedgerProfileRequest": {
     "generalLedgerProfileCode": "USG_GP",
     "displayName": "USGAAP",
-    "description": null,
+    "description": "New Description",
     "generalLedgerProfileMappings": [
       {
         "mappingFilter": "GeneralLedgerAccountCode eq 'INVESTMENTS'",
         "levels": [
           "EconomicBucket",
           "Instrument.Identifiers['ClientInternal']"
+        ]
+      },
+      {
+        "mappingFilter": "Properties['Account/default/Profile'] eq 'CCY'",
+        "levels": [
+          "DefaultCurrency"
         ]
       },
       {
