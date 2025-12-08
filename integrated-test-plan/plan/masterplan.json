@@ -316,5 +316,154 @@
         }
       }
     }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "PORTFOLIO_GROUP",
+    "scope" : "ATG",
+    "key" : "MyGroupCode-2",
+    "sourcePath" : "cosmos://PORTFOLIO_GROUP/ATG/portfoliogroups",
+    "payload" : {
+      "code" : "MyGroupCode-2",
+      "created" : "2018-03-05T18:00:00.001Z",
+      "values" : [ {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode1"
+      }, {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode2"
+      } ],
+      "subGroups" : [ {
+        "scope" : "MyScope",
+        "code" : "MySubGroupCode"
+      } ],
+      "properties" : { },
+      "displayName" : "MyGroupName",
+      "description" : "Portfolio group metadata refreshed"
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "PORTFOLIO_GROUP",
+    "scope" : "ATG",
+    "key" : "MyGroupCode-1",
+    "sourcePath" : "cosmos://PORTFOLIO_GROUP/ATG/portfoliogroups",
+    "payload" : {
+      "code" : "MyGroupCode-1",
+      "created" : "2018-03-05T18:00:00.001Z",
+      "values" : [ {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode1"
+      }, {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode2"
+      } ],
+      "subGroups" : [ {
+        "scope" : "MyScope",
+        "code" : "MySubGroupCode"
+      } ],
+      "properties" : { },
+      "displayName" : "MyGroupName-1",
+      "description" : "Portfolio group metadata refreshed"
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "PORTFOLIO_GROUP",
+    "scope" : "ATG",
+    "key" : "MyGroupCode-3",
+    "sourcePath" : "cosmos://PORTFOLIO_GROUP/ATG/portfoliogroups",
+    "payload" : {
+      "code" : "MyGroupCode-3",
+      "created" : "2018-03-05T18:00:00.001Z",
+      "values" : [ {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode1"
+      }, {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode2"
+      } ],
+      "subGroups" : [ {
+        "scope" : "MyScope",
+        "code" : "MySubGroupCode"
+      } ],
+      "properties" : { },
+      "displayName" : "MyGroupName3",
+      "description" : "Portfolio group metadata refreshed"
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "DERIVED_PORTFOLIO",
+    "scope" : "ATG",
+    "key" : "DerivedPortfolioCode-3",
+    "sourcePath" : "cosmos://DERIVED_PORTFOLIO/ATG/derivedportfolios",
+    "payload" : {
+      "displayName" : "MyDerivedPortfolioName 3",
+      "description" : "Derived Portfolio Batch Update",
+      "code" : "DerivedPortfolioCode-3",
+      "parentPortfolioId" : {
+        "scope" : "MyParentPortfolioScope",
+        "code" : "MyParentPortfolioCode"
+      },
+      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "DERIVED_PORTFOLIO",
+    "scope" : "ATG",
+    "key" : "DerivedPortfolioCode-2",
+    "sourcePath" : "cosmos://DERIVED_PORTFOLIO/ATG/derivedportfolios",
+    "payload" : {
+      "displayName" : "MyDerivedPortfolioName 4",
+      "description" : "Derived Portfolio Batch Update",
+      "code" : "DerivedPortfolioCode-2",
+      "parentPortfolioId" : {
+        "scope" : "MyParentPortfolioScope",
+        "code" : "MyParentPortfolioCode"
+      },
+      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "DERIVED_PORTFOLIO",
+    "scope" : "ATG",
+    "key" : "DerivedPortfolioCode-1",
+    "sourcePath" : "cosmos://DERIVED_PORTFOLIO/ATG/derivedportfolios",
+    "payload" : {
+      "displayName" : "MyDerivedPortfolioName 1",
+      "description" : "Derived Portfolio Batch Update",
+      "code" : "DerivedPortfolioCode-1",
+      "parentPortfolioId" : {
+        "scope" : "MyParentPortfolioScope",
+        "code" : "MyParentPortfolioCode"
+      },
+      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
+    }
+  }, {
+    "action" : "DELETE",
+    "fileCategory" : "GENERAL_LEDGER_PROFILE",
+    "scope" : "ATG",
+    "key" : "USG-USG_GP",
+    "sourcePath" : "cosmos://GENERAL_LEDGER_PROFILE/ATG/USG-USG_GP",
+    "payload" : {
+      "scope" : "ATG",
+      "chartOfAccountsCode" : "USG_GP",
+      "generalLedgerProfileCode" : "USG_GP",
+      "generalLedgerProfileRequest" : {
+        "generalLedgerProfileCode" : "USG_GP",
+        "displayName" : "USGAAP",
+        "description" : "GLP description updated via automation",
+        "generalLedgerProfileMappings" : [ {
+          "mappingFilter" : "GeneralLedgerAccountCode eq 'INVESTMENTS'",
+          "levels" : [ "EconomicBucket", "Instrument.Identifiers['ClientInternal']" ]
+        }, {
+          "mappingFilter" : "Properties['Account/default/Profile'] eq 'CCY'",
+          "levels" : [ "DefaultCurrency" ]
+        }, {
+          "mappingFilter" : "Properties['Account/default/Profile'] eq 'CCY'",
+          "levels" : [ "DefaultCurrency" ]
+        }, {
+          "mappingFilter" : "true",
+          "levels" : [ "DefaultCurrency" ]
+        } ]
+      }
+    }
   } ]
 }

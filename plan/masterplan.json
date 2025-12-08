@@ -1,12 +1,12 @@
 {
   "items" : [ {
-    "action" : "DELETE",
+    "action" : "NEW",
     "fileCategory" : "PORTFOLIO_GROUP",
     "scope" : "ATG",
-    "key" : "MyGroupCode-4",
-    "sourcePath" : "cosmos://PORTFOLIO_GROUP/ATG/portfoliogroups",
+    "key" : "MyGroupCode-2",
+    "sourcePath" : "changedfiles\\ATG\\portfoliogroups\\portfoliogroups-ATG.json",
     "payload" : {
-      "code" : "MyGroupCode-4",
+      "code" : "MyGroupCode-2",
       "created" : "2018-03-05T18:00:00.001Z",
       "values" : [ {
         "scope" : "MyScope",
@@ -20,8 +20,56 @@
         "code" : "MySubGroupCode"
       } ],
       "properties" : { },
-      "displayName" : "MyGroupName4",
-      "description" : "My group description4"
+      "displayName" : "MyGroupName",
+      "description" : "My group description changed"
+    }
+  }, {
+    "action" : "NEW",
+    "fileCategory" : "PORTFOLIO_GROUP",
+    "scope" : "ATG",
+    "key" : "MyGroupCode-1",
+    "sourcePath" : "changedfiles\\ATG\\portfoliogroups\\portfoliogroups-ATG.json",
+    "payload" : {
+      "code" : "MyGroupCode-1",
+      "created" : "2018-03-05T18:00:00.001Z",
+      "values" : [ {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode1"
+      }, {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode2"
+      } ],
+      "subGroups" : [ {
+        "scope" : "MyScope",
+        "code" : "MySubGroupCode"
+      } ],
+      "properties" : { },
+      "displayName" : "MyGroupName-1",
+      "description" : "My group description updated"
+    }
+  }, {
+    "action" : "NEW",
+    "fileCategory" : "PORTFOLIO_GROUP",
+    "scope" : "ATG",
+    "key" : "MyGroupCode-3",
+    "sourcePath" : "changedfiles\\ATG\\portfoliogroups\\portfoliogroups-ATG.json",
+    "payload" : {
+      "code" : "MyGroupCode-3",
+      "created" : "2018-03-05T18:00:00.001Z",
+      "values" : [ {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode1"
+      }, {
+        "scope" : "MyScope",
+        "code" : "MyPortfolioCode2"
+      } ],
+      "subGroups" : [ {
+        "scope" : "MyScope",
+        "code" : "MySubGroupCode"
+      } ],
+      "properties" : { },
+      "displayName" : "MyGroupName3",
+      "description" : "My group description3"
     }
   } ]
 }

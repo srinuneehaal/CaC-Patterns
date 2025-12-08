@@ -2,12 +2,12 @@ package com.example.cacex.service;
 
 import com.example.cacex.exception.PlanApplyException;
 import com.example.cacex.model.*;
-import com.finbourne.lusid.model.*;
 import com.example.cacex.repository.StateRepository;
 import com.example.cacex.service.plan.JsonModelMapper;
+import com.example.cacex.util.PathUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.example.cacex.util.PathUtils;
+import com.finbourne.lusid.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -62,12 +62,12 @@ public class StateFileService {
         }
     }
 
-    public <T> List<StateDocument> listStateDocuments(FileCategory category, String scope) {
+    public List<StateDocument> listStateDocuments(FileCategory category, String scope) {
         return stateRepository.list(category.name(), scope);
     }
 
     public <T> T loadPayload(FileCategory category, String scope, String key, Class<T> payloadType) {
-        System.out.println("loadPayload-->"+category+"-->"+scope+"-->"+key+"-->"+payloadType);
+        log.info("loadPayload-->"+category+"-->"+scope+"-->"+key+"-->"+payloadType);
         return loadStateDocument(category, scope, key)
                 .map(doc -> parseStatePayload(doc.getData(), payloadType))
                 .orElse(null);
@@ -252,7 +252,6 @@ public class StateFileService {
     }
 
     private void applyAccount(PlanItem item, String scope, String key) {
-        System.out.println();
         AccountFile file = readOrDefault(item.getFileCategory(), scope, key, AccountFile.class, AccountFile::new);
         if (file.getScope() == null) {
             file.setScope(scope);
@@ -260,11 +259,9 @@ public class StateFileService {
         if (file.getChartOfAccountsCode() == null) {
             file.setChartOfAccountsCode(extractChartOfAccounts(key, scope));
         }
-        System.out.println("accounts-->"+file.getAccounts());
+        log.info("accounts-->"+file.getAccounts());
         List<Account> accounts = new ArrayList<>(optionalList(file.getAccounts()));
         if (item.getAction() == Action.DELETE) {
-            System.out.println("accounts-->"+accounts);
-            System.out.println("Removing account " + item.getKey() + " from file " + file.getChartOfAccountsCode());
             removeAccountByCandidates(item, file, accounts);
         } else {
             Account payload = castPayload(item, Account.class);
@@ -293,15 +290,14 @@ public class StateFileService {
                                String key,
                                Class<T> type,
                                Supplier<T> fallback) {
-        System.out.println("readOrDefault-->"+category+"-->"+scope+"-->"+key+"-->"+type+"-->"+fallback);
+        log.info("readOrDefault-->"+category+"-->"+scope+"-->"+key+"-->"+type+"-->"+fallback);
         T payload = loadPayload(category, scope, key, type);
-        System.out.println("readOrDefault-->"+payload);
         return payload == null ? fallback.get() : payload;
     }
 
     private Optional<StateDocument> loadStateDocument(FileCategory category, String scope, String key) {
         String id = stateDocumentId(category, scope, key);
-        System.out.println("loadStateDocument-->"+category+"-->"+scope+"-->"+key+"-->"+id);
+        log.info("loadStateDocument-->"+category+"-->"+scope+"-->"+key+"-->"+id);
         return stateRepository.find(id, category.name());
     }
 

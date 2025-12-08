@@ -2,12 +2,8 @@ package com.example.cacex.repository;
 
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosException;
-import com.azure.cosmos.models.CosmosItemRequestOptions;
-import com.azure.cosmos.models.CosmosQueryRequestOptions;
+import com.azure.cosmos.models.*;
 import com.azure.cosmos.util.CosmosPagedIterable;
-import com.azure.cosmos.models.PartitionKey;
-import com.azure.cosmos.models.SqlParameter;
-import com.azure.cosmos.models.SqlQuerySpec;
 import com.example.cacex.model.StateDocument;
 import org.springframework.stereotype.Service;
 

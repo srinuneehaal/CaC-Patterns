@@ -32,12 +32,13 @@ public class ApplyRunner implements CommandLineRunner {
      */
     @Override
     public void run(String... args) {
-        if (!CommandLineFlags.hasFlag(args, ARG_APPLY)) {
+        String[] sanitizedArgs = args == null ? new String[0] : args;
+        if (!CommandLineFlags.hasFlag(sanitizedArgs, ARG_APPLY)) {
             log.debug("Apply flag not provided. Skipping plan application.");
             return;
         }
-        if (args != null && args.length > 1) {
-            log.warn("Extra arguments detected alongside {}: {}", ARG_APPLY, java.util.Arrays.toString(args));
+        if (sanitizedArgs.length > 1 && log.isWarnEnabled()) {
+            log.warn("Extra arguments detected alongside {}: {}", ARG_APPLY, java.util.Arrays.toString(sanitizedArgs));
         }
         try {
             planApplyService.applyPlan();

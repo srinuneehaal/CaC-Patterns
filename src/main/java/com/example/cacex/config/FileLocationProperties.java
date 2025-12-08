@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * Centralised holder for filesystem locations so directory and file names
@@ -28,7 +27,7 @@ public class FileLocationProperties {
     private String aborConfigurationsDirName = "aborconfigs";
     private String aborDirName = "abor";
     private String generalLedgerProfilesDirName = "glprofile";
-    private Function<String, String> envLookup = System::getenv;
+    private EnvironmentLookup envLookup = System::getenv;
 
     /**
      * Returns the configured changed files directory.
@@ -293,14 +292,14 @@ public class FileLocationProperties {
     }
 
     private String resolveFromEnv(String envKey, String fallback) {
-        String value = envLookup.apply(envKey);
+        String value = envLookup.lookup(envKey);
         return value != null && !value.isBlank() ? value : fallback;
     }
 
     /**
      * Test hook to override environment lookup without touching real env vars.
      */
-    public void setEnvLookup(Function<String, String> envLookup) {
+    public void setEnvLookup(EnvironmentLookup envLookup) {
         this.envLookup = Objects.requireNonNull(envLookup);
     }
 }

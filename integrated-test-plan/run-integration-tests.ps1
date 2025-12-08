@@ -72,6 +72,48 @@ $categorySamples = @(
         }
     },
     [pscustomobject]@{
+        Category = 'glprofile'
+        SamplePath = 'changedfiles/ATG/glprofile/USG-USG_GP-ATG.json'
+        UpdateScript = {
+            param($path)
+            $content = Get-Content -Raw $path
+            if ($content -match '"description":\s*"[^"]+"') {
+                $updated = [regex]::Replace($content, '"description":\s*"[^"]+"', '"description": "GLP description updated via automation"', 1)
+            } else {
+                $updated = $content -replace '(}\s*)$', ', "_integrationUpdated": true$1'
+            }
+            Set-Content -Path $path -Value $updated
+        }
+    },
+    [pscustomobject]@{
+        Category = 'derivedportfolios'
+        SamplePath = 'changedfiles/ATG/derivedportfolios/derivedportfolios-ATG.json'
+        UpdateScript = {
+            param($path)
+            $content = Get-Content -Raw $path
+            if ($content -match '"description":\s*"[^"]+"') {
+                $updated = [regex]::Replace($content, '"description":\s*"[^"]+"', '"description": "Derived Portfolio Batch Update"', 1)
+            } else {
+                $updated = $content -replace '(}\s*)$', ', "_integrationUpdated": true$1'
+            }
+            Set-Content -Path $path -Value $updated
+        }
+    },
+    [pscustomobject]@{
+        Category = 'portfoliogroups'
+        SamplePath = 'changedfiles/ATG/portfoliogroups/portfoliogroups-ATG.json'
+        UpdateScript = {
+            param($path)
+            $content = Get-Content -Raw $path
+            if ($content -match '"description":\s*"[^"]+"') {
+                $updated = [regex]::Replace($content, '"description":\s*"[^"]+"', '"description": "Portfolio group metadata refreshed"', 1)
+            } else {
+                $updated = $content -replace '(}\s*)$', ', "_integrationUpdated": true$1'
+            }
+            Set-Content -Path $path -Value $updated
+        }
+    },
+    [pscustomobject]@{
         Category = 'aborconfigs'
         SamplePath = 'changedfiles/ATG/aborconfigs/aborconfig-ATG.json'
         UpdateScript = {

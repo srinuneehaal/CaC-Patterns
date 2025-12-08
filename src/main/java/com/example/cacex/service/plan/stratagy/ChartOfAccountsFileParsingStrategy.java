@@ -63,7 +63,6 @@ public class ChartOfAccountsFileParsingStrategy implements FileParsingStrategy {
         String scope = file.getScope() == null ? null : file.getScope().strip();
         String code = resolveCode(file);
         String key = buildKey(path, scope, code);
-        System.out.println("COA key-->"+key);
         return new LoadedFile(getCategory(), key, path, file.getChartOfAccountsRequest());
     }
 

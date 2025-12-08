@@ -1,23 +1,24 @@
 package com.example.cacex.service.plan;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 @Component
 public class ChangedFilesProvider {
 
     private static final String ENV_KEY = "CHANGED_FILES";
 
-    private final Function<String, String> envLookup;
+    private final EnvironmentLookup envLookup;
 
     /**
      * Creates a provider that reads from real environment variables.
      */
+    @Autowired
     public ChangedFilesProvider() {
         this(System::getenv);
     }
@@ -25,9 +26,9 @@ public class ChangedFilesProvider {
     /**
      * Creates a provider with a custom environment lookup (primarily for testing).
      *
-     * @param envLookup function that returns environment values
+     * @param envLookup lookup that returns environment values
      */
-    ChangedFilesProvider(Function<String, String> envLookup) {
+    ChangedFilesProvider(EnvironmentLookup envLookup) {
         this.envLookup = envLookup;
     }
 
@@ -37,7 +38,7 @@ public class ChangedFilesProvider {
      * @return list of changed file paths, or empty when none
      */
     public List<Path> getChangedPaths() {
-        String envValue = envLookup.apply(ENV_KEY);
+        String envValue = envLookup.lookup(ENV_KEY);
         if (envValue == null || envValue.trim().isEmpty()) {
             return List.of();
         }
@@ -52,4 +53,9 @@ public class ChangedFilesProvider {
         String sanitized = rawPath.replace("\"", "").trim();
         return Paths.get(sanitized);
     }
+}
+
+@FunctionalInterface
+interface EnvironmentLookup {
+    String lookup(String key);
 }

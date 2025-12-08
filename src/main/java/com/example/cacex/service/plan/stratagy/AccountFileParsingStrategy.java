@@ -65,7 +65,6 @@ public class AccountFileParsingStrategy implements FileParsingStrategy {
     public LoadedFile parse(Path path) throws IOException {
         AccountFile file = mapper.read(path, AccountFile.class);
         String key = PathUtils.baseName(path);
-        System.out.println("Account key-->"+key);
         return new LoadedFile(getCategory(), key, path, file);
     }
 }

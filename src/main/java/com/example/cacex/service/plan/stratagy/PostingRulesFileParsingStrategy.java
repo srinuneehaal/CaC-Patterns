@@ -67,11 +67,7 @@ public class PostingRulesFileParsingStrategy implements FileParsingStrategy {
                             String postingModuleCode,
                             String chartOfAccountsCode,
                             PostingRulesFile file) {
-        String module = StringUtils.hasText(postingModuleCode)
-                ? postingModuleCode.trim()
-                : (file.getPostingModuleRequest() != null && StringUtils.hasText(file.getPostingModuleRequest().getCode())
-                ? file.getPostingModuleRequest().getCode().trim()
-                : null);
+        String module = derivePostingModuleCode(postingModuleCode, file);
         String coa = StringUtils.hasText(chartOfAccountsCode) ? chartOfAccountsCode.trim() : null;
 
         if (StringUtils.hasText(module) && StringUtils.hasText(coa) && StringUtils.hasText(scope)) {
@@ -87,5 +83,15 @@ public class PostingRulesFileParsingStrategy implements FileParsingStrategy {
             return module;
         }
         return PathUtils.baseName(path);
+    }
+
+    private String derivePostingModuleCode(String postingModuleCode, PostingRulesFile file) {
+        if (StringUtils.hasText(postingModuleCode)) {
+            return postingModuleCode.trim();
+        }
+        if (file.getPostingModuleRequest() != null && StringUtils.hasText(file.getPostingModuleRequest().getCode())) {
+            return file.getPostingModuleRequest().getCode().trim();
+        }
+        return null;
     }
 }
