@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -266,6 +267,64 @@ class StateFileServiceTest {
         assertEquals("AC2", body.get("glAccounts").get(0).get("code").asText());
     }
 
+    @Test
+    void loadPayloadReadsExistingDocument() {
+        SideFile existing = new SideFile();
+        existing.setScope("S1");
+        existing.setSide("BUY");
+
+        StateDocument document = new StateDocument();
+        document.setId("BUY-S1");
+        document.setTypeOfItem(FileCategory.SIDE.name());
+        document.setScope("S1");
+        document.setData(objectMapper.valueToTree(existing));
+        repository.upsert(document);
+
+        SideFile payload = stateFileService.loadPayload(FileCategory.SIDE, "S1", "BUY", SideFile.class);
+        assertNotNull(payload);
+        assertEquals("BUY", payload.getSide());
+    }
+
+    @Test
+    void payloadFromDocumentHandlesNullData() {
+        StateDocument document = new StateDocument();
+        document.setTypeOfItem(FileCategory.SIDE.name());
+        document.setScope("S1");
+
+        assertNull(stateFileService.payloadFromDocument(document, SideFile.class));
+    }
+
+    @Test
+    void payloadsEqualHandlesNullAndDifferentValues() {
+        Map<String, String> same = Map.of("code", "A");
+        Map<String, String> different = Map.of("code", "B");
+
+        assertTrue(stateFileService.payloadsEqual(same, same));
+        assertFalse(stateFileService.payloadsEqual(same, different));
+        assertTrue(stateFileService.payloadsEqual(null, null));
+        assertFalse(stateFileService.payloadsEqual(same, null));
+    }
+
+    @Test
+    void stateDocumentIdAvoidsDuplicateScopeSuffix() throws Exception {
+        assertEquals("BUY-S10", invokeStateDocumentId(FileCategory.SIDE, "S10", "BUY-S10"));
+    }
+
+    @Test
+    void stateDocumentIdAccountUsesChartOnlyWhenScopeMissing() throws Exception {
+        assertEquals("COA1", invokeStateDocumentId(FileCategory.ACCOUNT, "", "COA1-AC1"));
+    }
+
+    @Test
+    void stateDocumentIdAccountRemovesScopeSuffixBeforeExtractingChart() throws Exception {
+        assertEquals("COA1-S9", invokeStateDocumentId(FileCategory.ACCOUNT, "S9", "COA1-AC1-S9"));
+    }
+
+    @Test
+    void stateDocumentIdAccountFallsBackWhenChartMissing() throws Exception {
+        assertEquals("-S9", invokeStateDocumentId(FileCategory.ACCOUNT, "S9", null));
+    }
+
     private String stateDocumentId(String key, String scope) {
         String normalizedKey = key == null ? "" : key.trim();
         if (scope != null && !scope.isBlank()) {
@@ -311,6 +370,12 @@ class StateFileServiceTest {
             return normalizedKey.substring(0, dash);
         }
         return normalizedKey;
+    }
+
+    private String invokeStateDocumentId(FileCategory category, String scope, String key) throws Exception {
+        Method method = StateFileService.class.getDeclaredMethod("stateDocumentId", FileCategory.class, String.class, String.class);
+        method.setAccessible(true);
+        return (String) method.invoke(stateFileService, category, scope, key);
     }
 
     private AborRequest aborRequest(String code) {

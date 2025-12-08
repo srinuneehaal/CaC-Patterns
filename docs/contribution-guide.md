@@ -2,6 +2,8 @@
 
 This guide outlines the steps to add a new file category, directory, or plan behavior so contributors can quickly plug into the existing architecture.
 
+> **Update note** – The sides plan/apply documentation (`spec/Sides/sides-plan-apply.md`) and the integration automation now include multiple categories (sides, postingrules, aborconfigs, abor). Update those docs/scripts whenever you change directory names, ordering rules, or apply behavior so the coverage remains accurate.
+
 ## 1. Update configuration
 
 1. **Enum entry** – Add your new type to `com.example.cacex.model.FileCategory`.  

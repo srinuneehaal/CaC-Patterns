@@ -1,6 +1,6 @@
 Knowledge Share Options
 
-Project Overview: Expand README.md (currently describing the Spring Boot plan generator) with sections on goals, architecture, and how the pieces (plan reader, writer, state service, ordering rules) interact; note JacksonConfiguration, PlanApplyService, and ordering strategy role.
+Project Overview: Expand README.md (currently describing the Spring Boot plan generator) with sections on goals, architecture, and how the pieces (plan reader, writer, state service, ordering rules) interact; note JacksonConfiguration, PlanApplyService, and ordering strategy role. Reference the new `spec/Sides/sides-plan-apply.md` document and the integration automation for full-flow verification.
 Configuration Guide: Document src/main/resources/application.properties + FileLocationProperties settings (changed files, Cosmos state properties, directory mappings, rule ordering) so teammates know how to tailor environments or add new directories (e.g., the new glprofile support).
 Module/Flow Diagram: Given the service/runner layout (PlanRunner, PlanService, PlanApplyService, state handlers, appliers), publish a short architecture note or sequence diagram describing how changed files become plan items and how plan application executes.
 Testing Overview: Summarize key test suites (PlanServiceCoreTest, PlanOrderingRuleEngineTest, StateFileServiceTest, PlanItemAppliersTest, etc.), including what each covers and how to run them (mvn test), plus mention the explicit plans generated via --plan.

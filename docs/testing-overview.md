@@ -1,6 +1,6 @@
 # Testing Overview
 
-This repository includes focused unit tests for the plan generator, state handling, parsing strategies, and model objects. Below is a summarized matrix that can guide developers when adding new features or verifying behavior.
+This repository includes focused unit tests for the plan generator, state handling, parsing strategies, and model objects. Below is a summarized matrix that can guide developers when adding new features or verifying behavior. Recent additions include `ModelCoverageTest` (full model validation), `CosmosStateRepositoryTest`, and the expanded `StateFileServiceTest` that now covers the account-specific document id logic, sides key derivation, and list-based deletions.
 
 | Layer | Representative tests | Purpose |
 | --- | --- | --- |

@@ -1,6 +1,6 @@
 # File Processing Catalogue
 
-This document describes how the project interprets each directory under `changedfiles`, which parsing strategy handles it, and what model type ultimately appears in a `PlanItem`.
+This document describes how the project interprets each directory under `changedfiles`, which parsing strategy handles it, and what model ultimately appears in a `PlanItem`. The provided catalog has been updated alongside the new sides plan/apply documentation and integration script so you can trace each directory through plan + apply without jumping between files.
 
 | Directory | Strategy class | Category | Model / payload | Notes |
 | --- | --- | --- | --- | --- |

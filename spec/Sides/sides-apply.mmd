@@ -1,0 +1,15 @@
+---
+config:
+  layout: dagre
+---
+flowchart TD
+    PlanItem[PlanItem Side]
+Service[StateFileService.applySide]
+Payload[SideFile payload]
+Cosmos[CosmosStateRepository]
+
+PlanItem --> Service
+Service -->|Action NEW/UPDATE| Payload
+Service -->|persist| Cosmos
+Service -->|Action DELETE| CosmosDelete[Cosmos deleteItem]
+CosmosDelete --> Cosmos

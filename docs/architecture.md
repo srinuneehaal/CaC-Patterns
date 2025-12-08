@@ -1,6 +1,6 @@
 ﻿# Architecture Overview
 
-This project converts a set of JSON configuration files into a ordered master plan and then applies that plan through mock LUSID SDK appliers. The critical pieces of the flow are below.
+This project converts configurations into ordered master plans and applies them through modular appliers. Recent additions include the dedicated `spec/Sides/sides-plan-apply.md` doc with Mermaid diagrams and the enhanced integration script that now exercises `sides`, `postingrules`, `aborconfigs`, and `abor`, so architecture readers can trace how each category flows through plan + apply.
 
 ## High-level flow
 

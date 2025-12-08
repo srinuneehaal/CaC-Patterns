@@ -1,6 +1,6 @@
 # State & Plan Lifecycle
 
-This document walks through the lifecycle of a plan from changed files to applied state updates, highlighting the key services and files involved in `PlanService`, `PlanApplyService`, and `StateFileService`.
+This document walks through the lifecycle of a plan from changed files to applied state updates, highlighting the key services and files involved in `PlanService`, `PlanApplyService`, and `StateFileService`. It now reflects the detailed sides plan/apply spec (`spec/Sides/sides-plan-apply.md`) and the integration automation that covers `sides`, `postingrules`, `aborconfigs`, and `abor`.
 
 ## 1. Change detection
 

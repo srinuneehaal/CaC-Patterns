@@ -1,6 +1,6 @@
 # Configuration Guide
 
-This project relies on a small set of conventions defined in `src/main/resources/application.properties` and `FileLocationProperties`. The goal is to ensure the parsing/planning/apply layers agree on where files live and how they should be ordered.
+This project relies on conventions defined in `application.properties` and `FileLocationProperties`. The goal is to ensure parsing/planning/apply layers agree on where files live and how they are ordered. Recent additions such as the `sides-plan-apply` specification and the extended integration automation (covering sides/postingrules/abor-configs/abor) demonstrate those conventions end-to-end.
 
 ## Directory layout
 

@@ -1,0 +1,14 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    ChangedFile["Changed file input Side JSON"] --> Parser["SideFileParsingStrategy"]
+    Parser --> ChangedPayload["ChangedPayload"]
+    ChangedPayload --> StateKey["deriveKeyFromFilename  scope/key"] & Compare["Payload comparison"]
+    StateKey -- key --> StateStore["CosmosStateRepository scope/type partition"]
+    StateStore --> ExistingPayload["ExistingPayload"]
+    ExistingPayload --> Compare
+    Compare -- new --> EmitNew["NEW plan item"]
+    Compare -- changed --> EmitUpdate["UPDATE plan item"]
+    Compare -- missing file --> EmitDelete["DELETE plan item"]
