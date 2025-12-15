@@ -1,0 +1,11 @@
+---
+config:
+  layout: dagre
+---
+flowchart TD
+    PlanItem[PlanItem COA] --> Applier["ChartOfAccountsPlanItemApplier"]
+    Applier --> Api["ChartOfAccountsApiService"]
+    Api --> Service["StateFileService.applyStateDocument"]
+    Service -->|persist snapshot| Cosmos["CosmosStateRepository type=CHART_OF_ACCOUNTS"]
+    Service -->|DELETE action| CosmosDelete[Delete chart]
+    CosmosDelete --> Cosmos

@@ -9,6 +9,12 @@
 ## Application
 - The apply path rewrites the entire `AccountFile` snapshot via `StateFileService`, ensuring the Cosmos document contains the full `chartOfAccountsCode`, the `scope`, and the `glAccounts` collection.
 
-## References
-- `spec/plan-apply/all-categories.md#account-files-(gl-accounts)` provides the diagram that maps parsing, comparison, and persistence.  
-- Mention this doc in knowledge-share sessions with the `docs/file-processing.md` table so teammates see where GL accounts live relative to other directories.
+## Strategy classes
+- Planner: `AccountFileParsingStrategy`.  
+- Apply: `AccountPlanItemApplier` with `StateFileService.applyStateDocument`.
+
+## Flow diagram
+- Refer to `spec/plan-apply/all-categories.md#account-files-(gl-accounts)` flowchart showing parser -> normalized key -> state comparison -> persistence.
+
+## Sequence diagram
+- Use `diagrams/sequence_1.mmd` in knowledge-share decks when describing how GL account plans are built, sorted, and applied through the state service.

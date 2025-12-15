@@ -9,6 +9,12 @@
 ## Application
 - `SidePlanItemApplier` hands off the action to `StateFileService.applySide`, which writes or removes the `StateDocument` so the next plan run sees an accurate baseline.
 
-## Diagrams and references
-- `diagrams/sequence_1.mmd` and `diagrams/system_design LLD.mmd` highlight how `SidePlanItemApplier` fits into the apply chain.  
-- Reference `spec/plan-apply/all-categories.md#side-files` for the Mermaid flowchart specific to sides.
+## Strategy classes
+- Planner: `SideFileParsingStrategy` (registered via `FileParsingStrategyFactory`).  
+- Apply: `SidePlanItemApplier` + `PlanItemActionService` beans that call `StateFileService.applySide`.
+
+## Flow diagram
+- See the `flowchart TD` in `spec/plan-apply/all-categories.md#side-files` for how the parser → state lookup → diff steps produce `PlanItem`s and how `StateFileService.applySide` persists the COSMOS document.
+
+## Sequence diagram
+- Reference `diagrams/sequence_1.mmd` and `diagrams/system_design LLD.mmd` for the ordered interactions from `PlanRunner` reading `CHANGED_FILES` through `PlanApplyService` applying each `PlanItem`.

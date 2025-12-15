@@ -1,0 +1,11 @@
+---
+config:
+  layout: dagre
+---
+flowchart TD
+    PlanItem[PlanItem GL profile] --> Applier["GeneralLedgerProfilePlanItemApplier"]
+    Applier --> Api["GeneralLedgerProfileApiService"]
+    Api --> Service["StateFileService.applyStateDocument"]
+    Service -->|persist snapshot| Cosmos["CosmosStateRepository type=GENERAL_LEDGER_PROFILE"]
+    Service -->|DELETE action| CosmosDelete[Delete profile]
+    CosmosDelete --> Cosmos

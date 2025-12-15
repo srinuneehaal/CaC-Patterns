@@ -1,0 +1,15 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    ChangedFile["Changed file input ABOR configuration JSON"] --> Parser["AborConfigurationFileParsingStrategy"]
+    Parser --> ConfigList["AborConfigurationRequest list"]
+    ConfigList --> Key["deriveKey from filename (e.g., aborconfig-ATG)"]
+    ConfigList --> Compare["Compare list snapshot vs persisted configuration"]
+    Key -- key --> StateStore["CosmosStateRepository type=ABOR_CONFIGURATION"]
+    StateStore --> ExistingPayload["ExistingPayload"]
+    ExistingPayload --> Compare
+    Compare -- new --> EmitNew["NEW plan item"]
+    Compare -- changed --> EmitUpdate["UPDATE plan item"]
+    Compare -- missing --> EmitDelete["DELETE plan item"]

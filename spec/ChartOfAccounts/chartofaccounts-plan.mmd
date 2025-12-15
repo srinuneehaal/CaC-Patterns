@@ -1,0 +1,15 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    ChangedFile["Changed file input COA JSON"] --> Parser["ChartOfAccountsFileParsingStrategy"]
+    Parser --> CoaPayload["ChartOfAccountsFile payload"]
+    CoaPayload --> Compare["Compare chart payload vs persisted document"]
+    CoaPayload --> Key["deriveKey (scope/chartCode)"]
+    Key -- key --> StateStore["CosmosStateRepository type=CHART_OF_ACCOUNTS"]
+    StateStore --> ExistingPayload["ExistingPayload"]
+    ExistingPayload --> Compare
+    Compare -- new --> EmitNew["NEW plan item"]
+    Compare -- changed --> EmitUpdate["UPDATE plan item"]
+    Compare -- missing --> EmitDelete["DELETE plan item"]

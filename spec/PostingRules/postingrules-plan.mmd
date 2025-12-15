@@ -1,0 +1,15 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    ChangedFile["Changed file input posting rules JSON"] --> Parser["PostingRulesFileParsingStrategy"]
+    Parser --> ModuleRequests["PostingModuleRequest entries"]
+    ModuleRequests --> Compare["Compare module payload vs persisted module"]
+    ModuleRequests --> Key["deriveKey (module-coa-scope)"]
+    Key -- key --> StateStore["CosmosStateRepository type=POSTING_RULE"]
+    StateStore --> ExistingPayload["ExistingPayload"]
+    ExistingPayload --> Compare
+    Compare -- new --> EmitNew["NEW plan item"]
+    Compare -- changed --> EmitUpdate["UPDATE plan item"]
+    Compare -- missing --> EmitDelete["DELETE plan item"]

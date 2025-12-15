@@ -1,0 +1,10 @@
+---
+config:
+  layout: dagre
+---
+flowchart TD
+    PlanItem[PlanItem GL account] --> Applier["AccountPlanItemApplier"]
+    Applier --> Service["StateFileService.applyStateDocument"]
+    Service -->|persist snapshot| Cosmos["CosmosStateRepository type=ACCOUNT"]
+    Service -->|DELETE action| CosmosDelete[Delete account entry]
+    CosmosDelete --> Cosmos

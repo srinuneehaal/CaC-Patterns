@@ -9,6 +9,12 @@
 ## Application
 - `StateFileService` rebuilds the `AborFile` aggregate document after each apply action, so the persisted list mirrors the latest config.
 
-## References
-- `spec/plan-apply/all-categories.md#abors` explains the per-entry diff approach.  
-- Include this doc in knowledge-share sessions when discussing how side-by-side diffing works for updates that touch translations or mathematical rules.
+## Strategy classes
+- Planner: `AborFileParsingStrategy`.  
+- Apply: `AborPlanItemApplier` partnered with `StateFileService`.
+
+## Flow diagram
+- The diff explanation under `spec/plan-apply/all-categories.md#abors` highlights how each `AborRequest` is compared/per code and how deletes arise when entries vanish.
+
+## Sequence diagram
+- Show `diagrams/sequence_1.mmd` as the “per-item” view so reviewers see how ABOR diffs trigger `PlanItem` creation and the apply step rebuilds the aggregated list.

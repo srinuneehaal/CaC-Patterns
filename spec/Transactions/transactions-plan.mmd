@@ -1,0 +1,16 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    ChangedFile["Changed file input transaction JSON"] --> Parser["TransactionFileParsingStrategy"]
+    Parser --> TransactionPayload["TransactionFile payload"]
+    TransactionPayload --> Compare["Compare transaction payload vs persisted document"]
+    TransactionPayload --> Key["deriveKey (scope/transactionCode)"]
+    Key -- key --> StateStore["CosmosStateRepository type=TRANSACTION"]
+    StateStore --> ExistingPayload["ExistingPayload"]
+    ExistingPayload --> Compare
+    Compare -- new --> EmitNew["NEW plan item"]
+    Compare -- changed --> EmitUpdate["UPDATE plan item"]
+    Compare -- missing --> EmitDelete["DELETE plan item"]
+    Compare --> Sequence["Plan respects transactionSequence ordering"]

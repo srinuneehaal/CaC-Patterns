@@ -1,0 +1,11 @@
+---
+config:
+  layout: dagre
+---
+flowchart TD
+    PlanItem[PlanItem posting module] --> Applier["PostingModulePlanItemApplier"]
+    Applier --> Api["PostingModuleApiService"]
+    Api --> Service["StateFileService.applyStateDocument"]
+    Service -->|persist module| Cosmos["CosmosStateRepository type=POSTING_RULE"]
+    Service -->|DELETE action| CosmosDelete[Delete module entry]
+    CosmosDelete --> Cosmos

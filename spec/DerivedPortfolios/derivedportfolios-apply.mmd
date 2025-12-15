@@ -1,0 +1,10 @@
+---
+config:
+  layout: dagre
+---
+flowchart TD
+    PlanItem[PlanItem derived portfolio] --> Applier["DerivedPortfolioPlanItemApplier"]
+    Applier --> Service["StateFileService.persistListDocument"]
+    Service -->|persist list| Cosmos["CosmosStateRepository type=DERIVED_PORTFOLIO"]
+    Service -->|DELETE action| CosmosDelete[Remove derived portfolio entry]
+    CosmosDelete --> Cosmos

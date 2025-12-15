@@ -9,6 +9,12 @@
 ## Application
 - `ChartOfAccountsPlanItemApplier` (via `StateFileService.persistListDocument`/`applyStateDocument`) writes the snapshot to Cosmos so the next plan run can detect deletions or further edits.
 
-## References
-- The flowchart in `spec/plan-apply/all-categories.md#chart-of-accounts` shows how diff detection transitions into the state persistence step.  
-- Link to `diagrams/system_design.png` when you need a high-level artifact showing this category among other feeds.
+## Strategy classes
+- Planner: `ChartOfAccountsFileParsingStrategy`.  
+- Apply: `ChartOfAccountsPlanItemApplier` + `ChartOfAccountsApiService`.
+
+## Flow diagram
+- The `flowchart LR` in `spec/plan-apply/all-categories.md#chart-of-accounts` traces parser → state document → diff → `StateFileService.persist`.
+
+## Sequence diagram
+- Embed `diagrams/sequence.mmd` as the narrative for plan/apply interactions, emphasizing how the chart request is normalized before ordering and persisted afterwards.

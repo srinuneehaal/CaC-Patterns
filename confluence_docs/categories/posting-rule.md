@@ -9,6 +9,12 @@
 ## Application
 - `PostingModulePlanItemApplier` delegates to `StateFileService` to persist the module request along with the referenced chart code, keeping the aggregate document in sync for future runs.
 
-## References
-- Refer to `spec/plan-apply/all-categories.md#posting-rules` for the specific flow and diagram.  
-- Knowledge-share decks should link to this doc when covering how posting rules tie into both budgeting and GL categorizations.
+## Strategy classes
+- Planner: `PostingRulesFileParsingStrategy`.  
+- Apply: `PostingModulePlanItemApplier` and `PostingModuleApiService`.
+
+## Flow diagram
+- The `graph TB` in `spec/plan-apply/all-categories.md#posting-rules` visualizes parser -> Cosmos type POSTING_RULE lookup -> `PlanItem` -> `StateFileService` upsert.
+
+## Sequence diagram
+- Reference `diagrams/system_design LLD.mmd` when explaining how posting rules move from JSON files through plan ordering to apply service.

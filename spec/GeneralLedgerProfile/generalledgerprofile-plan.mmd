@@ -1,0 +1,15 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    ChangedFile["Changed file input GL profile JSON"] --> Parser["GeneralLedgerProfileFileParsingStrategy"]
+    Parser --> ProfilePayload["GeneralLedgerProfileFile payload"]
+    ProfilePayload --> Compare["Compare profile request vs persisted document"]
+    ProfilePayload --> Key["normalize key (profileCode-coa-scope)"]
+    Key -- key --> StateStore["CosmosStateRepository type=GENERAL_LEDGER_PROFILE"]
+    StateStore --> ExistingPayload["ExistingPayload"]
+    ExistingPayload --> Compare
+    Compare -- new --> EmitNew["NEW plan item"]
+    Compare -- changed --> EmitUpdate["UPDATE plan item"]
+    Compare -- missing --> EmitDelete["DELETE plan item"]

@@ -1,0 +1,15 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    ChangedFile["Changed file input GL account JSON"] --> Parser["AccountFileParsingStrategy"]
+    Parser --> AccountFile["AccountFile payload"]
+    AccountFile --> Compare["Compare account list vs persisted entry"]
+    AccountFile --> Key["deriveKey (COACODE-AccountCode)"]
+    Key -- key --> StateStore["CosmosStateRepository type=ACCOUNT"]
+    StateStore --> ExistingPayload["ExistingPayload"]
+    ExistingPayload --> Compare
+    Compare -- new --> EmitNew["NEW plan item"]
+    Compare -- changed --> EmitUpdate["UPDATE plan item"]
+    Compare -- missing --> EmitDelete["DELETE plan item"]

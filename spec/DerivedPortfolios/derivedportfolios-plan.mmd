@@ -1,0 +1,16 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    ChangedFile["Changed file input derived portfolios JSON"] --> Parser["DerivedPortfolioFileParsingStrategy"]
+    Parser --> PortfolioList["CreateDerivedTransactionPortfolioRequest list"]
+    PortfolioList --> Entries["Individual request entries"]
+    Entries --> Compare["Compare entry vs persisted code"]
+    Entries --> Key["deriveKey (scope/code)"]
+    Key -- key --> StateStore["CosmosStateRepository type=DERIVED_PORTFOLIO"]
+    StateStore --> ExistingPayload["ExistingPayload"]
+    ExistingPayload --> Compare
+    Compare -- new --> EmitNew["NEW plan item"]
+    Compare -- changed --> EmitUpdate["UPDATE plan item"]
+    Compare -- missing --> EmitDelete["DELETE plan item"]

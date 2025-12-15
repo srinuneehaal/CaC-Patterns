@@ -10,6 +10,12 @@
 ## Application
 - `GeneralLedgerProfilePlanItemApplier` calls `GeneralLedgerProfileApiService` (a logging stub) and writes the snapshot through `StateFileService`, ensuring the persisted state remains aligned with configuration changes.
 
-## References
-- `spec/plan-apply/all-categories.md#general-ledger-profile` features the Mermaid diagram for this category.  
-- Pair this page with `docs/plan-lifecycle.md` when explaining the overlapping responsibilities of parsing strategies and apply services.
+## Strategy classes
+- Planner: `GeneralLedgerProfileFileParsingStrategy`.  
+- Apply: `GeneralLedgerProfilePlanItemApplier` + `GeneralLedgerProfileApiService`.
+
+## Flow diagram
+- `spec/plan-apply/all-categories.md#general-ledger-profile` includes the flowchart tracing parser -> state document -> plan diff -> `GeneralLedgerProfileApiService` call.
+
+## Sequence diagram
+- Use `diagrams/sequence.mmd` to illustrate how the GL profile request steps in right after chart/account processing before the apply services persist the new profile.

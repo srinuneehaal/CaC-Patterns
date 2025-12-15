@@ -9,6 +9,12 @@
 ## Application
 - Apply rewrites the aggregate `DerivedPortfolioFile` snapshot via `StateFileService.persistListDocument`, keeping the list of requests per scope in sync for the next plan run.
 
-## References
-- `spec/plan-apply/all-categories.md#derived-portfolios-&-portfolio-groups` highlights the shared list-based flow.  
-- When presenting categories, include this page alongside `portfolio-group.md` to emphasize commonalities in list diffing.
+## Strategy classes
+- Planner: `DerivedPortfolioFileParsingStrategy`.  
+- Apply: `DerivedPortfolioPlanItemApplier` via `StateFileService.persistListDocument`.
+
+## Flow diagram
+- `spec/plan-apply/all-categories.md#derived-portfolios-&-portfolio-groups` shows the shared flow that splits list entries and emits deletes for missing codes.
+
+## Sequence diagram
+- Use `diagrams/sequence_1.mmd` while explaining how derived portfolios’ list diffs map into apply-phase snapshots.

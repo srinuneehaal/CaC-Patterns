@@ -1,0 +1,12 @@
+---
+config:
+  layout: dagre
+---
+flowchart TD
+    PlanItem[PlanItem transaction] --> Applier["TransactionPlanItemApplier"]
+    Applier --> Registry["PlanItemApplierRegistry"]
+    Registry --> Api["TransactionTypeApiService"]
+    Api --> Service["StateFileService.applyStateDocument"]
+    Service -->|persist snapshot| Cosmos["CosmosStateRepository type=TRANSACTION"]
+    Service -->|DELETE action| CosmosDelete[Delete transaction entry]
+    CosmosDelete --> Cosmos

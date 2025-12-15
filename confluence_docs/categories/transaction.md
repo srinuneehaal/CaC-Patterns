@@ -9,6 +9,12 @@
 ## Application
 - `TransactionPlanItemApplier` persists the entire `TransactionFile` snapshot via `StateFileService`, updating Cosmos `transaction` documents and emitting delete events when entries vanish.
 
-## Diagrams & references
-- `spec/plan-apply/all-categories.md#transactions` contains the sequence diagram showing parser → state lookup → apply chain.  
-- Pair that with `diagrams/sequence.mmd` or `diagrams/system_design.mmd` whenever you explain how transactions flow through plan and apply in knowledge share sessions.
+## Strategy classes
+- Planner: `TransactionFileParsingStrategy`.  
+- Apply: `TransactionPlanItemApplier` + `TransactionTypeApiService` (logs payloads) via `PlanItemActionService`.
+
+## Flow diagram
+- The sequence diagram in `spec/plan-apply/all-categories.md#transactions` illustrates parser → Cosmos lookup → `PlanItem` emission → `StateFileService` persistence.
+
+## Sequence diagram
+- Use `diagrams/sequence.mmd`/`diagrams/system_design.mmd` to show the full plan/apply run, noting how `transactionSequence` ordering affects the plan ordering phase.

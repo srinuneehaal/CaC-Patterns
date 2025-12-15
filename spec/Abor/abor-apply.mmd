@@ -1,0 +1,10 @@
+---
+config:
+  layout: dagre
+---
+flowchart TD
+    PlanItem[PlanItem ABOR entry] --> Applier["AborPlanItemApplier"]
+    Applier --> Service["StateFileService.persistListDocument"]
+    Service -->|persist list| Cosmos["CosmosStateRepository type=ABOR"]
+    Service -->|DELETE action| CosmosDelete[Delete ABOR entry]
+    CosmosDelete --> Cosmos
