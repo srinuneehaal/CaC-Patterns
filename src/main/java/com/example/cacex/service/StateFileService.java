@@ -67,7 +67,7 @@ public class StateFileService {
     }
 
     public <T> T loadPayload(FileCategory category, String scope, String key, Class<T> payloadType) {
-        log.info("loadPayload-->"+category+"-->"+scope+"-->"+key+"-->"+payloadType);
+        log.info("loadPayload-->{}-->{}-->{}-->{}", category, scope, key, payloadType);
         return loadStateDocument(category, scope, key)
                 .map(doc -> parseStatePayload(doc.getData(), payloadType))
                 .orElse(null);
@@ -259,7 +259,7 @@ public class StateFileService {
         if (file.getChartOfAccountsCode() == null) {
             file.setChartOfAccountsCode(extractChartOfAccounts(key, scope));
         }
-        log.info("accounts-->"+file.getAccounts());
+        log.info("accounts--> {}", file.getAccounts());
         List<Account> accounts = new ArrayList<>(optionalList(file.getAccounts()));
         if (item.getAction() == Action.DELETE) {
             removeAccountByCandidates(item, file, accounts);
@@ -290,14 +290,14 @@ public class StateFileService {
                                String key,
                                Class<T> type,
                                Supplier<T> fallback) {
-        log.info("readOrDefault-->"+category+"-->"+scope+"-->"+key+"-->"+type+"-->"+fallback);
+        log.info("readOrDefault-->{}-->{}-->{}-->{}-->{}", category, scope, key, type, fallback);
         T payload = loadPayload(category, scope, key, type);
         return payload == null ? fallback.get() : payload;
     }
 
     private Optional<StateDocument> loadStateDocument(FileCategory category, String scope, String key) {
         String id = stateDocumentId(category, scope, key);
-        log.info("loadStateDocument-->"+category+"-->"+scope+"-->"+key+"-->"+id);
+        log.info("loadStateDocument-->{}-->{}-->{}-->{}", category, scope, key, id);
         return stateRepository.find(id, category.name());
     }
 

@@ -3,7 +3,6 @@ package com.example.cacex.service.apply.itemapply;
 import com.example.cacex.exception.InvalidPlanItemException;
 import com.example.cacex.exception.PlanApplyException;
 import com.example.cacex.model.Action;
-import com.example.cacex.model.FileCategory;
 import com.example.cacex.model.PlanItem;
 import com.example.cacex.service.apply.apiservice.PlanItemActionService;
 
@@ -63,6 +62,4 @@ public abstract class AbstractPlanItemApplier<T> implements PlanItemApplier {
         return payloadType.cast(payload);
     }
 
-    @Override
-    public abstract FileCategory supportedCategory();
 }

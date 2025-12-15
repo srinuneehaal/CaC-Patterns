@@ -146,26 +146,30 @@ public class PlanService {
         }
         Object state = statePayloads.get(stateKey);
 
-        if (Files.exists(path)) {
-            LoadedFile changed = parsePath(path);
-            if (changed == null) {
-                return;
+        if (!Files.exists(path)) {
+            if (state != null) {
+                plan.addItem(new PlanItem(Action.DELETE, category, scope, key,
+                        cosmosStateReference(category, scope, key), state));
             }
-            if (state == null) {
-                plan.addItem(new PlanItem(Action.NEW, changed.getCategory(), scope, key,
-                        changed.getPath().toString(), changed.getPayload()));
-            } else {
-                Object comparableState = normalizeStatePayload(category, state);
-                if (!stateFileService.payloadsEqual(changed.getPayload(), comparableState)) {
-                    PlanItem updateItem = new PlanItem(Action.UPDATE, changed.getCategory(), scope, key,
-                            changed.getPath().toString(), changed.getPayload());
-                    updateItem.setBeforePayload(comparableState);
-                    plan.addItem(updateItem);
-                }
+            return;
+        }
+
+        LoadedFile changed = parsePath(path);
+        if (changed == null) {
+            return;
+        }
+
+        if (state == null) {
+            plan.addItem(new PlanItem(Action.NEW, changed.getCategory(), scope, key,
+                    changed.getPath().toString(), changed.getPayload()));
+        } else {
+            Object comparableState = normalizeStatePayload(category, state);
+            if (!stateFileService.payloadsEqual(changed.getPayload(), comparableState)) {
+                PlanItem updateItem = new PlanItem(Action.UPDATE, changed.getCategory(), scope, key,
+                        changed.getPath().toString(), changed.getPayload());
+                updateItem.setBeforePayload(comparableState);
+                plan.addItem(updateItem);
             }
-        } else if (state != null) {
-            plan.addItem(new PlanItem(Action.DELETE, category, scope, key,
-                    cosmosStateReference(category, scope, key), state));
         }
     }
 
@@ -296,71 +300,115 @@ public class PlanService {
 
     private Map<String, CreateDerivedTransactionPortfolioRequest> toDerivedMap(DerivedPortfolioFile file) {
         Map<String, CreateDerivedTransactionPortfolioRequest> map = new HashMap<>();
-        if (file == null || file.getDerivedPortfolios() == null) {
+        if (file == null) {
             return map;
         }
-        for (CreateDerivedTransactionPortfolioRequest request : file.getDerivedPortfolios()) {
-            if (request != null && request.getCode() != null) {
-                map.put(request.getCode(), request);
+        List<CreateDerivedTransactionPortfolioRequest> derivedPortfolios = file.getDerivedPortfolios();
+        if (derivedPortfolios == null) {
+            return map;
+        }
+        for (CreateDerivedTransactionPortfolioRequest request : derivedPortfolios) {
+            if (request == null) {
+                continue;
             }
+            String code = request.getCode();
+            if (code == null) {
+                continue;
+            }
+            map.put(code, request);
         }
         return map;
     }
 
     private Map<String, CreatePortfolioGroupRequest> toPortfolioGroupMap(PortfolioGroupFile file) {
         Map<String, CreatePortfolioGroupRequest> map = new HashMap<>();
-        if (file == null || file.getGroups() == null) {
+        if (file == null) {
             return map;
         }
-        for (CreatePortfolioGroupRequest request : file.getGroups()) {
-            if (request != null && request.getCode() != null) {
-                map.put(request.getCode(), request);
+        List<CreatePortfolioGroupRequest> groups = file.getGroups();
+        if (groups == null) {
+            return map;
+        }
+        for (CreatePortfolioGroupRequest request : groups) {
+            if (request == null) {
+                continue;
             }
+            String code = request.getCode();
+            if (code == null) {
+                continue;
+            }
+            map.put(code, request);
         }
         return map;
     }
 
     private Map<String, Account> toAccountMap(AccountFile file) {
         Map<String, Account> map = new HashMap<>();
-        if (file == null || file.getAccounts() == null) {
+        if (file == null) {
             return map;
         }
         String chartOfAccountsCode = Optional.ofNullable(file.getChartOfAccountsCode())
                 .map(String::trim)
                 .filter(code -> !code.isEmpty())
                 .orElse(null);
-        for (Account account : file.getAccounts()) {
-            if (account != null && account.getCode() != null) {
-                String accountCode = account.getCode();
-                String key = chartOfAccountsCode != null ? chartOfAccountsCode + "-" + accountCode : accountCode;
-                map.put(key, account);
+        List<Account> accounts = file.getAccounts();
+        if (accounts == null) {
+            return map;
+        }
+        for (Account account : accounts) {
+            if (account == null) {
+                continue;
             }
+            String accountCode = account.getCode();
+            if (accountCode == null) {
+                continue;
+            }
+            String key = chartOfAccountsCode != null ? chartOfAccountsCode + "-" + accountCode : accountCode;
+            map.put(key, account);
         }
         return map;
     }
 
     private Map<String, AborRequest> toAborMap(AborFile file) {
         Map<String, AborRequest> map = new HashMap<>();
-        if (file == null || file.getAborRequests() == null) {
+        if (file == null) {
             return map;
         }
-        for (AborRequest request : file.getAborRequests()) {
-            if (request != null && request.getCode() != null) {
-                map.put(request.getCode(), request);
+        List<AborRequest> aborRequests = file.getAborRequests();
+        if (aborRequests == null) {
+            return map;
+        }
+        for (AborRequest request : aborRequests) {
+            if (request == null) {
+                continue;
             }
+            String code = request.getCode();
+            if (code == null) {
+                continue;
+            }
+            map.put(code, request);
         }
         return map;
     }
 
     private Map<String, AborConfigurationRequest> toAborConfigurationMap(AborConfigurationFile file) {
         Map<String, AborConfigurationRequest> map = new HashMap<>();
-        if (file == null || file.getAborConfigurations() == null) {
+        if (file == null) {
             return map;
         }
-        for (AborConfigurationRequest request : file.getAborConfigurations()) {
-            if (request != null && request.getCode() != null) {
-                map.put(request.getCode(), request);
+        List<AborConfigurationRequest> aborConfigurations = file.getAborConfigurations();
+        if (aborConfigurations == null) {
+            return map;
+        }
+        for (AborConfigurationRequest request : aborConfigurations) {
+            if (request == null) {
+                continue;
             }
+            String code = request.getCode();
+            if (code == null) {
+                continue;
+            }
+            map.put(code, request);
         }
         return map;
     }
@@ -383,14 +431,14 @@ public class PlanService {
             String code = entry.getKey();
             Object changed = entry.getValue();
             Object existing = stateMap.get(code);
-                if (existing == null) {
-                    plan.addItem(new PlanItem(Action.NEW, category, scope, code, changedPath.toString(), changed));
-                } else if (!Objects.equals(changed, existing)) {
-                    PlanItem updateItem = new PlanItem(Action.UPDATE, category, scope, code, changedPath.toString(), changed);
-                    updateItem.setBeforePayload(existing);
-                    plan.addItem(updateItem);
-                }
+            if (existing == null) {
+                plan.addItem(new PlanItem(Action.NEW, category, scope, code, changedPath.toString(), changed));
+            } else if (!Objects.equals(changed, existing)) {
+                PlanItem updateItem = new PlanItem(Action.UPDATE, category, scope, code, changedPath.toString(), changed);
+                updateItem.setBeforePayload(existing);
+                plan.addItem(updateItem);
             }
+        }
 
         for (Map.Entry<String, ?> entry : stateMap.entrySet()) {
             String code = entry.getKey();

@@ -60,6 +60,7 @@
             border-radius: 16px;
             padding: 16px;
             box-shadow: 0 12px 28px rgba(8, 31, 63, 0.08);
+            overflow-x: auto;
         }
         .chart-box h3 {
             margin: 0 0 8px;
@@ -256,45 +257,7 @@
 </div>
 <script>
     const planData = {
-  "items" : [ {
-    "action" : "UPDATE",
-    "fileCategory" : "POSTING_RULE",
-    "scope" : "ATG",
-    "key" : "USG-USG",
-    "sourcePath" : "changedfiles\\ATG\\postingrules\\USG-USG-ATG.json",
-    "payload" : {
-      "code" : "USG",
-      "displayName" : "PostingModuleName",
-      "description" : "PostingModuleDescription Update",
-      "rules" : [ {
-        "ruleId" : "rule1Id-0",
-        "generalLedgerAccountCode" : "account1",
-        "ruleFilter" : "Transaction.TransactionId eq 'Transaction_1'"
-      }, {
-        "ruleId" : "rule1Id-1",
-        "generalLedgerAccountCode" : "account1",
-        "ruleFilter" : "Transaction.TransactionId eq 'Transaction_1'"
-      }, {
-        "ruleId" : "rule1Id-2",
-        "generalLedgerAccountCode" : "account2",
-        "ruleFilter" : "Transaction.TransactionId eq 'Transaction_2'"
-      } ]
-    },
-    "beforePayload" : {
-      "code" : "USG",
-      "displayName" : "PostingModuleName",
-      "description" : "PostingModuleDescription Update",
-      "rules" : [ {
-        "ruleId" : "rule1Id-1",
-        "generalLedgerAccountCode" : "account1",
-        "ruleFilter" : "Transaction.TransactionId eq 'Transaction_1'"
-      }, {
-        "ruleId" : "rule1Id-2",
-        "generalLedgerAccountCode" : "account2",
-        "ruleFilter" : "Transaction.TransactionId eq 'Transaction_2'"
-      } ]
-    }
-  } ]
+  "items" : [ ]
 };
     const items = planData.items || [];
     const actionColors = {NEW: '#2d9cdb', UPDATE: '#f0ad4e', DELETE: '#d6364a'};
