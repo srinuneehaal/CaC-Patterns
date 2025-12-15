@@ -5,7 +5,7 @@
     "security": "Txn:LusidInstrumentId",
     "currency": "Txn:TradeCurrency",
     "rate": "Txn:Units",
-    "units": "0",
+    "units": "1",
     "amount": "Transaction/MyScope/TradeAmount",
     "notionalAmount": "Transaction/default/NotionalAmount",
     "currentFace": "Txn:CurrentFace"

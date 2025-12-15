@@ -1,0 +1,153 @@
+{
+  "items" : [ {
+    "action" : "UPDATE",
+    "fileCategory" : "SIDE",
+    "scope" : "ATG",
+    "key" : "side1",
+    "sourcePath" : "changedfiles\\ATG\\sides\\side1-ATG.json",
+    "payload" : {
+      "scope" : "ATG",
+      "side" : "side1",
+      "sideDefinitionRequest" : {
+        "security" : "Txn:LusidInstrumentId",
+        "currency" : "Txn:TradeCurrency",
+        "rate" : "Txn:Units",
+        "units" : "1",
+        "amount" : "Transaction/MyScope/TradeAmount",
+        "notionalAmount" : "Transaction/default/NotionalAmount",
+        "currentFace" : "Txn:CurrentFace"
+      }
+    },
+    "beforePayload" : {
+      "scope" : "ATG",
+      "side" : "side1",
+      "sideDefinitionRequest" : {
+        "security" : "Txn:LusidInstrumentId",
+        "currency" : "Txn:TradeCurrency",
+        "rate" : "Txn:Units",
+        "units" : "0",
+        "amount" : "Transaction/MyScope/TradeAmount",
+        "notionalAmount" : "Transaction/default/NotionalAmount",
+        "currentFace" : "Txn:CurrentFace"
+      }
+    }
+  }, {
+    "action" : "UPDATE",
+    "fileCategory" : "CHART_OF_ACCOUNTS",
+    "scope" : "ATG",
+    "key" : "USG",
+    "sourcePath" : "changedfiles\\ATG\\coa\\USG-ATG.json",
+    "payload" : {
+      "code" : "ChartOfAccounts",
+      "displayName" : "ChartOfAccountsName",
+      "description" : "Standard COA updated new",
+      "properties" : {
+        "ChartOfAccounts/MyScope/FundManagerName" : {
+          "key" : "ChartOfAccounts/MyScope/FundManagerName",
+          "value" : {
+            "labelValue" : "Smith"
+          },
+          "effectiveFrom" : "2018-03-05T18:00:00.001Z"
+        }
+      }
+    },
+    "beforePayload" : {
+      "code" : "ChartOfAccounts",
+      "displayName" : "ChartOfAccountsName",
+      "description" : "Standard COA updated",
+      "properties" : {
+        "ChartOfAccounts/MyScope/FundManagerName" : {
+          "key" : "ChartOfAccounts/MyScope/FundManagerName",
+          "value" : {
+            "labelValue" : "Smith"
+          },
+          "effectiveFrom" : "2018-03-05T18:00:00.001Z"
+        }
+      }
+    }
+  }, {
+    "action" : "NEW",
+    "fileCategory" : "ACCOUNT",
+    "scope" : "ATG",
+    "key" : "USG-00161",
+    "sourcePath" : "changedfiles\\ATG\\gla\\USG-ATG.json",
+    "payload" : {
+      "code" : "00161",
+      "description" : "Cash New 1",
+      "type" : "Asset",
+      "status" : "ACTIVE",
+      "control" : "Manual",
+      "properties" : { }
+    }
+  }, {
+    "action" : "UPDATE",
+    "fileCategory" : "ACCOUNT",
+    "scope" : "ATG",
+    "key" : "USG-001458",
+    "sourcePath" : "changedfiles\\ATG\\gla\\USG-ATG.json",
+    "payload" : {
+      "code" : "001458",
+      "description" : "Cash 1 update",
+      "type" : "Asset",
+      "status" : "ACTIVE",
+      "control" : "Manual",
+      "properties" : { }
+    },
+    "beforePayload" : {
+      "code" : "001458",
+      "description" : "Cash 1",
+      "type" : "Asset",
+      "status" : "ACTIVE",
+      "control" : "Manual",
+      "properties" : { }
+    }
+  }, {
+    "action" : "NEW",
+    "fileCategory" : "DERIVED_PORTFOLIO",
+    "scope" : "ATG",
+    "key" : "DerivedPortfolioCode-3",
+    "sourcePath" : "changedfiles\\ATG\\derivedportfolios\\derivedportfolios-ATG.json",
+    "payload" : {
+      "displayName" : "MyDerivedPortfolioName 3",
+      "description" : "Example long form portfolio 3 description",
+      "code" : "DerivedPortfolioCode-3",
+      "parentPortfolioId" : {
+        "scope" : "MyParentPortfolioScope",
+        "code" : "MyParentPortfolioCode"
+      },
+      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
+    }
+  }, {
+    "action" : "NEW",
+    "fileCategory" : "DERIVED_PORTFOLIO",
+    "scope" : "ATG",
+    "key" : "DerivedPortfolioCode-2",
+    "sourcePath" : "changedfiles\\ATG\\derivedportfolios\\derivedportfolios-ATG.json",
+    "payload" : {
+      "displayName" : "MyDerivedPortfolioName 4",
+      "description" : "Example long form portfolio 4 description",
+      "code" : "DerivedPortfolioCode-2",
+      "parentPortfolioId" : {
+        "scope" : "MyParentPortfolioScope",
+        "code" : "MyParentPortfolioCode"
+      },
+      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
+    }
+  }, {
+    "action" : "NEW",
+    "fileCategory" : "DERIVED_PORTFOLIO",
+    "scope" : "ATG",
+    "key" : "DerivedPortfolioCode-1",
+    "sourcePath" : "changedfiles\\ATG\\derivedportfolios\\derivedportfolios-ATG.json",
+    "payload" : {
+      "displayName" : "MyDerivedPortfolioName 1",
+      "description" : "Example long form portfolio 3 description",
+      "code" : "DerivedPortfolioCode-1",
+      "parentPortfolioId" : {
+        "scope" : "MyParentPortfolioScope",
+        "code" : "MyParentPortfolioCode"
+      },
+      "subHoldingKeys" : [ "Transaction/MyScope/Strategy", "Transaction/MyScope/SubAccount" ]
+    }
+  } ]
+}

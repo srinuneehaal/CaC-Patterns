@@ -8,6 +8,7 @@ public class PlanItem {
     private String key;
     private String sourcePath;
     private Object payload;
+    private Object beforePayload;
 
     /**
      * Creates an empty plan item placeholder.
@@ -131,6 +132,24 @@ public class PlanItem {
      */
     public void setPayload(Object payload) {
         this.payload = payload;
+    }
+
+    /**
+     * Returns the payload that existed before the action (if available).
+     *
+     * @return before payload
+     */
+    public Object getBeforePayload() {
+        return beforePayload;
+    }
+
+    /**
+     * Sets the payload that existed before the action.
+     *
+     * @param beforePayload before payload object
+     */
+    public void setBeforePayload(Object beforePayload) {
+        this.beforePayload = beforePayload;
     }
 
     /**

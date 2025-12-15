@@ -2,7 +2,21 @@
   "scope": "ATG",
   "chartOfAccountsCode": "USG",
   "glAccounts": [
-
+    {
+      "code": "00162",
+      "description": "Cash New 2",
+      "type": "Asset",
+      "status": "ACTIVE",
+      "control": "Manual",
+      "properties": {}
+    },{
+      "code": "00161",
+      "description": "Cash New 1 updated",
+      "type": "Asset",
+      "status": "ACTIVE",
+      "control": "Manual",
+      "properties": {}
+    },
     {
       "code": "0016",
       "description": "Cash New",
@@ -20,7 +34,7 @@
       "properties": {}
     },{
       "code": "001458",
-      "description": "Cash 1",
+      "description": "Cash 1 update",
       "type": "Asset",
       "status": "ACTIVE",
       "control": "Manual",

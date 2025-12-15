@@ -157,8 +157,10 @@ public class PlanService {
             } else {
                 Object comparableState = normalizeStatePayload(category, state);
                 if (!stateFileService.payloadsEqual(changed.getPayload(), comparableState)) {
-                    plan.addItem(new PlanItem(Action.UPDATE, changed.getCategory(), scope, key,
-                            changed.getPath().toString(), changed.getPayload()));
+                    PlanItem updateItem = new PlanItem(Action.UPDATE, changed.getCategory(), scope, key,
+                            changed.getPath().toString(), changed.getPayload());
+                    updateItem.setBeforePayload(comparableState);
+                    plan.addItem(updateItem);
                 }
             }
         } else if (state != null) {
@@ -381,12 +383,14 @@ public class PlanService {
             String code = entry.getKey();
             Object changed = entry.getValue();
             Object existing = stateMap.get(code);
-            if (existing == null) {
-                plan.addItem(new PlanItem(Action.NEW, category, scope, code, changedPath.toString(), changed));
-            } else if (!Objects.equals(changed, existing)) {
-                plan.addItem(new PlanItem(Action.UPDATE, category, scope, code, changedPath.toString(), changed));
+                if (existing == null) {
+                    plan.addItem(new PlanItem(Action.NEW, category, scope, code, changedPath.toString(), changed));
+                } else if (!Objects.equals(changed, existing)) {
+                    PlanItem updateItem = new PlanItem(Action.UPDATE, category, scope, code, changedPath.toString(), changed);
+                    updateItem.setBeforePayload(existing);
+                    plan.addItem(updateItem);
+                }
             }
-        }
 
         for (Map.Entry<String, ?> entry : stateMap.entrySet()) {
             String code = entry.getKey();

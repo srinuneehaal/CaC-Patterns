@@ -15,6 +15,13 @@
         ]
       },
       {
+        "mappingFilter": "GeneralLedgerAccountCode eq 'INVESTMENTS'",
+        "levels": [
+          "EconomicBucket",
+          "Instrument.Identifiers['ClientInternal']"
+        ]
+      },
+      {
         "mappingFilter": "Properties['Account/default/Profile'] eq 'CCY'",
         "levels": [
           "DefaultCurrency"

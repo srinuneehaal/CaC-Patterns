@@ -1,75 +1,41 @@
 {
   "items" : [ {
-    "action" : "NEW",
-    "fileCategory" : "PORTFOLIO_GROUP",
+    "action" : "UPDATE",
+    "fileCategory" : "POSTING_RULE",
     "scope" : "ATG",
-    "key" : "MyGroupCode-2",
-    "sourcePath" : "changedfiles\\ATG\\portfoliogroups\\portfoliogroups-ATG.json",
+    "key" : "USG-USG",
+    "sourcePath" : "changedfiles\\ATG\\postingrules\\USG-USG-ATG.json",
     "payload" : {
-      "code" : "MyGroupCode-2",
-      "created" : "2018-03-05T18:00:00.001Z",
-      "values" : [ {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode1"
+      "code" : "USG",
+      "displayName" : "PostingModuleName",
+      "description" : "PostingModuleDescription Update",
+      "rules" : [ {
+        "ruleId" : "rule1Id-0",
+        "generalLedgerAccountCode" : "account1",
+        "ruleFilter" : "Transaction.TransactionId eq 'Transaction_1'"
       }, {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode2"
-      } ],
-      "subGroups" : [ {
-        "scope" : "MyScope",
-        "code" : "MySubGroupCode"
-      } ],
-      "properties" : { },
-      "displayName" : "MyGroupName",
-      "description" : "My group description changed"
-    }
-  }, {
-    "action" : "NEW",
-    "fileCategory" : "PORTFOLIO_GROUP",
-    "scope" : "ATG",
-    "key" : "MyGroupCode-1",
-    "sourcePath" : "changedfiles\\ATG\\portfoliogroups\\portfoliogroups-ATG.json",
-    "payload" : {
-      "code" : "MyGroupCode-1",
-      "created" : "2018-03-05T18:00:00.001Z",
-      "values" : [ {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode1"
+        "ruleId" : "rule1Id-1",
+        "generalLedgerAccountCode" : "account1",
+        "ruleFilter" : "Transaction.TransactionId eq 'Transaction_1'"
       }, {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode2"
-      } ],
-      "subGroups" : [ {
-        "scope" : "MyScope",
-        "code" : "MySubGroupCode"
-      } ],
-      "properties" : { },
-      "displayName" : "MyGroupName-1",
-      "description" : "My group description updated"
-    }
-  }, {
-    "action" : "NEW",
-    "fileCategory" : "PORTFOLIO_GROUP",
-    "scope" : "ATG",
-    "key" : "MyGroupCode-3",
-    "sourcePath" : "changedfiles\\ATG\\portfoliogroups\\portfoliogroups-ATG.json",
-    "payload" : {
-      "code" : "MyGroupCode-3",
-      "created" : "2018-03-05T18:00:00.001Z",
-      "values" : [ {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode1"
+        "ruleId" : "rule1Id-2",
+        "generalLedgerAccountCode" : "account2",
+        "ruleFilter" : "Transaction.TransactionId eq 'Transaction_2'"
+      } ]
+    },
+    "beforePayload" : {
+      "code" : "USG",
+      "displayName" : "PostingModuleName",
+      "description" : "PostingModuleDescription Update",
+      "rules" : [ {
+        "ruleId" : "rule1Id-1",
+        "generalLedgerAccountCode" : "account1",
+        "ruleFilter" : "Transaction.TransactionId eq 'Transaction_1'"
       }, {
-        "scope" : "MyScope",
-        "code" : "MyPortfolioCode2"
-      } ],
-      "subGroups" : [ {
-        "scope" : "MyScope",
-        "code" : "MySubGroupCode"
-      } ],
-      "properties" : { },
-      "displayName" : "MyGroupName3",
-      "description" : "My group description3"
+        "ruleId" : "rule1Id-2",
+        "generalLedgerAccountCode" : "account2",
+        "ruleFilter" : "Transaction.TransactionId eq 'Transaction_2'"
+      } ]
     }
   } ]
 }

@@ -3,6 +3,7 @@ package com.example.cacex.runner;
 import com.example.cacex.model.MasterPlan;
 import com.example.cacex.service.PlanService;
 import com.example.cacex.service.plan.ChangedFilesProvider;
+import com.example.cacex.service.plan.MasterPlanHtmlReportGenerator;
 import com.example.cacex.service.plan.PlanWriter;
 import com.example.cacex.util.CommandLineFlags;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ public class PlanRunner implements CommandLineRunner {
     private final ChangedFilesProvider changedFilesProvider;
     private final PlanService planService;
     private final PlanWriter planWriter;
+    private final MasterPlanHtmlReportGenerator masterPlanHtmlReportGenerator;
 
     /**
      * Creates a plan runner with required collaborators.
@@ -29,11 +31,16 @@ public class PlanRunner implements CommandLineRunner {
      * @param changedFilesProvider provider for changed paths
      * @param planService          builder for master plans
      * @param planWriter           writer for output plans
+     * @param masterPlanHtmlReportGenerator report generator that creates `masterplan.html`
      */
-    public PlanRunner(ChangedFilesProvider changedFilesProvider, PlanService planService, PlanWriter planWriter) {
+    public PlanRunner(ChangedFilesProvider changedFilesProvider,
+                      PlanService planService,
+                      PlanWriter planWriter,
+                      MasterPlanHtmlReportGenerator masterPlanHtmlReportGenerator) {
         this.changedFilesProvider = changedFilesProvider;
         this.planService = planService;
         this.planWriter = planWriter;
+        this.masterPlanHtmlReportGenerator = masterPlanHtmlReportGenerator;
     }
 
     /**
@@ -70,5 +77,7 @@ public class PlanRunner implements CommandLineRunner {
         MasterPlan masterPlan = planService.buildPlan(changedPaths);
         Path output = planWriter.write(masterPlan);
         log.info("Master plan written to {}", output.toAbsolutePath());
+        Path report = masterPlanHtmlReportGenerator.generateReport(masterPlan);
+        log.info("Master plan report written to {}", report.toAbsolutePath());
     }
 }

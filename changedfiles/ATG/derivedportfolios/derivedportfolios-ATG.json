@@ -42,6 +42,20 @@
         "Transaction/MyScope/SubAccount"
       ],
       "trnsactionTypeScope": "default"
+    },
+    {
+      "displayName": "MyDerivedPortfolioName 6",
+      "description": "Example long form portfolio 6 description",
+      "code": "DerivedPortfolioCode-6",
+      "parentPortfolioId": {
+        "scope": "MyParentPortfolioScope",
+        "code": "MyParentPortfolioCode"
+      },
+      "subHoldingKeys": [
+        "Transaction/MyScope/Strategy",
+        "Transaction/MyScope/SubAccount"
+      ],
+      "trnsactionTypeScope": "default"
     }
   ]
 }

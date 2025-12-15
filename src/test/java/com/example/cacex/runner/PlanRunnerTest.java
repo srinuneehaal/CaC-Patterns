@@ -3,6 +3,7 @@ package com.example.cacex.runner;
 import com.example.cacex.model.MasterPlan;
 import com.example.cacex.service.PlanService;
 import com.example.cacex.service.plan.ChangedFilesProvider;
+import com.example.cacex.service.plan.MasterPlanHtmlReportGenerator;
 import com.example.cacex.service.plan.PlanWriter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,9 @@ class PlanRunnerTest {
     @Mock
     private PlanWriter planWriter;
 
+    @Mock
+    private MasterPlanHtmlReportGenerator masterPlanHtmlReportGenerator;
+
     @InjectMocks
     private PlanRunner runner;
 
@@ -35,7 +39,7 @@ class PlanRunnerTest {
     void skipsWhenFlagMissing() {
         assertDoesNotThrow(() -> runner.run("--apply"));
 
-        verifyNoInteractions(changedFilesProvider, planService, planWriter);
+        verifyNoInteractions(changedFilesProvider, planService, planWriter, masterPlanHtmlReportGenerator);
     }
 
     @Test
@@ -45,7 +49,7 @@ class PlanRunnerTest {
         runner.run("--plan");
 
         verify(changedFilesProvider).getChangedPaths();
-        verifyNoInteractions(planService, planWriter);
+        verifyNoInteractions(planService, planWriter, masterPlanHtmlReportGenerator);
     }
 
     @Test
@@ -53,16 +57,19 @@ class PlanRunnerTest {
         List<Path> changedPaths = List.of(Path.of("changedfiles", "file.json"));
         MasterPlan masterPlan = new MasterPlan();
         Path output = Path.of("plan", "masterplan.json");
+        Path report = Path.of("plan", "masterplan.html");
 
         when(changedFilesProvider.getChangedPaths()).thenReturn(changedPaths);
         when(planService.buildPlan(changedPaths)).thenReturn(masterPlan);
         when(planWriter.write(masterPlan)).thenReturn(output);
+        when(masterPlanHtmlReportGenerator.generateReport(masterPlan)).thenReturn(report);
 
         runner.run("--plan");
 
         verify(changedFilesProvider).getChangedPaths();
         verify(planService).buildPlan(changedPaths);
         verify(planWriter).write(masterPlan);
+        verify(masterPlanHtmlReportGenerator).generateReport(masterPlan);
     }
 
     @Test
@@ -83,6 +90,6 @@ class PlanRunnerTest {
         runner.run("--plan");
 
         verify(planService).buildPlan(changedPaths);
-        verifyNoInteractions(planWriter);
+        verifyNoInteractions(planWriter, masterPlanHtmlReportGenerator);
     }
 }

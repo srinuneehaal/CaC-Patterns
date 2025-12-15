@@ -8,6 +8,10 @@
     "description": "PostingModuleDescription Update",
     "rules": [
       {
+        "ruleId": "rule1Id-0",
+        "generalLedgerAccountCode": "account1",
+        "ruleFilter": "Transaction.TransactionId eq 'Transaction_1'"
+      },{
         "ruleId": "rule1Id-1",
         "generalLedgerAccountCode": "account1",
         "ruleFilter": "Transaction.TransactionId eq 'Transaction_1'"
