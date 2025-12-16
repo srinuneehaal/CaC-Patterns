@@ -15,6 +15,7 @@
 
 ## Flow diagram
 - Refer to `spec/plan-apply/all-categories.md#account-files-(gl-accounts)` flowchart showing parser -> normalized key -> state comparison -> persistence.
+- View the plan/apply sequence directly in `spec/Accounts/accounts-plan.mmd` and `spec/Accounts/accounts-apply.mmd`.
 
 ## Sequence diagram
 - Use `diagrams/sequence_1.mmd` in knowledge-share decks when describing how GL account plans are built, sorted, and applied through the state service.

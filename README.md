@@ -39,6 +39,7 @@ The master plan is sorted by a configurable rule engine. Edit `src/main/resource
 ## Diagrams & knowledge sharing
 - `diagrams/system_design*.mmd`, `diagrams/system_design LLD*.mmd`, and `diagrams/sequence*.mmd` illustrate the plan/apply flow you can use during walkthroughs.
 - `diagrams/class.mmd` documents the key domain models (`PlanItem`, `LoadedFile`, appliers) and can be exported as a PNG for quick slides.
+- `spec/<Category>/*-plan.mmd` and `spec/<Category>/*-apply.mmd` (for example, `spec/Accounts/accounts-plan.mmd`/`accounts-apply.mmd`, `spec/Transactions/transactions-plan.mmd`/`transactions-apply.mmd`, etc.) capture each category’s parser-to-Cosmos diff and apply persistence steps so you can grab the exact sequence you need for documentation or presentations.
 - `docs/knowledge-share.md` maps each diagram to the narrative docs so you can run a consistent onboarding session.
 
 ## Build

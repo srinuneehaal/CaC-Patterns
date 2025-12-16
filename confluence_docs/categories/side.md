@@ -15,6 +15,7 @@
 
 ## Flow diagram
 - See the `flowchart TD` in `spec/plan-apply/all-categories.md#side-files` for how the parser → state lookup → diff steps produce `PlanItem`s and how `StateFileService.applySide` persists the COSMOS document.
+- Show the same steps in `spec/Sides/sides-plan.mmd` and `spec/Sides/sides-apply.mmd` to tie the narrative to the specific Mermaid files.
 
 ## Sequence diagram
 - Reference `diagrams/sequence_1.mmd` and `diagrams/system_design LLD.mmd` for the ordered interactions from `PlanRunner` reading `CHANGED_FILES` through `PlanApplyService` applying each `PlanItem`.

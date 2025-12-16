@@ -15,6 +15,7 @@
 
 ## Flow diagram
 - The `flowchart LR` in `spec/plan-apply/all-categories.md#chart-of-accounts` traces parser → state document → diff → `StateFileService.persist`.
+- Inspect `spec/ChartOfAccounts/chartofaccounts-plan.mmd` and `spec/ChartOfAccounts/chartofaccounts-apply.mmd` for the same flow translated into Mermaid.
 
 ## Sequence diagram
 - Embed `diagrams/sequence.mmd` as the narrative for plan/apply interactions, emphasizing how the chart request is normalized before ordering and persisted afterwards.

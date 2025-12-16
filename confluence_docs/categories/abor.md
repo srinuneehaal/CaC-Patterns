@@ -15,6 +15,7 @@
 
 ## Flow diagram
 - The diff explanation under `spec/plan-apply/all-categories.md#abors` highlights how each `AborRequest` is compared/per code and how deletes arise when entries vanish.
+- For the detailed stages, render `spec/Abor/abor-plan.mmd` and `spec/Abor/abor-apply.mmd` to show how the parser emits per-code `PlanItem`s and how the applier rebuilds the aggregate document.
 
 ## Sequence diagram
 - Show `diagrams/sequence_1.mmd` as the “per-item” view so reviewers see how ABOR diffs trigger `PlanItem` creation and the apply step rebuilds the aggregated list.

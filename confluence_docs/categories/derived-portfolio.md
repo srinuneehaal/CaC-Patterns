@@ -15,6 +15,7 @@
 
 ## Flow diagram
 - `spec/plan-apply/all-categories.md#derived-portfolios-&-portfolio-groups` shows the shared flow that splits list entries and emits deletes for missing codes.
+- Refer to `spec/DerivedPortfolios/derivedportfolios-plan.mmd` and `spec/DerivedPortfolios/derivedportfolios-apply.mmd` when illustrating how each derived portfolio entry moves through plan and apply.
 
 ## Sequence diagram
 - Use `diagrams/sequence_1.mmd` while explaining how derived portfolios’ list diffs map into apply-phase snapshots.

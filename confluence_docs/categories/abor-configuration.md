@@ -15,6 +15,7 @@
 
 ## Flow diagram
 - The `sequenceDiagram` in `spec/plan-apply/all-categories.md#abor-configuration` illustrates the parser -> diff -> upsert process for config lists.
+- Draw the parser and persistence steps via `spec/AborConfiguration/aborconfiguration-plan.mmd` and `spec/AborConfiguration/aborconfiguration-apply.mmd`.
 
 ## Sequence diagram
 - Reference `diagrams/sequence_1.mmd` when narrating how ABOR configs move through the plan/apply cycle; the apply step writes the aggregate list back to Cosmos.

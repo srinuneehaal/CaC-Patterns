@@ -16,6 +16,7 @@
 
 ## Flow diagram
 - `spec/plan-apply/all-categories.md#general-ledger-profile` includes the flowchart tracing parser -> state document -> plan diff -> `GeneralLedgerProfileApiService` call.
+- Walk through `spec/GeneralLedgerProfile/generalledgerprofile-plan.mmd` and `spec/GeneralLedgerProfile/generalledgerprofile-apply.mmd` for the normalized key → persistence steps.
 
 ## Sequence diagram
 - Use `diagrams/sequence.mmd` to illustrate how the GL profile request steps in right after chart/account processing before the apply services persist the new profile.

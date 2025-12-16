@@ -15,6 +15,7 @@
 
 ## Flow diagram
 - The `graph TB` in `spec/plan-apply/all-categories.md#posting-rules` visualizes parser -> Cosmos type POSTING_RULE lookup -> `PlanItem` -> `StateFileService` upsert.
+- Detail the per-module flow with `spec/PostingRules/postingrules-plan.mmd` and `spec/PostingRules/postingrules-apply.mmd`, which highlight the apply call path through `PostingModuleApiService`.
 
 ## Sequence diagram
 - Reference `diagrams/system_design LLD.mmd` when explaining how posting rules move from JSON files through plan ordering to apply service.

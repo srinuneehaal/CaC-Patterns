@@ -15,6 +15,7 @@
 
 ## Flow diagram
 - The sequence diagram in `spec/plan-apply/all-categories.md#transactions` illustrates parser → Cosmos lookup → `PlanItem` emission → `StateFileService` persistence.
+- Walk through `spec/Transactions/transactions-plan.mmd` and `spec/Transactions/transactions-apply.mmd` when you need category-specific plan/apply visuals that mention `transactionSequence`.
 
 ## Sequence diagram
 - Use `diagrams/sequence.mmd`/`diagrams/system_design.mmd` to show the full plan/apply run, noting how `transactionSequence` ordering affects the plan ordering phase.

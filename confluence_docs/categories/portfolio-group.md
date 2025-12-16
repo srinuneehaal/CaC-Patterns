@@ -15,6 +15,7 @@
 
 ## Flow diagram
 - Refer to `spec/plan-apply/all-categories.md#derived-portfolios-&-portfolio-groups` for the combined list-flow diagram: parser -> diff -> plan -> aggregate persistence.
+- Show `spec/PortfolioGroups/portfoliogroups-plan.mmd` and `spec/PortfolioGroups/portfoliogroups-apply.mmd` when breaking down the per-code comparison and the aggregate rewrite.
 
 ## Sequence diagram
 - Pair this page with `diagrams/sequence_1.mmd` to show how portfolio groups are part of the final apply phase that rewrites list snapshots.
