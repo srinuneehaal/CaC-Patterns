@@ -8,11 +8,11 @@ This project converts configurations into ordered master plans and applies them 
    The `ChangedFilesProvider` reads the `CHANGED_FILES` environment variable and normalizes the supplied paths (`changedfiles/...`).  
 2. **Plan generation**  
    A `--plan` run launches `PlanRunner`, which feeds those paths into `PlanService`.  
-   - `PlanService` identifies each file’s category via `FileParsingStrategyFactory` (one implementation per file type, e.g., `SideFileParsingStrategy`, `GeneralLedgerProfileFileParsingStrategy`).  
+   - `PlanService` identifies each file's category via `FileParsingStrategyFactory` (one implementation per file type, e.g., `SideFileParsingStrategy`, `GeneralLedgerProfileFileParsingStrategy`).  
    - The `JsonModelMapper` (backed by `JacksonConfiguration`) deserializes each file into a domain model (`SideFile`, `AccountFile`, `GeneralLedgerProfileRequest`, etc.).  
    - Special categories (ABOR, derived portfolios, ABOR configs, portfolio groups, accounts) are reconciled with state files via `StateFileService`, producing `PlanItem`s for creates/updates/deletes.  
    - `PlanOrderingRuleEngine` sorts the collected `PlanItem`s using configured rules (defaulting to the order listed in `application.properties`, including the new `GENERAL_LEDGER_PROFILE` rule).  
-   - `PlanWriter` writes the resulting `MasterPlan` to `plan/masterplan.json`.
+   - `PlanWriter` writes the resulting `MasterPlan` to `plan/masterplan.json`. `MasterPlanHtmlReportGenerator` writes `plan/masterplan.html` unless the env toggle `MASTER_PLAN_REPORT_ENABLED` disables it.
 3. **Plan application**  
    Running `--apply` invokes `PlanApplyService`, which reads the master plan via `PlanReader` and converts each item’s payload (`GeneralLedgerProfileRequest`, `PostingModuleRequest`, etc.).  
    - It resolves the appropriate `PlanItemApplier` (e.g., `GeneralLedgerProfilePlanItemApplier`, `PostingModulePlanItemApplier`) via the `supportedCategory()` map.  

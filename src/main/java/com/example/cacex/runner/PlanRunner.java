@@ -1,5 +1,6 @@
 package com.example.cacex.runner;
 
+import com.example.cacex.config.EnvironmentLookup;
 import com.example.cacex.model.MasterPlan;
 import com.example.cacex.service.PlanService;
 import com.example.cacex.service.plan.ChangedFilesProvider;
@@ -13,17 +14,20 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class PlanRunner implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(PlanRunner.class);
     private static final String ARG_PLAN = "--plan";
+    static final String ENV_MASTER_PLAN_REPORT_ENABLED = "MASTER_PLAN_REPORT_ENABLED";
 
     private final ChangedFilesProvider changedFilesProvider;
     private final PlanService planService;
     private final PlanWriter planWriter;
     private final MasterPlanHtmlReportGenerator masterPlanHtmlReportGenerator;
+    private EnvironmentLookup envLookup = System::getenv;
 
     /**
      * Creates a plan runner with required collaborators.
@@ -77,7 +81,32 @@ public class PlanRunner implements CommandLineRunner {
         MasterPlan masterPlan = planService.buildPlan(changedPaths);
         Path output = planWriter.write(masterPlan);
         log.info("Master plan written to {}", output.toAbsolutePath());
-        Path report = masterPlanHtmlReportGenerator.generateReport(masterPlan);
-        log.info("Master plan report written to {}", report.toAbsolutePath());
+        if (isReportGenerationEnabled()) {
+            Path report = masterPlanHtmlReportGenerator.generateReport(masterPlan);
+            log.info("Master plan report written to {}", report.toAbsolutePath());
+        } else {
+            log.info("Master plan report generation disabled via env {}", ENV_MASTER_PLAN_REPORT_ENABLED);
+        }
+    }
+
+    private boolean isReportGenerationEnabled() {
+        String toggle = envLookup.lookup(ENV_MASTER_PLAN_REPORT_ENABLED);
+        System.out.println("MASTER_PLAN_REPORT_ENABLED--->"+toggle+" ");
+
+        if (toggle == null || toggle.isBlank()) {
+            return true;
+        }
+        String normalized = toggle.trim();
+        return !normalized.equalsIgnoreCase("false")
+                && !normalized.equalsIgnoreCase("off")
+                && !normalized.equalsIgnoreCase("no")
+                && !normalized.equals("0");
+    }
+
+    /**
+     * Test hook to override environment lookup without touching real env vars.
+     */
+    void setEnvLookup(EnvironmentLookup envLookup) {
+        this.envLookup = Objects.requireNonNull(envLookup);
     }
 }

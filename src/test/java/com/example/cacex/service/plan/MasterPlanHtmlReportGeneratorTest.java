@@ -41,7 +41,7 @@ class MasterPlanHtmlReportGeneratorTest {
         String html = Files.readString(report);
         assertTrue(html.contains("Master Plan Report"));
         assertTrue(html.contains("Action distribution"));
-        assertTrue(html.contains("Category × action"));
+        assertTrue(html.contains("Category x action") || html.contains("Category \u00d7 action"));
         assertTrue(html.contains("Sort by action"));
         assertTrue(html.contains("TX-1"));
     }

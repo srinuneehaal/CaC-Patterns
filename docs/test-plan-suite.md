@@ -17,8 +17,9 @@ This project follows a dual-pronged testing strategy: an automated integration p
    - Log files for each stage (`plan-create.log`, `apply-create.log`, etc.).
 
 3. **Verification checklist**  
-   - Review `plan/masterplan.json` after each stage to confirm actions/ordering.  
-   - Inspect emulator documents in `transaction_types_config` to ensure the persisted JSON aligns with the latest run.  
+- Review `plan/masterplan.json` after each stage to confirm actions/ordering.  
+- Optionally confirm `plan/masterplan.html` when `MASTER_PLAN_REPORT_ENABLED` is left on (default) to visualize counts and diffs.  
+- Inspect emulator documents in `transaction_types_config` to ensure the persisted JSON aligns with the latest run.  
    - Rerun the script to ensure idempotency (zero plan items for unchanged payloads).  
    - Add or adjust sample files in `changedfiles/<scope>/<category>/` when reinforcing the coverage for new features.
 

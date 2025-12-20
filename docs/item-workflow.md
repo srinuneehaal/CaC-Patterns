@@ -26,7 +26,7 @@ This repository uses structured JSON payloads to build a master plan and then ap
    mvn -q -DskipTests spring-boot:run -- --plan
    ```
 
-2. Inspect `plan/masterplan.json` (and the `plan.log` file if present) to ensure each `PlanItem` maps to the intended category/key and carries the right `Action` (`NEW`, `UPDATE`, `DELETE`). A standalone HTML report (`plan/masterplan.html`) is also emitted with KPIs, charts, and an interactive table to quickly spot hot spots before you apply. The ordering obeys `plan.ordering.rules[*]` in `src/main/resources/application.properties`; adjust the property file if you need a different sequence before rerunning the plan.
+2. Inspect `plan/masterplan.json` (and the `plan.log` file if present) to ensure each `PlanItem` maps to the intended category/key and carries the right `Action` (`NEW`, `UPDATE`, `DELETE`). A standalone HTML report (`plan/masterplan.html`) is emitted by default with KPIs, charts, and an interactive table to quickly spot hot spots before you apply; set `MASTER_PLAN_REPORT_ENABLED=false` (or `0`/`off`/`no`) to skip it. The ordering obeys `plan.ordering.rules[*]` in `src/main/resources/application.properties`; adjust the property file if you need a different sequence before rerunning the plan.
 
 3. Use the `PlanWriter` output to confirm that the payload references the JSON model you edited (e.g., `GeneralLedgerProfileRequest`, `PostingModuleRequest`).
 

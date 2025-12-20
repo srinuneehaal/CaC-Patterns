@@ -1,3 +1,35 @@
 {
-  "items" : [ ]
+  "items" : [ {
+    "action" : "UPDATE",
+    "fileCategory" : "SIDE",
+    "scope" : "ATG",
+    "key" : "side1",
+    "sourcePath" : "changedfiles\\ATG\\sides\\side1-ATG.json",
+    "payload" : {
+      "scope" : "ATG",
+      "side" : "side1",
+      "sideDefinitionRequest" : {
+        "security" : "Txn:LusidInstrumentId",
+        "currency" : "Txn:TradeCurrency",
+        "rate" : "Txn:Units",
+        "units" : "1",
+        "amount" : "Transaction/MyScope/TradeAmount",
+        "notionalAmount" : "Transaction/default/NotionalAmount",
+        "currentFace" : "Txn:CurrentFace"
+      }
+    },
+    "beforePayload" : {
+      "scope" : "ATG",
+      "side" : "side1",
+      "sideDefinitionRequest" : {
+        "security" : "Txn:LusidInstrumentId",
+        "currency" : "Txn:TradeCurrency",
+        "rate" : "Txn:Units",
+        "units" : "0",
+        "amount" : "Transaction/MyScope/TradeAmount",
+        "notionalAmount" : "Transaction/default/NotionalAmount",
+        "currentFace" : "Txn:CurrentFace"
+      }
+    }
+  } ]
 }

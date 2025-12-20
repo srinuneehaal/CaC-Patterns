@@ -7,7 +7,6 @@ import com.example.cacex.service.plan.MasterPlanHtmlReportGenerator;
 import com.example.cacex.service.plan.PlanWriter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -32,11 +31,11 @@ class PlanRunnerTest {
     @Mock
     private MasterPlanHtmlReportGenerator masterPlanHtmlReportGenerator;
 
-    @InjectMocks
     private PlanRunner runner;
 
     @Test
     void skipsWhenFlagMissing() {
+        runner = new PlanRunner(changedFilesProvider, planService, planWriter, masterPlanHtmlReportGenerator);
         assertDoesNotThrow(() -> runner.run("--apply"));
 
         verifyNoInteractions(changedFilesProvider, planService, planWriter, masterPlanHtmlReportGenerator);
@@ -44,6 +43,7 @@ class PlanRunnerTest {
 
     @Test
     void abortsWhenNoChangedFilesProvided() {
+        runner = new PlanRunner(changedFilesProvider, planService, planWriter, masterPlanHtmlReportGenerator);
         when(changedFilesProvider.getChangedPaths()).thenReturn(List.of());
 
         runner.run("--plan");
@@ -64,6 +64,9 @@ class PlanRunnerTest {
         when(planWriter.write(masterPlan)).thenReturn(output);
         when(masterPlanHtmlReportGenerator.generateReport(masterPlan)).thenReturn(report);
 
+        runner = new PlanRunner(changedFilesProvider, planService, planWriter, masterPlanHtmlReportGenerator);
+        runner.setEnvLookup(key -> null);
+
         runner.run("--plan");
 
         verify(changedFilesProvider).getChangedPaths();
@@ -73,7 +76,29 @@ class PlanRunnerTest {
     }
 
     @Test
+    void skipsReportGenerationWhenDisabledByEnv() {
+        List<Path> changedPaths = List.of(Path.of("changedfiles", "file.json"));
+        MasterPlan masterPlan = new MasterPlan();
+        Path output = Path.of("plan", "masterplan.json");
+
+        when(changedFilesProvider.getChangedPaths()).thenReturn(changedPaths);
+        when(planService.buildPlan(changedPaths)).thenReturn(masterPlan);
+        when(planWriter.write(masterPlan)).thenReturn(output);
+
+        runner = new PlanRunner(changedFilesProvider, planService, planWriter, masterPlanHtmlReportGenerator);
+        runner.setEnvLookup(key -> PlanRunner.ENV_MASTER_PLAN_REPORT_ENABLED.equals(key) ? "false" : null);
+
+        runner.run("--plan");
+
+        verify(changedFilesProvider).getChangedPaths();
+        verify(planService).buildPlan(changedPaths);
+        verify(planWriter).write(masterPlan);
+        verifyNoInteractions(masterPlanHtmlReportGenerator);
+    }
+
+    @Test
     void warnsWhenExtraArgsProvided() {
+        runner = new PlanRunner(changedFilesProvider, planService, planWriter, masterPlanHtmlReportGenerator);
         when(changedFilesProvider.getChangedPaths()).thenReturn(List.of());
 
         runner.run("--plan", "--extra");
@@ -83,6 +108,7 @@ class PlanRunnerTest {
 
     @Test
     void catchesExceptionsDuringPlanExecution() {
+        runner = new PlanRunner(changedFilesProvider, planService, planWriter, masterPlanHtmlReportGenerator);
         List<Path> changedPaths = List.of(Path.of("changedfiles", "file.json"));
         when(changedFilesProvider.getChangedPaths()).thenReturn(changedPaths);
         when(planService.buildPlan(changedPaths)).thenThrow(new IllegalStateException("boom"));

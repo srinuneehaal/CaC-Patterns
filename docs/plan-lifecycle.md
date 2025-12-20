@@ -14,7 +14,7 @@ This document walks through the lifecycle of a plan from changed files to applie
 2. **Payload parsing** – The strategy uses `JsonModelMapper` to deserialize JSON into a domain payload (`SideFile`, `AccountFile`, `GeneralLedgerProfileRequest`, etc.).
 3. **PlanItem creation** – The new payload is compared to the existing state (if any) via `StateFileService` to determine whether to emit `PlanItem`s with `Action.NEW`, `.UPDATE`, or `.DELETE`.
 4. **Ordering** – `PlanOrderingRuleEngine` sorts the collected `PlanItem`s using configured rules (including action priority and `transactionSequence` sorting when enabled). It falls back to defaults when no rules are provided.
-5. **Persistence** – `PlanWriter` stores the ordered `MasterPlan` in `plan/masterplan.json`. `MasterPlanHtmlReportGenerator` emits `plan/masterplan.html`, giving you a browser-friendly report with summary KPIs, charts, filters, and inline diffs before apply. `PlanReader` reads the JSON file again during apply.
+5. **Persistence** – `PlanWriter` stores the ordered `MasterPlan` in `plan/masterplan.json`. `MasterPlanHtmlReportGenerator` emits `plan/masterplan.html` (unless `MASTER_PLAN_REPORT_ENABLED` is set to `false`/`off`/`no`/`0`), giving you a browser-friendly report with summary KPIs, charts, filters, and inline diffs before apply. `PlanReader` reads the JSON file again during apply.
 
 ## 3. Applying the master plan
 
