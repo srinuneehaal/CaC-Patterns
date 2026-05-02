@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonModelMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.service.plan</a> &gt; <span class="el_source">JsonModelMapper.java</span></div><h1>JsonModelMapper.java</h1><pre class="source lang-java linenums">package com.example.cacex.service.plan;
+
+import com.example.cacex.config.JacksonConfiguration;
+import com.example.cacex.model.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finbourne.lusid.model.AborConfigurationRequest;
+import com.finbourne.lusid.model.AborRequest;
+import com.finbourne.lusid.model.Account;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+@Component
+public class JsonModelMapper {
+
+<span class="nc" id="L24">    private static final Logger log = LoggerFactory.getLogger(JsonModelMapper.class);</span>
+
+    private final ObjectMapper objectMapper;
+
+    public JsonModelMapper() {
+<span class="nc" id="L29">        this(JacksonConfiguration.createObjectMapper());</span>
+<span class="nc" id="L30">    }</span>
+
+    @Autowired
+<span class="nc" id="L33">    public JsonModelMapper(ObjectMapper objectMapper) {</span>
+<span class="nc" id="L34">        this.objectMapper = objectMapper;</span>
+<span class="nc" id="L35">    }</span>
+
+    /**
+     * Reads and converts JSON content at the provided path into the requested model type.
+     *
+     * @param path path to a JSON file
+     * @param type target model class
+     * @return deserialized model instance
+     * @param &lt;T&gt;  model type
+     * @throws IOException if reading or parsing fails
+     */
+    public &lt;T&gt; T read(Path path, Class&lt;T&gt; type) throws IOException {
+<span class="nc" id="L47">        String content = Files.readString(path, StandardCharsets.UTF_8);</span>
+<span class="nc" id="L48">        return read(content, type);</span>
+    }
+
+    public &lt;T&gt; T read(String content, Class&lt;T&gt; type) throws IOException {
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if (type == SideFile.class) {</span>
+<span class="nc" id="L53">            return type.cast(readSideFile(content));</span>
+        }
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (type == TransactionFile.class) {</span>
+<span class="nc" id="L56">            return type.cast(readTransactionFile(content));</span>
+        }
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        if (type == DerivedPortfolioFile.class) {</span>
+<span class="nc" id="L59">            return type.cast(readDerivedPortfolioFile(content));</span>
+        }
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (type == PortfolioGroupFile.class) {</span>
+<span class="nc" id="L62">            return type.cast(readPortfolioGroupFile(content));</span>
+        }
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (type == ChartOfAccountsFile.class) {</span>
+<span class="nc" id="L65">            return type.cast(readChartOfAccountsFile(content));</span>
+        }
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (type == AccountFile.class) {</span>
+<span class="nc" id="L68">            return type.cast(readAccountFile(content));</span>
+        }
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        if (type == AborConfigurationFile.class) {</span>
+<span class="nc" id="L71">            return type.cast(readAborConfigurationFile(content));</span>
+        }
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (type == AborFile.class) {</span>
+<span class="nc" id="L74">            return type.cast(readAborFile(content));</span>
+        }
+<span class="nc" id="L76">        return objectMapper.readValue(content, type);</span>
+    }
+
+    private SideFile readSideFile(String content) throws IOException {
+<span class="nc" id="L80">        JsonNode root = objectMapper.readTree(content);</span>
+<span class="nc" id="L81">        SideFile sideFile = objectMapper.treeToValue(root, SideFile.class);</span>
+<span class="nc" id="L82">        JsonNode definition =  root.get(&quot;sideDefinitionRequest&quot;);</span>
+<span class="nc bnc" id="L83" title="All 4 branches missed.">        if (definition != null &amp;&amp; !definition.isNull()) {</span>
+<span class="nc" id="L84">            sideFile.setSideDefinition(objectMapper.treeToValue(definition,</span>
+<span class="nc" id="L85">                    com.finbourne.lusid.model.SideDefinitionRequest.class));</span>
+<span class="nc" id="L86">        } else {</span>
+<span class="nc" id="L87">            log.warn(&quot;sideDefinition missing when parsing side file payload. Fields: {}&quot;,</span>
+<span class="nc" id="L88">                    describeFields(root));</span>
+        }
+<span class="nc" id="L90">        return sideFile;</span>
+    }
+
+    private TransactionFile readTransactionFile(String content) throws IOException {
+<span class="nc" id="L94">        JsonNode root = objectMapper.readTree(content);</span>
+<span class="nc" id="L95">        TransactionFile txnFile = objectMapper.treeToValue(root, TransactionFile.class);</span>
+<span class="nc" id="L96">        JsonNode definition =  root.get(&quot;transactionTypeRequest&quot;);</span>
+<span class="nc bnc" id="L97" title="All 4 branches missed.">        if (definition != null &amp;&amp; !definition.isNull()) {</span>
+<span class="nc" id="L98">            txnFile.setSideDefinition(objectMapper.treeToValue(definition,</span>
+<span class="nc" id="L99">                    com.finbourne.lusid.model.TransactionTypeRequest.class));</span>
+<span class="nc" id="L100">        } else {</span>
+<span class="nc" id="L101">            log.warn(&quot;sideDefinition missing when parsing transaction file payload. Fields: {}&quot;,</span>
+<span class="nc" id="L102">                    describeFields(root));</span>
+        }
+<span class="nc" id="L104">        return txnFile;</span>
+    }
+
+    private DerivedPortfolioFile readDerivedPortfolioFile(String content) throws IOException {
+<span class="nc" id="L108">        JsonNode root = objectMapper.readTree(content);</span>
+<span class="nc" id="L109">        DerivedPortfolioFile file = objectMapper.treeToValue(root, DerivedPortfolioFile.class);</span>
+<span class="nc" id="L110">        JsonNode listNode = root.get(&quot;createDerivedPortfolioRequestList&quot;);</span>
+<span class="nc bnc" id="L111" title="All 4 branches missed.">        if (listNode != null &amp;&amp; !listNode.isNull()) {</span>
+<span class="nc" id="L112">            file.setDerivedPortfolios(objectMapper.readerForListOf(</span>
+<span class="nc" id="L113">                    com.finbourne.lusid.model.CreateDerivedTransactionPortfolioRequest.class)</span>
+<span class="nc" id="L114">                    .readValue(listNode));</span>
+<span class="nc" id="L115">        } else {</span>
+<span class="nc" id="L116">            log.warn(&quot;createDerivedPortfolioRequestList missing when parsing derived portfolio payload. Fields: {}&quot;,</span>
+<span class="nc" id="L117">                    describeFields(root));</span>
+        }
+<span class="nc" id="L119">        return file;</span>
+    }
+
+    private AborFile readAborFile(String content) throws IOException {
+<span class="nc" id="L123">        JsonNode root = objectMapper.readTree(content);</span>
+<span class="nc" id="L124">        AborFile file = objectMapper.treeToValue(root, AborFile.class);</span>
+<span class="nc" id="L125">        JsonNode listNode = root.get(&quot;aborRequestList&quot;);</span>
+<span class="nc bnc" id="L126" title="All 4 branches missed.">        if (listNode != null &amp;&amp; !listNode.isNull()) {</span>
+<span class="nc" id="L127">            file.setAborRequests(objectMapper.readerForListOf(AborRequest.class).readValue(listNode));</span>
+<span class="nc" id="L128">        } else {</span>
+<span class="nc" id="L129">            log.warn(&quot;aborRequestList missing when parsing ABOR payload. Fields: {}&quot;, describeFields(root));</span>
+        }
+<span class="nc" id="L131">        return file;</span>
+    }
+
+    private PortfolioGroupFile readPortfolioGroupFile(String content) throws IOException {
+<span class="nc" id="L135">        JsonNode root = objectMapper.readTree(content);</span>
+<span class="nc" id="L136">        PortfolioGroupFile file = objectMapper.treeToValue(root, PortfolioGroupFile.class);</span>
+<span class="nc" id="L137">        JsonNode listNode = root.get(&quot;createPortfolioGroupRequestList&quot;);</span>
+<span class="nc bnc" id="L138" title="All 4 branches missed.">        if (listNode != null &amp;&amp; !listNode.isNull()) {</span>
+<span class="nc" id="L139">            file.setGroups(objectMapper.readerForListOf(</span>
+<span class="nc" id="L140">                    com.finbourne.lusid.model.CreatePortfolioGroupRequest.class).readValue(listNode));</span>
+<span class="nc" id="L141">        } else {</span>
+<span class="nc" id="L142">            log.warn(&quot;createPortfolioGroupRequestList missing when parsing portfolio group payload. Fields: {}&quot;,</span>
+<span class="nc" id="L143">                    describeFields(root));</span>
+        }
+<span class="nc" id="L145">        return file;</span>
+    }
+
+    private ChartOfAccountsFile readChartOfAccountsFile(String content) throws IOException {
+<span class="nc" id="L149">        JsonNode root = objectMapper.readTree(content);</span>
+<span class="nc" id="L150">        ChartOfAccountsFile file = objectMapper.treeToValue(root, ChartOfAccountsFile.class);</span>
+<span class="nc" id="L151">        JsonNode requestNode = root.get(&quot;chartOfAccountsRequest&quot;);</span>
+<span class="nc bnc" id="L152" title="All 4 branches missed.">        if (requestNode != null &amp;&amp; !requestNode.isNull()) {</span>
+<span class="nc" id="L153">            file.setChartOfAccountsRequest(objectMapper.treeToValue(requestNode,</span>
+<span class="nc" id="L154">                    com.finbourne.lusid.model.ChartOfAccountsRequest.class));</span>
+<span class="nc" id="L155">        } else {</span>
+<span class="nc" id="L156">            log.warn(&quot;chartOfAccountsRequest missing when parsing chart of accounts payload. Fields: {}&quot;,</span>
+<span class="nc" id="L157">                    describeFields(root));</span>
+        }
+<span class="nc" id="L159">        return file;</span>
+    }
+
+    private AccountFile readAccountFile(String content) throws IOException {
+<span class="nc" id="L163">        JsonNode root = objectMapper.readTree(content);</span>
+<span class="nc" id="L164">        AccountFile file = objectMapper.treeToValue(root, AccountFile.class);</span>
+<span class="nc" id="L165">        JsonNode accountsNode = root.get(&quot;glAccounts&quot;);</span>
+<span class="nc bnc" id="L166" title="All 4 branches missed.">        if (accountsNode != null &amp;&amp; !accountsNode.isNull()) {</span>
+<span class="nc" id="L167">            file.setAccounts(objectMapper.readerForListOf(Account.class).readValue(accountsNode));</span>
+<span class="nc" id="L168">        } else {</span>
+<span class="nc" id="L169">            log.warn(&quot;glAccounts missing when parsing accounts payload. Fields: {}&quot;, describeFields(root));</span>
+        }
+<span class="nc" id="L171">        return file;</span>
+    }
+
+    private AborConfigurationFile readAborConfigurationFile(String content) throws IOException {
+<span class="nc" id="L175">        JsonNode root = objectMapper.readTree(content);</span>
+<span class="nc" id="L176">        AborConfigurationFile file = objectMapper.treeToValue(root, AborConfigurationFile.class);</span>
+<span class="nc" id="L177">        JsonNode listNode = root.get(&quot;aborConfigurationRequestList&quot;);</span>
+<span class="nc bnc" id="L178" title="All 4 branches missed.">        if (listNode != null &amp;&amp; !listNode.isNull()) {</span>
+<span class="nc" id="L179">            file.setAborConfigurations(objectMapper.readerForListOf(AborConfigurationRequest.class).readValue(listNode));</span>
+<span class="nc" id="L180">        } else {</span>
+<span class="nc" id="L181">            log.warn(&quot;aborConfigurationRequestList missing when parsing ABOR configuration payload. Fields: {}&quot;,</span>
+<span class="nc" id="L182">                    describeFields(root));</span>
+        }
+<span class="nc" id="L184">        return file;</span>
+    }
+
+    private List&lt;String&gt; describeFields(JsonNode root) {
+<span class="nc" id="L188">        List&lt;String&gt; fields = new java.util.ArrayList&lt;&gt;();</span>
+<span class="nc" id="L189">        root.fieldNames().forEachRemaining(fields::add);</span>
+<span class="nc" id="L190">        return fields;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

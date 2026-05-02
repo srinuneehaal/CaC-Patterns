@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MasterPlanHtmlReportGenerator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.service.plan</a> &gt; <span class="el_source">MasterPlanHtmlReportGenerator.java</span></div><h1>MasterPlanHtmlReportGenerator.java</h1><pre class="source lang-java linenums">package com.example.cacex.service.plan;
+
+import com.example.cacex.config.FileLocationProperties;
+import com.example.cacex.model.MasterPlan;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+/**
+ * Produces a standalone HTML report from the generated {@link MasterPlan}.
+ */
+@Component
+public class MasterPlanHtmlReportGenerator {
+
+    private static final String REPORT_FILE_NAME = &quot;masterplan.html&quot;;
+    private static final String TEMPLATE_PATH = &quot;masterplan-report-template.html&quot;;
+
+    private final FileLocationProperties fileLocationProperties;
+    private final ObjectMapper objectMapper;
+    private final String template;
+
+<span class="nc" id="L28">    public MasterPlanHtmlReportGenerator(FileLocationProperties fileLocationProperties, ObjectMapper objectMapper) {</span>
+<span class="nc" id="L29">        this.fileLocationProperties = fileLocationProperties;</span>
+<span class="nc" id="L30">        this.objectMapper = objectMapper;</span>
+<span class="nc" id="L31">        this.template = loadTemplate();</span>
+<span class="nc" id="L32">    }</span>
+
+    /**
+     * Writes the HTML report next to the JSON master plan.
+     *
+     * @param masterPlan master plan data
+     * @return written report path
+     */
+    public Path generateReport(MasterPlan masterPlan) {
+<span class="nc" id="L41">        Path reportPath = fileLocationProperties.planDirPath().resolve(REPORT_FILE_NAME);</span>
+        try {
+<span class="nc" id="L43">            Files.createDirectories(reportPath.getParent());</span>
+<span class="nc" id="L44">            String json = objectMapper.writeValueAsString(masterPlan);</span>
+<span class="nc" id="L45">            Files.writeString(reportPath, template.replace(&quot;{{PLAN_DATA}}&quot;, json));</span>
+<span class="nc" id="L46">            return reportPath;</span>
+<span class="nc" id="L47">        } catch (IOException e) {</span>
+<span class="nc" id="L48">            throw new IllegalStateException(&quot;Unable to write master plan HTML report&quot;, e);</span>
+        }
+    }
+
+    private String loadTemplate() {
+<span class="nc" id="L53">        try (InputStream stream = new ClassPathResource(TEMPLATE_PATH).getInputStream()) {</span>
+<span class="nc" id="L54">            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);</span>
+<span class="nc" id="L55">        } catch (IOException e) {</span>
+<span class="nc" id="L56">            throw new IllegalStateException(&quot;Unable to load master plan report template&quot;, e);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeneralLedgerProfileFile.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.model</a> &gt; <span class="el_source">GeneralLedgerProfileFile.java</span></div><h1>GeneralLedgerProfileFile.java</h1><pre class="source lang-java linenums">package com.example.cacex.model;
+
+import com.finbourne.lusid.model.GeneralLedgerProfileRequest;
+
+import java.util.Objects;
+
+<span class="nc" id="L7">public class GeneralLedgerProfileFile {</span>
+
+    private String scope;
+    private String chartOfAccountsCode;
+    private String generalLedgerProfileCode;
+    private GeneralLedgerProfileRequest generalLedgerProfileRequest;
+
+    /**
+     * Returns the scope for the file.
+     *
+     * @return scope value
+     */
+    public String getScope() {
+<span class="nc" id="L20">        return scope;</span>
+    }
+
+    /**
+     * Sets the scope for the file.
+     *
+     * @param scope scope value
+     */
+    public void setScope(String scope) {
+<span class="nc" id="L29">        this.scope = scope;</span>
+<span class="nc" id="L30">    }</span>
+
+    /**
+     * Returns the associated chart of accounts code.
+     *
+     * @return chart of accounts code
+     */
+    public String getChartOfAccountsCode() {
+<span class="nc" id="L38">        return chartOfAccountsCode;</span>
+    }
+
+    /**
+     * Sets the chart of accounts code.
+     *
+     * @param chartOfAccountsCode chart code
+     */
+    public void setChartOfAccountsCode(String chartOfAccountsCode) {
+<span class="nc" id="L47">        this.chartOfAccountsCode = chartOfAccountsCode;</span>
+<span class="nc" id="L48">    }</span>
+
+    /**
+     * Returns the general ledger profile code contained in this file.
+     *
+     * @return profile code
+     */
+    public String getGeneralLedgerProfileCode() {
+<span class="nc" id="L56">        return generalLedgerProfileCode;</span>
+    }
+
+    /**
+     * Sets the general ledger profile code.
+     *
+     * @param generalLedgerProfileCode profile code
+     */
+    public void setGeneralLedgerProfileCode(String generalLedgerProfileCode) {
+<span class="nc" id="L65">        this.generalLedgerProfileCode = generalLedgerProfileCode;</span>
+<span class="nc" id="L66">    }</span>
+
+    /**
+     * Returns the general ledger profile request payload.
+     *
+     * @return profile request
+     */
+    public GeneralLedgerProfileRequest getGeneralLedgerProfileRequest() {
+<span class="nc" id="L74">        return generalLedgerProfileRequest;</span>
+    }
+
+    /**
+     * Sets the general ledger profile request payload.
+     *
+     * @param generalLedgerProfileRequest profile request
+     */
+    public void setGeneralLedgerProfileRequest(GeneralLedgerProfileRequest generalLedgerProfileRequest) {
+<span class="nc" id="L83">        this.generalLedgerProfileRequest = generalLedgerProfileRequest;</span>
+<span class="nc" id="L84">    }</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L89">            return true;</span>
+        }
+<span class="nc bnc" id="L91" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L92">            return false;</span>
+        }
+<span class="nc" id="L94">        GeneralLedgerProfileFile that = (GeneralLedgerProfileFile) o;</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        return Objects.equals(scope, that.scope)</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">                &amp;&amp; Objects.equals(chartOfAccountsCode, that.chartOfAccountsCode)</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">                &amp;&amp; Objects.equals(generalLedgerProfileCode, that.generalLedgerProfileCode)</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">                &amp;&amp; Objects.equals(generalLedgerProfileRequest, that.generalLedgerProfileRequest);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L103">        return Objects.hash(scope, chartOfAccountsCode, generalLedgerProfileCode, generalLedgerProfileRequest);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L108">        return &quot;GeneralLedgerProfileFile{&quot; +</span>
+<span class="nc" id="L109">                &quot;scope='&quot; + scope + '\'' +</span>
+<span class="nc" id="L110">                &quot;, chartOfAccountsCode='&quot; + chartOfAccountsCode + '\'' +</span>
+<span class="nc" id="L111">                &quot;, generalLedgerProfileCode='&quot; + generalLedgerProfileCode + '\'' +</span>
+<span class="nc" id="L112">                &quot;, generalLedgerProfileRequest=&quot; + generalLedgerProfileRequest +</span>
+                '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

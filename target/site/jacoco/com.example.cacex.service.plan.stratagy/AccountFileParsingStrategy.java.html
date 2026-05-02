@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccountFileParsingStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.service.plan.stratagy</a> &gt; <span class="el_source">AccountFileParsingStrategy.java</span></div><h1>AccountFileParsingStrategy.java</h1><pre class="source lang-java linenums">package com.example.cacex.service.plan.stratagy;
+
+import com.example.cacex.config.FileLocationProperties;
+import com.example.cacex.model.AccountFile;
+import com.example.cacex.model.FileCategory;
+import com.example.cacex.model.LoadedFile;
+import com.example.cacex.service.plan.JsonModelMapper;
+import com.example.cacex.util.PathUtils;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Locale;
+
+@Component
+public class AccountFileParsingStrategy implements FileParsingStrategy {
+
+    private final JsonModelMapper mapper;
+    private final String folderMarker;
+
+    /**
+     * Creates an account file parsing strategy.
+     *
+     * @param mapper                 JSON mapper
+     * @param fileLocationProperties file location properties
+     */
+<span class="nc" id="L27">    public AccountFileParsingStrategy(JsonModelMapper mapper, FileLocationProperties fileLocationProperties) {</span>
+<span class="nc" id="L28">        this.mapper = mapper;</span>
+<span class="nc" id="L29">        this.folderMarker = fileLocationProperties.getAccountsDirName().toLowerCase(Locale.ROOT);</span>
+<span class="nc" id="L30">    }</span>
+
+    @Override
+    public FileCategory getCategory() {
+<span class="nc" id="L34">        return FileCategory.ACCOUNT;</span>
+    }
+
+    /**
+     * Determines whether the given path is an account file under the configured directory.
+     *
+     * @param path candidate path
+     * @return true if supported
+     */
+    @Override
+    public boolean supports(Path path) {
+<span class="nc" id="L45">        String value = path.toString().toLowerCase(Locale.ROOT);</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (!value.endsWith(&quot;.json&quot;)) {</span>
+<span class="nc" id="L47">            return false;</span>
+        }
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        for (Path part : path.normalize()) {</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">            if (folderMarker.equalsIgnoreCase(part.toString())) {</span>
+<span class="nc" id="L51">                return true;</span>
+            }
+        }
+<span class="nc" id="L54">        return false;</span>
+    }
+
+    /**
+     * Parses an account JSON file into a {@link LoadedFile}.
+     *
+     * @param path path to parse
+     * @return loaded file wrapper containing the account payload
+     * @throws IOException if reading fails
+     */
+    @Override
+    public LoadedFile parse(Path path) throws IOException {
+<span class="nc" id="L66">        AccountFile file = mapper.read(path, AccountFile.class);</span>
+<span class="nc" id="L67">        String key = PathUtils.baseName(path);</span>
+<span class="nc" id="L68">        return new LoadedFile(getCategory(), key, path, file);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

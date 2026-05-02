@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlanReader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.service.apply</a> &gt; <span class="el_source">PlanReader.java</span></div><h1>PlanReader.java</h1><pre class="source lang-java linenums">package com.example.cacex.service.apply;
+
+import com.example.cacex.config.FileLocationProperties;
+import com.example.cacex.model.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finbourne.lusid.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+@Component
+public class PlanReader {
+
+<span class="fc" id="L19">    private static final Logger log = LoggerFactory.getLogger(PlanReader.class);</span>
+
+    private final FileLocationProperties fileLocationProperties;
+    private final ObjectMapper objectMapper;
+
+<span class="nc" id="L24">    public PlanReader(FileLocationProperties fileLocationProperties, ObjectMapper objectMapper) {</span>
+<span class="nc" id="L25">        this.fileLocationProperties = fileLocationProperties;</span>
+<span class="nc" id="L26">        this.objectMapper = objectMapper;</span>
+<span class="nc" id="L27">    }</span>
+
+    /**
+     * Reads and converts the configured master plan file into a {@link MasterPlan}.
+     *
+     * @return populated master plan
+     * @throws IllegalStateException if the plan file is missing or cannot be parsed
+     */
+    public MasterPlan read() {
+<span class="nc" id="L36">        Path inputPath = fileLocationProperties.masterPlanPath();</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (!Files.exists(inputPath)) {</span>
+<span class="nc" id="L38">            throw new IllegalStateException(&quot;Plan file not found at &quot; + inputPath.toAbsolutePath());</span>
+        }
+        try {
+<span class="nc" id="L41">            JsonNode root = objectMapper.readTree(inputPath.toFile());</span>
+<span class="nc" id="L42">            MasterPlan plan = new MasterPlan();</span>
+<span class="nc" id="L43">            JsonNode itemsNode = root.get(&quot;items&quot;);</span>
+<span class="nc bnc" id="L44" title="All 4 branches missed.">            if (itemsNode == null || !itemsNode.isArray()) {</span>
+<span class="nc" id="L45">                log.warn(&quot;Plan file {} contains no items array&quot;, inputPath.toAbsolutePath());</span>
+<span class="nc" id="L46">                return plan;</span>
+            }
+<span class="nc bnc" id="L48" title="All 2 branches missed.">            for (JsonNode itemNode : itemsNode) {</span>
+<span class="nc" id="L49">                PlanItem planItem = objectMapper.treeToValue(itemNode, PlanItem.class);</span>
+<span class="nc" id="L50">                planItem.setPayload(convertPayload(planItem.getFileCategory(), itemNode.get(&quot;payload&quot;)));</span>
+<span class="nc" id="L51">                plan.addItem(planItem);</span>
+            }
+<span class="nc" id="L53">            return plan;</span>
+<span class="nc" id="L54">        } catch (IOException e) {</span>
+<span class="nc" id="L55">            throw new IllegalStateException(&quot;Unable to read plan file&quot;, e);</span>
+        }
+    }
+
+    private Object convertPayload(FileCategory category, JsonNode payloadNode) {
+<span class="nc bnc" id="L60" title="All 6 branches missed.">        if (payloadNode == null || payloadNode.isNull() || category == null) {</span>
+<span class="nc" id="L61">            return null;</span>
+        }
+<span class="nc bnc" id="L63" title="All 10 branches missed.">        return switch (category) {</span>
+<span class="nc" id="L64">            case SIDE -&gt; objectMapper.convertValue(payloadNode, SideFile.class);</span>
+<span class="nc" id="L65">            case TRANSACTION -&gt; objectMapper.convertValue(payloadNode, TransactionFile.class);</span>
+            case ABOR_CONFIGURATION -&gt;
+<span class="nc" id="L67">                    objectMapper.convertValue(payloadNode, AborConfigurationRequest.class);</span>
+            case ABOR -&gt;
+<span class="nc" id="L69">                    objectMapper.convertValue(payloadNode, AborRequest.class);</span>
+            case DERIVED_PORTFOLIO -&gt;
+<span class="nc" id="L71">                    objectMapper.convertValue(payloadNode, CreateDerivedTransactionPortfolioRequest.class);</span>
+            case PORTFOLIO_GROUP -&gt;
+<span class="nc" id="L73">                    objectMapper.convertValue(payloadNode, CreatePortfolioGroupRequest.class);</span>
+            case CHART_OF_ACCOUNTS -&gt;
+<span class="nc" id="L75">                    objectMapper.convertValue(payloadNode, ChartOfAccountsRequest.class);</span>
+<span class="nc" id="L76">            case ACCOUNT -&gt; objectMapper.convertValue(payloadNode, Account.class);</span>
+<span class="nc" id="L77">            case POSTING_RULE -&gt; objectMapper.convertValue(payloadNode, PostingModuleRequest.class);</span>
+            case GENERAL_LEDGER_PROFILE -&gt;
+<span class="nc" id="L79">                    objectMapper.convertValue(payloadNode, GeneralLedgerProfileRequest.class);</span>
+        };
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

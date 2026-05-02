@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TransactionFile.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.model</a> &gt; <span class="el_source">TransactionFile.java</span></div><h1>TransactionFile.java</h1><pre class="source lang-java linenums">package com.example.cacex.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.finbourne.lusid.model.TransactionTypeRequest;
+
+import java.util.Objects;
+
+<span class="nc" id="L8">public class TransactionFile {</span>
+
+    private String scope;
+    @JsonProperty(&quot;transactionType&quot;)
+    private String type;
+    private String transactionClass;
+    private String source;
+    private Integer transactionSequence;
+    @JsonProperty(&quot;transactionTypeRequest&quot;)
+    private TransactionTypeRequest transactionTypeRequest;
+
+    /**
+     * Returns the scope for the transaction type.
+     *
+     * @return scope value
+     */
+    public String getScope() {
+<span class="nc" id="L25">        return scope;</span>
+    }
+
+    /**
+     * Sets the scope for the transaction type.
+     *
+     * @param scope scope value
+     */
+    public void setScope(String scope) {
+<span class="nc" id="L34">        this.scope = scope;</span>
+<span class="nc" id="L35">    }</span>
+
+    /**
+     * Returns the transaction type code.
+     *
+     * @return type code
+     */
+    public String getType() {
+<span class="nc" id="L43">        return type;</span>
+    }
+
+    /**
+     * Sets the transaction type code.
+     *
+     * @param type type code
+     */
+    public void setType(String type) {
+<span class="nc" id="L52">        this.type = type;</span>
+<span class="nc" id="L53">    }</span>
+
+    /**
+     * Returns the transaction class.
+     *
+     * @return transaction class
+     */
+    public String getTransactionClass() {
+<span class="nc" id="L61">        return transactionClass;</span>
+    }
+
+    /**
+     * Sets the transaction class.
+     *
+     * @param transactionClass transaction class
+     */
+    public void setTransactionClass(String transactionClass) {
+<span class="nc" id="L70">        this.transactionClass = transactionClass;</span>
+<span class="nc" id="L71">    }</span>
+
+    /**
+     * Returns the transaction source identifier.
+     *
+     * @return source identifier
+     */
+    public String getSource() {
+<span class="nc" id="L79">        return source;</span>
+    }
+
+    /**
+     * Sets the transaction source identifier.
+     *
+     * @param source source identifier
+     */
+    public void setSource(String source) {
+<span class="nc" id="L88">        this.source = source;</span>
+<span class="nc" id="L89">    }</span>
+    /**
+     * Returns the transaction sequence weight.
+     *
+     * @return transaction sequence or null
+     */
+    public Integer getTransactionSequence() {
+<span class="nc" id="L96">        return transactionSequence;</span>
+    }
+
+    /**
+     * Sets the transaction sequence weight.
+     *
+     * @param transactionSequence transaction sequence
+     */
+    public void setTransactionSequence(Integer transactionSequence) {
+<span class="nc" id="L105">        this.transactionSequence = transactionSequence;</span>
+<span class="nc" id="L106">    }</span>
+    /**
+     * Returns the transaction type request payload.
+     *
+     * @return transaction type request
+     */
+    public TransactionTypeRequest getTransactionTypeRequest() {
+<span class="nc" id="L113">        return transactionTypeRequest;</span>
+    }
+
+    /**
+     * Sets the transaction type request payload.
+     *
+     * @param sideDefinition transaction type request
+     */
+    public void setSideDefinition(TransactionTypeRequest sideDefinition) {
+<span class="nc" id="L122">        this.transactionTypeRequest = sideDefinition;</span>
+<span class="nc" id="L123">    }</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L128">            return true;</span>
+        }
+<span class="nc bnc" id="L130" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L131">            return false;</span>
+        }
+<span class="nc" id="L133">        TransactionFile that = (TransactionFile) o;</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        return Objects.equals(scope, that.scope)</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">                &amp;&amp; Objects.equals(type, that.type)</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">                &amp;&amp; Objects.equals(transactionClass, that.transactionClass)</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">                &amp;&amp; Objects.equals(source, that.source)</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">                &amp;&amp; Objects.equals(transactionSequence, that.transactionSequence)</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">                &amp;&amp; Objects.equals(transactionTypeRequest, that.transactionTypeRequest);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L144">        return Objects.hash(scope, type, transactionClass, source, transactionSequence, transactionTypeRequest);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L149">        return &quot;TransactionFile{&quot; +</span>
+<span class="nc" id="L150">                &quot;scope='&quot; + scope + '\'' +</span>
+<span class="nc" id="L151">                &quot;, type='&quot; + type + '\'' +</span>
+<span class="nc" id="L152">                &quot;, transactionClass='&quot; + transactionClass + '\'' +</span>
+<span class="nc" id="L153">                &quot;, source='&quot; + source + '\'' +</span>
+<span class="nc" id="L154">                &quot;, transactionSequence=&quot; + transactionSequence +</span>
+<span class="nc" id="L155">                &quot;, transactionTypeRequest=&quot; + transactionTypeRequest +</span>
+                '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

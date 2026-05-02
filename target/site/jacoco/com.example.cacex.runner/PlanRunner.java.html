@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlanRunner.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.runner</a> &gt; <span class="el_source">PlanRunner.java</span></div><h1>PlanRunner.java</h1><pre class="source lang-java linenums">package com.example.cacex.runner;
+
+import com.example.cacex.config.EnvironmentLookup;
+import com.example.cacex.model.MasterPlan;
+import com.example.cacex.service.PlanService;
+import com.example.cacex.service.plan.ChangedFilesProvider;
+import com.example.cacex.service.plan.MasterPlanHtmlReportGenerator;
+import com.example.cacex.service.plan.PlanWriter;
+import com.example.cacex.util.CommandLineFlags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+
+@Component
+public class PlanRunner implements CommandLineRunner {
+
+<span class="nc" id="L22">    private static final Logger log = LoggerFactory.getLogger(PlanRunner.class);</span>
+    private static final String ARG_PLAN = &quot;--plan&quot;;
+<span class="nc" id="L24">    static final String ENV_MASTER_PLAN_REPORT_ENABLED = &quot;MASTER_PLAN_REPORT_ENABLED&quot;;</span>
+
+    private final ChangedFilesProvider changedFilesProvider;
+    private final PlanService planService;
+    private final PlanWriter planWriter;
+    private final MasterPlanHtmlReportGenerator masterPlanHtmlReportGenerator;
+<span class="nc" id="L30">    private EnvironmentLookup envLookup = System::getenv;</span>
+
+    /**
+     * Creates a plan runner with required collaborators.
+     *
+     * @param changedFilesProvider provider for changed paths
+     * @param planService          builder for master plans
+     * @param planWriter           writer for output plans
+     * @param masterPlanHtmlReportGenerator report generator that creates `masterplan.html`
+     */
+<span class="nc" id="L40">    public PlanRunner(ChangedFilesProvider changedFilesProvider,</span>
+                      PlanService planService,
+                      PlanWriter planWriter,
+                      MasterPlanHtmlReportGenerator masterPlanHtmlReportGenerator) {
+<span class="nc" id="L44">        this.changedFilesProvider = changedFilesProvider;</span>
+<span class="nc" id="L45">        this.planService = planService;</span>
+<span class="nc" id="L46">        this.planWriter = planWriter;</span>
+<span class="nc" id="L47">        this.masterPlanHtmlReportGenerator = masterPlanHtmlReportGenerator;</span>
+<span class="nc" id="L48">    }</span>
+
+    /**
+     * Executes plan generation when the --plan flag is present.
+     *
+     * @param args command-line arguments
+     */
+    @Override
+    public void run(String... args) {
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (!CommandLineFlags.hasFlag(args, ARG_PLAN)) {</span>
+<span class="nc" id="L58">            log.info(&quot;Plan flag not provided. Skipping plan generation.&quot;);</span>
+<span class="nc" id="L59">            return;</span>
+        }
+<span class="nc bnc" id="L61" title="All 4 branches missed.">        if (args != null &amp;&amp; args.length &gt; 1) {</span>
+<span class="nc" id="L62">            log.warn(&quot;Extra arguments detected alongside {}: {}&quot;, ARG_PLAN, List.of(args));</span>
+        }
+        try {
+<span class="nc" id="L65">            executePlan();</span>
+<span class="nc" id="L66">        } catch (Exception e) {</span>
+<span class="nc" id="L67">            log.error(&quot;Plan generation failed: {}&quot;, e.getMessage(), e);</span>
+        }
+<span class="nc" id="L69">    }</span>
+
+    /**
+     * Builds and writes a master plan using changed file inputs.
+     */
+    private void executePlan() {
+<span class="nc" id="L75">        List&lt;Path&gt; changedPaths = changedFilesProvider.getChangedPaths();</span>
+<span class="nc" id="L76">        log.info(&quot;Received {} changed file path(s) from CHANGED_FILES&quot;, changedPaths.size());</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (changedPaths.isEmpty()) {</span>
+<span class="nc" id="L78">            log.warn(&quot;No changed files provided. Nothing to plan.&quot;);</span>
+<span class="nc" id="L79">            return;</span>
+        }
+<span class="nc" id="L81">        MasterPlan masterPlan = planService.buildPlan(changedPaths);</span>
+<span class="nc" id="L82">        Path output = planWriter.write(masterPlan);</span>
+<span class="nc" id="L83">        log.info(&quot;Master plan written to {}&quot;, output.toAbsolutePath());</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        if (isReportGenerationEnabled()) {</span>
+<span class="nc" id="L85">            Path report = masterPlanHtmlReportGenerator.generateReport(masterPlan);</span>
+<span class="nc" id="L86">            log.info(&quot;Master plan report written to {}&quot;, report.toAbsolutePath());</span>
+<span class="nc" id="L87">        } else {</span>
+<span class="nc" id="L88">            log.info(&quot;Master plan report generation disabled via env {}&quot;, ENV_MASTER_PLAN_REPORT_ENABLED);</span>
+        }
+<span class="nc" id="L90">    }</span>
+
+    private boolean isReportGenerationEnabled() {
+<span class="nc" id="L93">        String toggle = envLookup.lookup(ENV_MASTER_PLAN_REPORT_ENABLED);</span>
+<span class="nc" id="L94">        System.out.println(&quot;MASTER_PLAN_REPORT_ENABLED---&gt;&quot;+toggle+&quot; &quot;);</span>
+
+<span class="nc bnc" id="L96" title="All 4 branches missed.">        if (toggle == null || toggle.isBlank()) {</span>
+<span class="nc" id="L97">            return true;</span>
+        }
+<span class="nc" id="L99">        String normalized = toggle.trim();</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        return !normalized.equalsIgnoreCase(&quot;false&quot;)</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">                &amp;&amp; !normalized.equalsIgnoreCase(&quot;off&quot;)</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">                &amp;&amp; !normalized.equalsIgnoreCase(&quot;no&quot;)</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">                &amp;&amp; !normalized.equals(&quot;0&quot;);</span>
+    }
+
+    /**
+     * Test hook to override environment lookup without touching real env vars.
+     */
+    void setEnvLookup(EnvironmentLookup envLookup) {
+<span class="nc" id="L110">        this.envLookup = Objects.requireNonNull(envLookup);</span>
+<span class="nc" id="L111">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

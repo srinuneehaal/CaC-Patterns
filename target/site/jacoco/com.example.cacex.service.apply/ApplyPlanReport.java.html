@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApplyPlanReport.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.service.apply</a> &gt; <span class="el_source">ApplyPlanReport.java</span></div><h1>ApplyPlanReport.java</h1><pre class="source lang-java linenums">package com.example.cacex.service.apply;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Summary of a full apply run, including each processed item's outcome.
+ */
+<span class="fc" id="L11">public class ApplyPlanReport {</span>
+
+<span class="fc" id="L13">    private final List&lt;ApplyPlanItemResult&gt; itemResults = new ArrayList&lt;&gt;();</span>
+
+    public void add(ApplyPlanItemResult itemResult) {
+<span class="pc bpc" id="L16" title="1 of 2 branches missed.">        if (itemResult != null) {</span>
+<span class="fc" id="L17">            itemResults.add(itemResult);</span>
+        }
+<span class="fc" id="L19">    }</span>
+
+    public List&lt;ApplyPlanItemResult&gt; getItemResults() {
+<span class="fc" id="L22">        return Collections.unmodifiableList(itemResults);</span>
+    }
+
+    public int getTotalCount() {
+<span class="fc" id="L26">        return itemResults.size();</span>
+    }
+
+    public int getSuccessCount() {
+<span class="fc" id="L30">        return (int) itemResults.stream().filter(ApplyPlanItemResult::success).count();</span>
+    }
+
+    public int getFailureCount() {
+<span class="fc" id="L34">        return getTotalCount() - getSuccessCount();</span>
+    }
+
+    public boolean hasFailures() {
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        return getFailureCount() &gt; 0;</span>
+    }
+
+    public String summary() {
+<span class="fc" id="L42">        StringBuilder builder = new StringBuilder();</span>
+<span class="fc" id="L43">        builder.append(&quot;Apply summary: status=&quot;)</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">                .append(hasFailures() ? &quot;FAILURE&quot; : &quot;SUCCESS&quot;)</span>
+<span class="fc" id="L45">                .append(&quot;, total=&quot;)</span>
+<span class="fc" id="L46">                .append(getTotalCount())</span>
+<span class="fc" id="L47">                .append(&quot;, succeeded=&quot;)</span>
+<span class="fc" id="L48">                .append(getSuccessCount())</span>
+<span class="fc" id="L49">                .append(&quot;, failed=&quot;)</span>
+<span class="fc" id="L50">                .append(getFailureCount());</span>
+
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if (itemResults.isEmpty()) {</span>
+<span class="fc" id="L53">            builder.append(System.lineSeparator()).append(&quot;No plan items were processed.&quot;);</span>
+<span class="fc" id="L54">            return builder.toString();</span>
+        }
+
+<span class="fc" id="L57">        appendSection(builder, &quot;Successful items&quot;, successfulItems());</span>
+<span class="fc" id="L58">        appendSection(builder, &quot;Failed items&quot;, failedItems());</span>
+<span class="fc" id="L59">        return builder.toString();</span>
+    }
+
+    private List&lt;ApplyPlanItemResult&gt; successfulItems() {
+<span class="fc" id="L63">        return resultsByStatus(true);</span>
+    }
+
+    private List&lt;ApplyPlanItemResult&gt; failedItems() {
+<span class="fc" id="L67">        return resultsByStatus(false);</span>
+    }
+
+    private List&lt;ApplyPlanItemResult&gt; resultsByStatus(boolean success) {
+<span class="fc" id="L71">        return itemResults.stream()</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">                .filter(itemResult -&gt; itemResult.success() == success)</span>
+<span class="fc" id="L73">                .collect(Collectors.toList());</span>
+    }
+
+    private void appendSection(StringBuilder builder, String heading, List&lt;ApplyPlanItemResult&gt; results) {
+<span class="fc" id="L77">        builder.append(System.lineSeparator())</span>
+<span class="fc" id="L78">                .append(heading)</span>
+<span class="fc" id="L79">                .append(&quot; (&quot;)</span>
+<span class="fc" id="L80">                .append(results.size())</span>
+<span class="fc" id="L81">                .append(&quot;):&quot;);</span>
+
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (results.isEmpty()) {</span>
+<span class="fc" id="L84">            builder.append(System.lineSeparator()).append(&quot;None.&quot;);</span>
+<span class="fc" id="L85">            return;</span>
+        }
+
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        for (ApplyPlanItemResult itemResult : results) {</span>
+<span class="fc" id="L89">            builder.append(System.lineSeparator()).append(itemResult.summaryLine());</span>
+        }
+<span class="fc" id="L91">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

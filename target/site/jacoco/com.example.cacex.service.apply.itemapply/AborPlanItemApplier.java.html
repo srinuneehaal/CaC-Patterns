@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AborPlanItemApplier.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.service.apply.itemapply</a> &gt; <span class="el_source">AborPlanItemApplier.java</span></div><h1>AborPlanItemApplier.java</h1><pre class="source lang-java linenums">package com.example.cacex.service.apply.itemapply;
+
+import com.example.cacex.model.FileCategory;
+import com.example.cacex.service.apply.apiservice.AborApiService;
+import com.finbourne.lusid.model.AborRequest;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AborPlanItemApplier extends AbstractPlanItemApplier&lt;AborRequest&gt; {
+
+    /**
+     * Creates an ABOR plan item applier.
+     *
+     * @param apiService service that performs ABOR operations
+     */
+    public AborPlanItemApplier(AborApiService apiService) {
+<span class="nc" id="L17">        super(AborRequest.class, apiService);</span>
+<span class="nc" id="L18">    }</span>
+
+    /**
+     * Supported file category for this applier.
+     *
+     * @return ABOR
+     */
+    @Override
+    public FileCategory supportedCategory() {
+<span class="nc" id="L27">        return FileCategory.ABOR;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

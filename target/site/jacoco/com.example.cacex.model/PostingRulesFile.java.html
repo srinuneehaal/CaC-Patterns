@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PostingRulesFile.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.model</a> &gt; <span class="el_source">PostingRulesFile.java</span></div><h1>PostingRulesFile.java</h1><pre class="source lang-java linenums">package com.example.cacex.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.finbourne.lusid.model.PostingModuleRequest;
+
+import java.util.Objects;
+
+<span class="nc" id="L8">public class PostingRulesFile {</span>
+
+    private String scope;
+    private String chartOfAccountsCode;
+    private String postingModuleCode;
+    @JsonProperty(&quot;postingModuleRequest&quot;)
+    private PostingModuleRequest postingModuleRequest;
+
+    /**
+     * Returns the scope for the posting rules file.
+     *
+     * @return scope value
+     */
+    public String getScope() {
+<span class="nc" id="L22">        return scope;</span>
+    }
+
+    /**
+     * Sets the scope for the posting rules file.
+     *
+     * @param scope scope value
+     */
+    public void setScope(String scope) {
+<span class="nc" id="L31">        this.scope = scope;</span>
+<span class="nc" id="L32">    }</span>
+
+    /**
+     * Returns the chart of accounts code associated with the posting rules.
+     *
+     * @return chart of accounts code
+     */
+    public String getChartOfAccountsCode() {
+<span class="nc" id="L40">        return chartOfAccountsCode;</span>
+    }
+
+    /**
+     * Sets the chart of accounts code associated with the posting rules.
+     *
+     * @param chartOfAccountsCode chart of accounts code
+     */
+    public void setChartOfAccountsCode(String chartOfAccountsCode) {
+<span class="nc" id="L49">        this.chartOfAccountsCode = chartOfAccountsCode;</span>
+<span class="nc" id="L50">    }</span>
+
+    /**
+     * Returns the posting module code.
+     *
+     * @return posting module code
+     */
+    public String getPostingModuleCode() {
+<span class="nc" id="L58">        return postingModuleCode;</span>
+    }
+
+    /**
+     * Sets the posting module code.
+     *
+     * @param postingModuleCode posting module code
+     */
+    public void setPostingModuleCode(String postingModuleCode) {
+<span class="nc" id="L67">        this.postingModuleCode = postingModuleCode;</span>
+<span class="nc" id="L68">    }</span>
+
+    /**
+     * Returns the posting module request payload.
+     *
+     * @return posting module request
+     */
+    public PostingModuleRequest getPostingModuleRequest() {
+<span class="nc" id="L76">        return postingModuleRequest;</span>
+    }
+
+    /**
+     * Sets the posting module request payload.
+     *
+     * @param postingModuleRequest posting module request
+     */
+    public void setPostingModuleRequest(PostingModuleRequest postingModuleRequest) {
+<span class="nc" id="L85">        this.postingModuleRequest = postingModuleRequest;</span>
+<span class="nc" id="L86">    }</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L91">            return true;</span>
+        }
+<span class="nc bnc" id="L93" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L94">            return false;</span>
+        }
+<span class="nc" id="L96">        PostingRulesFile that = (PostingRulesFile) o;</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        return Objects.equals(scope, that.scope)</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">                &amp;&amp; Objects.equals(chartOfAccountsCode, that.chartOfAccountsCode)</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">                &amp;&amp; Objects.equals(postingModuleCode, that.postingModuleCode)</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">                &amp;&amp; Objects.equals(postingModuleRequest, that.postingModuleRequest);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L105">        return Objects.hash(scope, chartOfAccountsCode, postingModuleCode, postingModuleRequest);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L110">        return &quot;PostingRulesFile{&quot; +</span>
+<span class="nc" id="L111">                &quot;scope='&quot; + scope + '\'' +</span>
+<span class="nc" id="L112">                &quot;, chartOfAccountsCode='&quot; + chartOfAccountsCode + '\'' +</span>
+<span class="nc" id="L113">                &quot;, postingModuleCode='&quot; + postingModuleCode + '\'' +</span>
+<span class="nc" id="L114">                &quot;, postingModuleRequest=&quot; + postingModuleRequest +</span>
+                '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

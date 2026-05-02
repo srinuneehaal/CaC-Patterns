@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeneralLedgerProfileFileParsingStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.service.plan.stratagy</a> &gt; <span class="el_source">GeneralLedgerProfileFileParsingStrategy.java</span></div><h1>GeneralLedgerProfileFileParsingStrategy.java</h1><pre class="source lang-java linenums">package com.example.cacex.service.plan.stratagy;
+
+import com.example.cacex.config.FileLocationProperties;
+import com.example.cacex.model.FileCategory;
+import com.example.cacex.model.GeneralLedgerProfileFile;
+import com.example.cacex.model.LoadedFile;
+import com.example.cacex.service.plan.JsonModelMapper;
+import com.example.cacex.util.PathUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Locale;
+
+/**
+ * Parsing strategy for general ledger profile files.
+ */
+@Component
+public class GeneralLedgerProfileFileParsingStrategy implements FileParsingStrategy {
+
+    private final JsonModelMapper mapper;
+    private final String folderMarker;
+
+    /**
+     * Creates a general ledger profile parsing strategy.
+     *
+     * @param mapper                 JSON mapper
+     * @param fileLocationProperties file location configuration
+     */
+<span class="nc" id="L31">    public GeneralLedgerProfileFileParsingStrategy(JsonModelMapper mapper,</span>
+                                                   FileLocationProperties fileLocationProperties) {
+<span class="nc" id="L33">        this.mapper = mapper;</span>
+<span class="nc" id="L34">        this.folderMarker = fileLocationProperties.getGeneralLedgerProfilesDirName().toLowerCase(Locale.ROOT);</span>
+<span class="nc" id="L35">    }</span>
+
+    @Override
+    public FileCategory getCategory() {
+<span class="nc" id="L39">        return FileCategory.GENERAL_LEDGER_PROFILE;</span>
+    }
+
+    @Override
+    public boolean supports(Path path) {
+<span class="nc" id="L44">        String value = path.toString().toLowerCase(Locale.ROOT);</span>
+<span class="nc bnc" id="L45" title="All 4 branches missed.">        return value.contains(folderMarker) &amp;&amp; value.endsWith(&quot;.json&quot;);</span>
+    }
+
+    @Override
+    public LoadedFile parse(Path path) throws IOException {
+<span class="nc" id="L50">        GeneralLedgerProfileFile file = mapper.read(path, GeneralLedgerProfileFile.class);</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        String scope = file.getScope() == null ? &quot;&quot; : file.getScope().strip();</span>
+<span class="nc" id="L52">        String key = buildKey(path, scope,</span>
+<span class="nc" id="L53">                file.getGeneralLedgerProfileCode(),</span>
+<span class="nc" id="L54">                file.getChartOfAccountsCode());</span>
+<span class="nc" id="L55">        return new LoadedFile(getCategory(), key, path, file.getGeneralLedgerProfileRequest());</span>
+    }
+
+    private String buildKey(Path path,
+                            String scope,
+                            String profileCode,
+                            String chartOfAccountsCode) {
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        String profile = StringUtils.hasText(profileCode) ? profileCode.trim() : null;</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        String chart = StringUtils.hasText(chartOfAccountsCode) ? chartOfAccountsCode.trim() : null;</span>
+
+<span class="nc bnc" id="L65" title="All 6 branches missed.">        if (profile != null &amp;&amp; chart != null &amp;&amp; StringUtils.hasText(scope)) {</span>
+<span class="nc" id="L66">            return profile + &quot;-&quot; + chart + &quot;-&quot; + scope;</span>
+        }
+<span class="nc bnc" id="L68" title="All 4 branches missed.">        if (profile != null &amp;&amp; chart != null) {</span>
+<span class="nc" id="L69">            return profile + &quot;-&quot; + chart;</span>
+        }
+<span class="nc bnc" id="L71" title="All 4 branches missed.">        if (profile != null &amp;&amp; StringUtils.hasText(scope)) {</span>
+<span class="nc" id="L72">            return profile + &quot;-&quot; + scope;</span>
+        }
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (profile != null) {</span>
+<span class="nc" id="L75">            return profile;</span>
+        }
+<span class="nc" id="L77">        return PathUtils.baseName(path);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

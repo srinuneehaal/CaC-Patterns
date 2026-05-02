@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StateFileService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.service</a> &gt; <span class="el_source">StateFileService.java</span></div><h1>StateFileService.java</h1><pre class="source lang-java linenums">package com.example.cacex.service;
+
+import com.example.cacex.exception.PlanApplyException;
+import com.example.cacex.model.*;
+import com.example.cacex.repository.StateRepository;
+import com.example.cacex.service.plan.JsonModelMapper;
+import com.example.cacex.util.PathUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finbourne.lusid.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+@Service
+public class StateFileService {
+
+<span class="fc" id="L26">    private static final Logger log = LoggerFactory.getLogger(StateFileService.class);</span>
+
+    private final StateRepository stateRepository;
+    private final JsonModelMapper jsonModelMapper;
+    private final ObjectMapper objectMapper;
+
+<span class="nc" id="L32">    public StateFileService(StateRepository stateRepository,</span>
+                            JsonModelMapper jsonModelMapper,
+                            ObjectMapper objectMapper) {
+<span class="nc" id="L35">        this.stateRepository = stateRepository;</span>
+<span class="nc" id="L36">        this.jsonModelMapper = jsonModelMapper;</span>
+<span class="nc" id="L37">        this.objectMapper = objectMapper;</span>
+<span class="nc" id="L38">    }</span>
+
+    public void applyStateChange(PlanItem item) {
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        if (item == null) {</span>
+<span class="nc" id="L42">            return;</span>
+        }
+<span class="nc bnc" id="L44" title="All 4 branches missed.">        if (item.getFileCategory() == null || item.getAction() == null) {</span>
+<span class="nc" id="L45">            throw new PlanApplyException(&quot;Plan item missing category or action; cannot update state file&quot;);</span>
+        }
+<span class="nc" id="L47">        FileCategory category = item.getFileCategory();</span>
+<span class="nc" id="L48">        String scope = item.getScope();</span>
+<span class="nc" id="L49">        String key = resolveStorageKey(item);</span>
+<span class="nc bnc" id="L50" title="All 11 branches missed.">        switch (category) {</span>
+<span class="nc" id="L51">            case SIDE -&gt; applySide(item, scope, key);</span>
+<span class="nc" id="L52">            case TRANSACTION -&gt; applyTransaction(item, scope, key);</span>
+<span class="nc" id="L53">            case CHART_OF_ACCOUNTS -&gt; applyChartOfAccounts(item, scope, key);</span>
+<span class="nc" id="L54">            case POSTING_RULE -&gt; applyPostingRule(item, scope, key);</span>
+<span class="nc" id="L55">            case GENERAL_LEDGER_PROFILE -&gt; applyGeneralLedgerProfile(item, scope, key);</span>
+<span class="nc" id="L56">            case ABOR -&gt; applyAbor(item, scope, key);</span>
+<span class="nc" id="L57">            case ABOR_CONFIGURATION -&gt; applyAborConfiguration(item, scope, key);</span>
+<span class="nc" id="L58">            case DERIVED_PORTFOLIO -&gt; applyDerivedPortfolio(item, scope, key);</span>
+<span class="nc" id="L59">            case PORTFOLIO_GROUP -&gt; applyPortfolioGroup(item, scope, key);</span>
+<span class="nc" id="L60">            case ACCOUNT -&gt; applyAccount(item, scope, key);</span>
+<span class="nc" id="L61">            default -&gt; log.warn(&quot;State file update not implemented for category {}&quot;, category);</span>
+        }
+<span class="nc" id="L63">    }</span>
+
+    public List&lt;StateDocument&gt; listStateDocuments(FileCategory category, String scope) {
+<span class="nc" id="L66">        return stateRepository.list(category.name(), scope);</span>
+    }
+
+    public &lt;T&gt; T loadPayload(FileCategory category, String scope, String key, Class&lt;T&gt; payloadType) {
+<span class="nc" id="L70">        log.info(&quot;loadPayload--&gt;{}--&gt;{}--&gt;{}--&gt;{}&quot;, category, scope, key, payloadType);</span>
+<span class="nc" id="L71">        return loadStateDocument(category, scope, key)</span>
+<span class="nc" id="L72">                .map(doc -&gt; parseStatePayload(doc.getData(), payloadType))</span>
+<span class="nc" id="L73">                .orElse(null);</span>
+    }
+
+    public boolean payloadsEqual(Object left, Object right) {
+<span class="nc bnc" id="L77" title="All 4 branches missed.">        if (left == null &amp;&amp; right == null) {</span>
+<span class="nc" id="L78">            return true;</span>
+        }
+<span class="nc bnc" id="L80" title="All 4 branches missed.">        if (left == null || right == null) {</span>
+<span class="nc" id="L81">            return false;</span>
+        }
+        try {
+<span class="nc" id="L84">            return objectMapper.valueToTree(left).equals(objectMapper.valueToTree(right));</span>
+<span class="nc" id="L85">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L86">            log.debug(&quot;Failed to compare payloads: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L87">            return false;</span>
+        }
+    }
+
+    public &lt;T&gt; T payloadFromDocument(StateDocument document, Class&lt;T&gt; payloadType) {
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        if (document == null) {</span>
+<span class="nc" id="L93">            return null;</span>
+        }
+<span class="nc" id="L95">        return parseStatePayload(document.getData(), payloadType);</span>
+    }
+
+    public String deriveKeyFromFilename(Path path) {
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (path == null) {</span>
+<span class="nc" id="L100">            throw new PlanApplyException(&quot;Cannot derive key from null path&quot;);</span>
+        }
+<span class="nc" id="L102">        String base = PathUtils.baseName(path);</span>
+<span class="nc" id="L103">        int dash = base.lastIndexOf('-');</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        if (dash &gt; 0) {</span>
+<span class="nc" id="L105">            return base.substring(0, dash);</span>
+        }
+<span class="nc" id="L107">        return base;</span>
+    }
+
+    private void applySide(PlanItem item, String scope, String key) {
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (item.getAction() == Action.DELETE) {</span>
+<span class="nc" id="L112">            deleteStateDocument(item.getFileCategory(), scope, key);</span>
+<span class="nc" id="L113">            return;</span>
+        }
+<span class="nc" id="L115">        SideFile payload = castPayload(item, SideFile.class);</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        if (payload.getScope() == null) {</span>
+<span class="nc" id="L117">            payload.setScope(scope);</span>
+        }
+<span class="nc" id="L119">        persistStateDocument(item.getFileCategory(), scope, key, payload);</span>
+<span class="nc" id="L120">    }</span>
+
+    private void applyTransaction(PlanItem item, String scope, String key) {
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        if (item.getAction() == Action.DELETE) {</span>
+<span class="nc" id="L124">            deleteStateDocument(item.getFileCategory(), scope, key);</span>
+<span class="nc" id="L125">            return;</span>
+        }
+<span class="nc" id="L127">        TransactionFile payload = castPayload(item, TransactionFile.class);</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (payload.getScope() == null) {</span>
+<span class="nc" id="L129">            payload.setScope(scope);</span>
+        }
+<span class="nc" id="L131">        persistStateDocument(item.getFileCategory(), scope, key, payload);</span>
+<span class="nc" id="L132">    }</span>
+
+    private void applyChartOfAccounts(PlanItem item, String scope, String key) {
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (item.getAction() == Action.DELETE) {</span>
+<span class="nc" id="L136">            deleteStateDocument(item.getFileCategory(), scope, key);</span>
+<span class="nc" id="L137">            return;</span>
+        }
+<span class="nc" id="L139">        ChartOfAccountsRequest payload = castPayload(item, ChartOfAccountsRequest.class);</span>
+<span class="nc" id="L140">        ChartOfAccountsFile file = new ChartOfAccountsFile();</span>
+<span class="nc" id="L141">        file.setScope(scope);</span>
+<span class="nc" id="L142">        file.setChartOfAccountsCode(stripScopeSuffix(key, scope));</span>
+<span class="nc" id="L143">        file.setChartOfAccountsRequest(payload);</span>
+<span class="nc" id="L144">        persistStateDocument(item.getFileCategory(), scope, key, file);</span>
+<span class="nc" id="L145">    }</span>
+
+    private void applyPostingRule(PlanItem item, String scope, String key) {
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        if (item.getAction() == Action.DELETE) {</span>
+<span class="nc" id="L149">            deleteStateDocument(item.getFileCategory(), scope, key);</span>
+<span class="nc" id="L150">            return;</span>
+        }
+<span class="nc" id="L152">        PostingModuleRequest payload = castPayload(item, PostingModuleRequest.class);</span>
+<span class="nc" id="L153">        String trimmedKey = stripScopeSuffix(key, scope);</span>
+<span class="nc" id="L154">        String[] parts = trimmedKey.split(&quot;-&quot;);</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">        String moduleCode = parts.length &gt; 0 ? parts[0] : trimmedKey;</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">        String coaCode = parts.length &gt; 1 ? parts[1] : moduleCode;</span>
+
+<span class="nc" id="L158">        PostingRulesFile file = new PostingRulesFile();</span>
+<span class="nc" id="L159">        file.setScope(scope);</span>
+<span class="nc" id="L160">        file.setPostingModuleCode(moduleCode);</span>
+<span class="nc" id="L161">        file.setChartOfAccountsCode(coaCode);</span>
+<span class="nc" id="L162">        file.setPostingModuleRequest(payload);</span>
+<span class="nc" id="L163">        persistStateDocument(item.getFileCategory(), scope, key, file);</span>
+<span class="nc" id="L164">    }</span>
+
+    private void applyGeneralLedgerProfile(PlanItem item, String scope, String key) {
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        if (item.getAction() == Action.DELETE) {</span>
+<span class="nc" id="L168">            deleteStateDocument(item.getFileCategory(), scope, key);</span>
+<span class="nc" id="L169">            return;</span>
+        }
+<span class="nc" id="L171">        GeneralLedgerProfileRequest payload = castPayload(item, GeneralLedgerProfileRequest.class);</span>
+<span class="nc" id="L172">        GeneralLedgerProfileFile file = new GeneralLedgerProfileFile();</span>
+<span class="nc" id="L173">        file.setScope(scope);</span>
+<span class="nc" id="L174">        String trimmedKey = stripScopeSuffix(key, scope);</span>
+<span class="nc" id="L175">        file.setChartOfAccountsCode(extractChartOfAccountsFromGeneralLedgerProfileKey(trimmedKey));</span>
+<span class="nc" id="L176">        String profileCode = payload.getGeneralLedgerProfileCode();</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">        if (!StringUtils.hasText(profileCode)) {</span>
+<span class="nc" id="L178">            profileCode = extractGeneralLedgerProfileCodeFromKey(trimmedKey);</span>
+        }
+<span class="nc" id="L180">        file.setGeneralLedgerProfileCode(profileCode);</span>
+<span class="nc" id="L181">        file.setGeneralLedgerProfileRequest(payload);</span>
+<span class="nc" id="L182">        persistStateDocument(item.getFileCategory(), scope, key, file);</span>
+<span class="nc" id="L183">    }</span>
+
+    private void applyAbor(PlanItem item, String scope, String key) {
+<span class="nc" id="L186">        AborFile file = readOrDefault(item.getFileCategory(), scope, key, AborFile.class, AborFile::new);</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">        if (file.getScope() == null) {</span>
+<span class="nc" id="L188">            file.setScope(scope);</span>
+        }
+<span class="nc" id="L190">        List&lt;AborRequest&gt; abors = new ArrayList&lt;&gt;(optionalList(file.getAborRequests()));</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">        if (item.getAction() == Action.DELETE) {</span>
+<span class="nc" id="L192">            removeByKey(abors, item.getKey(), AborRequest::getCode);</span>
+<span class="nc" id="L193">        } else {</span>
+<span class="nc" id="L194">            AborRequest payload = castPayload(item, AborRequest.class);</span>
+<span class="nc" id="L195">            upsertByKey(abors, payload, AborRequest::getCode, item.getKey());</span>
+        }
+<span class="nc" id="L197">        file.setAborRequests(abors);</span>
+<span class="nc" id="L198">        persistListDocument(item.getFileCategory(), scope, key, file, abors);</span>
+<span class="nc" id="L199">    }</span>
+
+    private void applyAborConfiguration(PlanItem item, String scope, String key) {
+<span class="nc" id="L202">        AborConfigurationFile file = readOrDefault(item.getFileCategory(), scope, key, AborConfigurationFile.class,</span>
+<span class="nc" id="L203">                AborConfigurationFile::new);</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        if (file.getScope() == null) {</span>
+<span class="nc" id="L205">            file.setScope(scope);</span>
+        }
+<span class="nc" id="L207">        List&lt;AborConfigurationRequest&gt; configs = new ArrayList&lt;&gt;(optionalList(file.getAborConfigurations()));</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if (item.getAction() == Action.DELETE) {</span>
+<span class="nc" id="L209">            removeByKey(configs, item.getKey(), AborConfigurationRequest::getCode);</span>
+<span class="nc" id="L210">        } else {</span>
+<span class="nc" id="L211">            AborConfigurationRequest payload = castPayload(item, AborConfigurationRequest.class);</span>
+<span class="nc" id="L212">            upsertByKey(configs, payload, AborConfigurationRequest::getCode, item.getKey());</span>
+        }
+<span class="nc" id="L214">        file.setAborConfigurations(configs);</span>
+<span class="nc" id="L215">        persistListDocument(item.getFileCategory(), scope, key, file, configs);</span>
+<span class="nc" id="L216">    }</span>
+
+    private void applyDerivedPortfolio(PlanItem item, String scope, String key) {
+<span class="nc" id="L219">        DerivedPortfolioFile file = readOrDefault(item.getFileCategory(), scope, key, DerivedPortfolioFile.class,</span>
+<span class="nc" id="L220">                DerivedPortfolioFile::new);</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if (file.getScope() == null) {</span>
+<span class="nc" id="L222">            file.setScope(scope);</span>
+        }
+<span class="nc" id="L224">        List&lt;CreateDerivedTransactionPortfolioRequest&gt; portfolios =</span>
+<span class="nc" id="L225">                new ArrayList&lt;&gt;(optionalList(file.getDerivedPortfolios()));</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        if (item.getAction() == Action.DELETE) {</span>
+<span class="nc" id="L227">            removeByKey(portfolios, item.getKey(), CreateDerivedTransactionPortfolioRequest::getCode);</span>
+<span class="nc" id="L228">        } else {</span>
+<span class="nc" id="L229">            CreateDerivedTransactionPortfolioRequest payload =</span>
+<span class="nc" id="L230">                    castPayload(item, CreateDerivedTransactionPortfolioRequest.class);</span>
+<span class="nc" id="L231">            upsertByKey(portfolios, payload, CreateDerivedTransactionPortfolioRequest::getCode, item.getKey());</span>
+        }
+<span class="nc" id="L233">        file.setDerivedPortfolios(portfolios);</span>
+<span class="nc" id="L234">        persistListDocument(item.getFileCategory(), scope, key, file, portfolios);</span>
+<span class="nc" id="L235">    }</span>
+
+    private void applyPortfolioGroup(PlanItem item, String scope, String key) {
+<span class="nc" id="L238">        PortfolioGroupFile file = readOrDefault(item.getFileCategory(), scope, key, PortfolioGroupFile.class,</span>
+<span class="nc" id="L239">                PortfolioGroupFile::new);</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">        if (file.getScope() == null) {</span>
+<span class="nc" id="L241">            file.setScope(scope);</span>
+        }
+<span class="nc" id="L243">        List&lt;CreatePortfolioGroupRequest&gt; groups = new ArrayList&lt;&gt;(optionalList(file.getGroups()));</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">        if (item.getAction() == Action.DELETE) {</span>
+<span class="nc" id="L245">            removeByKey(groups, item.getKey(), CreatePortfolioGroupRequest::getCode);</span>
+<span class="nc" id="L246">        } else {</span>
+<span class="nc" id="L247">            CreatePortfolioGroupRequest payload = castPayload(item, CreatePortfolioGroupRequest.class);</span>
+<span class="nc" id="L248">            upsertByKey(groups, payload, CreatePortfolioGroupRequest::getCode, item.getKey());</span>
+        }
+<span class="nc" id="L250">        file.setGroups(groups);</span>
+<span class="nc" id="L251">        persistListDocument(item.getFileCategory(), scope, key, file, groups);</span>
+<span class="nc" id="L252">    }</span>
+
+    private void applyAccount(PlanItem item, String scope, String key) {
+<span class="nc" id="L255">        AccountFile file = readOrDefault(item.getFileCategory(), scope, key, AccountFile.class, AccountFile::new);</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        if (file.getScope() == null) {</span>
+<span class="nc" id="L257">            file.setScope(scope);</span>
+        }
+<span class="nc bnc" id="L259" title="All 2 branches missed.">        if (file.getChartOfAccountsCode() == null) {</span>
+<span class="nc" id="L260">            file.setChartOfAccountsCode(extractChartOfAccounts(key, scope));</span>
+        }
+<span class="nc" id="L262">        log.info(&quot;accounts--&gt; {}&quot;, file.getAccounts());</span>
+<span class="nc" id="L263">        List&lt;Account&gt; accounts = new ArrayList&lt;&gt;(optionalList(file.getAccounts()));</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">        if (item.getAction() == Action.DELETE) {</span>
+<span class="nc" id="L265">            removeAccountByCandidates(item, file, accounts);</span>
+<span class="nc" id="L266">        } else {</span>
+<span class="nc" id="L267">            Account payload = castPayload(item, Account.class);</span>
+<span class="nc" id="L268">            accounts.removeIf(acc -&gt; Objects.equals(acc.getCode(), payload.getCode()));</span>
+<span class="nc" id="L269">            accounts.add(payload);</span>
+        }
+<span class="nc" id="L271">        file.setAccounts(accounts);</span>
+<span class="nc" id="L272">        persistListDocument(item.getFileCategory(), scope, key, file, accounts);</span>
+<span class="nc" id="L273">    }</span>
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private &lt;T&gt; T castPayload(PlanItem item, Class&lt;T&gt; type) {
+<span class="nc" id="L277">        Object payload = item.getPayload();</span>
+<span class="nc bnc" id="L278" title="All 2 branches missed.">        if (payload == null) {</span>
+<span class="nc" id="L279">            throw new PlanApplyException(&quot;Missing payload for state update of &quot; + item.getKey());</span>
+        }
+<span class="nc bnc" id="L281" title="All 2 branches missed.">        if (!type.isInstance(payload)) {</span>
+<span class="nc" id="L282">            throw new PlanApplyException(&quot;Unexpected payload type for &quot; + item.getKey()</span>
+<span class="nc" id="L283">                    + &quot;; expected &quot; + type.getSimpleName() + &quot; but found &quot; + payload.getClass().getSimpleName());</span>
+        }
+<span class="nc" id="L285">        return (T) payload;</span>
+    }
+
+    private &lt;T&gt; T readOrDefault(FileCategory category,
+                               String scope,
+                               String key,
+                               Class&lt;T&gt; type,
+                               Supplier&lt;T&gt; fallback) {
+<span class="nc" id="L293">        log.info(&quot;readOrDefault--&gt;{}--&gt;{}--&gt;{}--&gt;{}--&gt;{}&quot;, category, scope, key, type, fallback);</span>
+<span class="nc" id="L294">        T payload = loadPayload(category, scope, key, type);</span>
+<span class="nc bnc" id="L295" title="All 2 branches missed.">        return payload == null ? fallback.get() : payload;</span>
+    }
+
+    private Optional&lt;StateDocument&gt; loadStateDocument(FileCategory category, String scope, String key) {
+<span class="nc" id="L299">        String id = stateDocumentId(category, scope, key);</span>
+<span class="nc" id="L300">        log.info(&quot;loadStateDocument--&gt;{}--&gt;{}--&gt;{}--&gt;{}&quot;, category, scope, key, id);</span>
+<span class="nc" id="L301">        return stateRepository.find(id, category.name());</span>
+    }
+
+    private &lt;T&gt; T parseStatePayload(JsonNode data, Class&lt;T&gt; type) {
+<span class="nc bnc" id="L305" title="All 2 branches missed.">        if (data == null) {</span>
+<span class="nc" id="L306">            return null;</span>
+        }
+        try {
+<span class="nc" id="L309">            return jsonModelMapper.read(data.toString(), type);</span>
+<span class="nc" id="L310">        } catch (IOException e) {</span>
+<span class="nc" id="L311">            throw new PlanApplyException(&quot;Failed to parse state payload for type &quot; + type.getSimpleName(), e);</span>
+        }
+    }
+
+    private void persistStateDocument(FileCategory category, String scope, String key, Object content) {
+        try {
+<span class="nc" id="L317">            StateDocument document = new StateDocument();</span>
+<span class="nc" id="L318">            document.setId(stateDocumentId(category, scope, key));</span>
+<span class="nc" id="L319">            document.setTypeOfItem(category.name());</span>
+<span class="nc" id="L320">            document.setScope(normalizeScope(scope));</span>
+<span class="nc" id="L321">            document.setData(objectMapper.valueToTree(content));</span>
+<span class="nc" id="L322">            stateRepository.upsert(document);</span>
+<span class="nc" id="L323">            log.debug(&quot;State document {} persisted for category {}&quot;, document.getId(), category);</span>
+<span class="nc" id="L324">        } catch (Exception e) {</span>
+<span class="nc" id="L325">            throw new PlanApplyException(&quot;Failed to write state for &quot; + category + &quot;/&quot; + key, e);</span>
+        }
+<span class="nc" id="L327">    }</span>
+
+    private void deleteStateDocument(FileCategory category, String scope, String key) {
+<span class="nc" id="L330">        stateRepository.delete(stateDocumentId(category, scope, key), category.name());</span>
+<span class="nc" id="L331">    }</span>
+
+    private void persistListDocument(FileCategory category,
+                                     String scope,
+                                     String key,
+                                     Object file,
+                                     List&lt;?&gt; contents) {
+<span class="nc bnc" id="L338" title="All 4 branches missed.">        if (contents == null || contents.isEmpty()) {</span>
+<span class="nc" id="L339">            deleteStateDocument(category, scope, key);</span>
+<span class="nc" id="L340">        } else {</span>
+<span class="nc" id="L341">            persistStateDocument(category, scope, key, file);</span>
+        }
+<span class="nc" id="L343">    }</span>
+
+    private String resolveStorageKey(PlanItem item) {
+<span class="nc" id="L346">        String key = item.getKey();</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">        if (StringUtils.hasText(item.getSourcePath())) {</span>
+<span class="nc" id="L348">            String derived = deriveKeyFromSourcePath(item.getSourcePath());</span>
+<span class="nc bnc" id="L349" title="All 2 branches missed.">            if (StringUtils.hasText(derived)) {</span>
+<span class="nc" id="L350">                key = derived;</span>
+            }
+        }
+<span class="nc" id="L353">        return key;</span>
+    }
+
+    private String deriveKeyFromSourcePath(String sourcePath) {
+<span class="nc bnc" id="L357" title="All 2 branches missed.">        if (!StringUtils.hasText(sourcePath)) {</span>
+<span class="nc" id="L358">            return null;</span>
+        }
+        try {
+<span class="nc" id="L361">            return deriveKeyFromFilename(Path.of(sourcePath));</span>
+<span class="nc" id="L362">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L363">            log.debug(&quot;Falling back to manual key derivation for {}: {}&quot;, sourcePath, e.getMessage());</span>
+<span class="nc" id="L364">            String normalized = sourcePath.replace('\\', '/');</span>
+<span class="nc" id="L365">            int segmentIndex = normalized.lastIndexOf('/');</span>
+<span class="nc bnc" id="L366" title="All 4 branches missed.">            if (segmentIndex &gt;= 0 &amp;&amp; segmentIndex &lt; normalized.length() - 1) {</span>
+<span class="nc" id="L367">                return normalized.substring(segmentIndex + 1);</span>
+            }
+<span class="nc" id="L369">            return normalized;</span>
+        }
+    }
+
+    private String stateDocumentId(FileCategory category, String scope, String key) {
+<span class="nc bnc" id="L374" title="All 2 branches missed.">        if (category == FileCategory.ACCOUNT) {</span>
+<span class="nc" id="L375">            return accountStateDocumentId(scope, key);</span>
+        }
+<span class="nc" id="L377">        return defaultStateDocumentId(scope, key);</span>
+    }
+
+    private String defaultStateDocumentId(String scope, String key) {
+<span class="nc bnc" id="L381" title="All 2 branches missed.">        String normalizedKey = key == null ? &quot;&quot; : key.trim();</span>
+<span class="nc" id="L382">        String normalizedScope = normalizeScope(scope);</span>
+<span class="nc bnc" id="L383" title="All 2 branches missed.">        if (!normalizedScope.isEmpty()) {</span>
+<span class="nc" id="L384">            String suffix = &quot;-&quot; + normalizedScope;</span>
+<span class="nc bnc" id="L385" title="All 4 branches missed.">            if (!normalizedKey.isEmpty() &amp;&amp; normalizedKey.toLowerCase(Locale.ROOT).endsWith(suffix.toLowerCase(Locale.ROOT))) {</span>
+<span class="nc" id="L386">                return normalizedKey;</span>
+            }
+<span class="nc" id="L388">            return normalizedKey + suffix;</span>
+        }
+<span class="nc" id="L390">        return normalizedKey;</span>
+    }
+
+    private String accountStateDocumentId(String scope, String key) {
+<span class="nc" id="L394">        String chartOfAccountsCode = extractChartOfAccounts(key, scope);</span>
+<span class="nc bnc" id="L395" title="All 2 branches missed.">        if (!StringUtils.hasText(chartOfAccountsCode)) {</span>
+<span class="nc" id="L396">            return defaultStateDocumentId(scope, key);</span>
+        }
+<span class="nc" id="L398">        String normalizedScope = normalizeScope(scope);</span>
+<span class="nc bnc" id="L399" title="All 2 branches missed.">        if (normalizedScope.isEmpty()) {</span>
+<span class="nc" id="L400">            return chartOfAccountsCode;</span>
+        }
+<span class="nc" id="L402">        return chartOfAccountsCode + &quot;-&quot; + normalizedScope;</span>
+    }
+
+    private String normalizeScope(String scope) {
+<span class="nc bnc" id="L406" title="All 2 branches missed.">        return scope == null ? &quot;&quot; : scope.trim();</span>
+    }
+
+    private &lt;T&gt; void upsertByKey(List&lt;T&gt; list, T payload, Function&lt;T, String&gt; keyExtractor, String fallbackKey) {
+<span class="nc" id="L410">        String code = keyExtractor.apply(payload);</span>
+<span class="nc bnc" id="L411" title="All 4 branches missed.">        if (code == null || code.isBlank()) {</span>
+<span class="nc" id="L412">            code = fallbackKey;</span>
+        }
+<span class="nc" id="L414">        String finalCode = code;</span>
+<span class="nc" id="L415">        list.removeIf(existing -&gt; Objects.equals(keyExtractor.apply(existing), finalCode));</span>
+<span class="nc" id="L416">        list.add(payload);</span>
+<span class="nc" id="L417">    }</span>
+
+    private &lt;T&gt; void removeByKey(List&lt;T&gt; list, String key, Function&lt;T, String&gt; keyExtractor) {
+<span class="nc" id="L420">        list.removeIf(existing -&gt; Objects.equals(keyExtractor.apply(existing), key));</span>
+<span class="nc" id="L421">    }</span>
+
+    private &lt;T&gt; List&lt;T&gt; optionalList(List&lt;T&gt; list) {
+<span class="nc bnc" id="L424" title="All 2 branches missed.">        return list == null ? Collections.emptyList() : list;</span>
+    }
+
+    private String stripScopeSuffix(String key, String scope) {
+<span class="nc bnc" id="L428" title="All 2 branches missed.">        if (key == null) {</span>
+<span class="nc" id="L429">            return &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L431" title="All 4 branches missed.">        if (scope != null &amp;&amp; !scope.isBlank()) {</span>
+<span class="nc" id="L432">            String suffix = &quot;-&quot; + scope;</span>
+<span class="nc bnc" id="L433" title="All 2 branches missed.">            if (key.endsWith(suffix)) {</span>
+<span class="nc" id="L434">                return key.substring(0, key.length() - suffix.length());</span>
+            }
+        }
+<span class="nc" id="L437">        return key;</span>
+    }
+
+    private String extractChartOfAccounts(String key, String scope) {
+<span class="nc" id="L441">        String trimmed = stripScopeSuffix(key, scope);</span>
+<span class="nc" id="L442">        int dash = trimmed.indexOf('-');</span>
+<span class="nc bnc" id="L443" title="All 2 branches missed.">        if (dash &gt; 0) {</span>
+<span class="nc" id="L444">            return trimmed.substring(0, dash);</span>
+        }
+<span class="nc" id="L446">        return trimmed;</span>
+    }
+
+    private void removeAccountByCandidates(PlanItem item, AccountFile file, List&lt;Account&gt; accounts) {
+<span class="nc" id="L450">        Set&lt;String&gt; codes = new LinkedHashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L451" title="All 2 branches missed.">        Account payload = item.getPayload() instanceof Account ? (Account) item.getPayload() : null;</span>
+<span class="nc bnc" id="L452" title="All 4 branches missed.">        if (payload != null &amp;&amp; StringUtils.hasText(payload.getCode())) {</span>
+<span class="nc" id="L453">            codes.add(payload.getCode());</span>
+        }
+<span class="nc" id="L455">        String strippedKey = stripScopeSuffix(item.getKey(), item.getScope());</span>
+<span class="nc bnc" id="L456" title="All 2 branches missed.">        if (StringUtils.hasText(strippedKey)) {</span>
+<span class="nc" id="L457">            codes.add(strippedKey);</span>
+        }
+<span class="nc" id="L459">        String chartCode = file.getChartOfAccountsCode();</span>
+<span class="nc bnc" id="L460" title="All 4 branches missed.">        if (StringUtils.hasText(chartCode) &amp;&amp; StringUtils.hasText(strippedKey)</span>
+<span class="nc bnc" id="L461" title="All 2 branches missed.">                &amp;&amp; strippedKey.startsWith(chartCode + &quot;-&quot;)) {</span>
+<span class="nc" id="L462">            codes.add(strippedKey.substring(chartCode.length() + 1));</span>
+        }
+<span class="nc" id="L464">        Set&lt;String&gt; normalized = codes.stream()</span>
+<span class="nc" id="L465">                .filter(StringUtils::hasText)</span>
+<span class="nc" id="L466">                .map(this::normalizeAccountCode)</span>
+<span class="nc" id="L467">                .collect(Collectors.toCollection(LinkedHashSet::new));</span>
+<span class="nc" id="L468">        accounts.removeIf(acc -&gt; normalized.contains(normalizeAccountCode(acc.getCode())));</span>
+<span class="nc" id="L469">    }</span>
+
+    private String normalizeAccountCode(String code) {
+<span class="nc bnc" id="L472" title="All 2 branches missed.">        if (code == null) {</span>
+<span class="nc" id="L473">            return null;</span>
+        }
+<span class="nc" id="L475">        return code.trim().replaceAll(&quot;\\s+&quot;, &quot;&quot;).toUpperCase(Locale.ROOT);</span>
+    }
+
+    private String extractChartOfAccountsFromGeneralLedgerProfileKey(String key) {
+<span class="nc bnc" id="L479" title="All 2 branches missed.">        if (key == null) {</span>
+<span class="nc" id="L480">            return &quot;&quot;;</span>
+        }
+<span class="nc" id="L482">        int dash = key.indexOf('-');</span>
+<span class="nc bnc" id="L483" title="All 4 branches missed.">        if (dash &gt;= 0 &amp;&amp; dash + 1 &lt; key.length()) {</span>
+<span class="nc" id="L484">            return key.substring(dash + 1);</span>
+        }
+<span class="nc" id="L486">        return key;</span>
+    }
+
+    private String extractGeneralLedgerProfileCodeFromKey(String key) {
+<span class="nc bnc" id="L490" title="All 2 branches missed.">        if (key == null) {</span>
+<span class="nc" id="L491">            return &quot;&quot;;</span>
+        }
+<span class="nc" id="L493">        int dash = key.indexOf('-');</span>
+<span class="nc bnc" id="L494" title="All 2 branches missed.">        if (dash &gt; 0) {</span>
+<span class="nc" id="L495">            return key.substring(0, dash);</span>
+        }
+<span class="nc" id="L497">        return key;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

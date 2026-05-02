@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileParsingStrategyFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.service.plan.stratagy</a> &gt; <span class="el_source">FileParsingStrategyFactory.java</span></div><h1>FileParsingStrategyFactory.java</h1><pre class="source lang-java linenums">package com.example.cacex.service.plan.stratagy;
+
+import com.example.cacex.exception.UnsupportedFileCategoryException;
+import com.example.cacex.exception.UnsupportedFilePathException;
+import com.example.cacex.model.FileCategory;
+import org.springframework.stereotype.Component;
+
+import java.nio.file.Path;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+
+@Component
+public class FileParsingStrategyFactory {
+
+<span class="nc" id="L16">    private final Map&lt;FileCategory, FileParsingStrategy&gt; strategies = new EnumMap&lt;&gt;(FileCategory.class);</span>
+
+    /**
+     * Builds a factory with discovered parsing strategies.
+     *
+     * @param discoveredStrategies strategies to register
+     */
+<span class="nc" id="L23">    public FileParsingStrategyFactory(List&lt;FileParsingStrategy&gt; discoveredStrategies) {</span>
+
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        for (FileParsingStrategy strategy : discoveredStrategies) {</span>
+<span class="nc" id="L26">            strategies.put(strategy.getCategory(), strategy);</span>
+        }
+<span class="nc" id="L28">    }</span>
+
+    /**
+     * Resolves the parsing strategy that supports the given path.
+     *
+     * @param path file path to parse
+     * @return matching parsing strategy
+     * @throws com.example.cacex.exception.UnsupportedFilePathException if none match
+     */
+    public FileParsingStrategy resolve(Path path) {
+
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        for (FileParsingStrategy strategy : strategies.values()) {</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">            if (strategy.supports(path)) {</span>
+<span class="nc" id="L41">                return strategy;</span>
+            }
+        }
+<span class="nc" id="L44">        throw new UnsupportedFilePathException(&quot;Unsupported file path: &quot; + path);</span>
+    }
+
+    /**
+     * Resolves a parsing strategy by category.
+     *
+     * @param category file category to resolve
+     * @return parsing strategy for the category
+     * @throws UnsupportedFileCategoryException if no strategy is registered
+     */
+    public FileParsingStrategy resolve(FileCategory category) {
+<span class="nc" id="L55">        FileParsingStrategy strategy = strategies.get(category);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (strategy == null) {</span>
+<span class="nc" id="L57">            throw new UnsupportedFileCategoryException(&quot;Unsupported file category: &quot; + category);</span>
+        }
+<span class="nc" id="L59">        return strategy;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

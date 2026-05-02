@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApplyPlanItemResult.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.service.apply</a> &gt; <span class="el_source">ApplyPlanItemResult.java</span></div><h1>ApplyPlanItemResult.java</h1><pre class="source lang-java linenums"><span class="fc" id="L1">package com.example.cacex.service.apply;</span>
+
+import com.example.cacex.model.Action;
+import com.example.cacex.model.FileCategory;
+import com.example.cacex.model.PlanItem;
+
+/**
+ * Captures the outcome of applying a single {@link PlanItem}.
+ */
+public record ApplyPlanItemResult(
+        int index,
+        Action action,
+        FileCategory fileCategory,
+        String scope,
+        String key,
+        String sourcePath,
+        boolean success,
+        String message
+) {
+
+    private static final String DEFAULT_SUCCESS_MESSAGE = &quot;Applied item and updated state successfully.&quot;;
+
+    public static ApplyPlanItemResult success(int index, PlanItem item) {
+<span class="fc" id="L24">        return new ApplyPlanItemResult(</span>
+<span class="fc" id="L25">                index,</span>
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">                item == null ? null : item.getAction(),</span>
+<span class="pc bpc" id="L27" title="1 of 2 branches missed.">                item == null ? null : item.getFileCategory(),</span>
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">                item == null ? null : item.getScope(),</span>
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">                item == null ? null : item.getKey(),</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">                item == null ? null : item.getSourcePath(),</span>
+<span class="fc" id="L31">                true,</span>
+<span class="fc" id="L32">                DEFAULT_SUCCESS_MESSAGE</span>
+        );
+    }
+
+    public static ApplyPlanItemResult failure(int index, PlanItem item, String message) {
+<span class="fc" id="L37">        return new ApplyPlanItemResult(</span>
+<span class="fc" id="L38">                index,</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">                item == null ? null : item.getAction(),</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">                item == null ? null : item.getFileCategory(),</span>
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">                item == null ? null : item.getScope(),</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">                item == null ? null : item.getKey(),</span>
+<span class="pc bpc" id="L43" title="1 of 2 branches missed.">                item == null ? null : item.getSourcePath(),</span>
+<span class="fc" id="L44">                false,</span>
+<span class="fc" id="L45">                normalizeMessage(message)</span>
+        );
+    }
+
+    public String status() {
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        return success ? &quot;SUCCESS&quot; : &quot;FAILURE&quot;;</span>
+    }
+
+    public String summaryLine() {
+<span class="fc" id="L54">        return index + &quot;. &quot;</span>
+<span class="fc" id="L55">                + status()</span>
+                + &quot; &quot;
+<span class="fc" id="L57">                + valueOrUnknown(fileCategory)</span>
+                + &quot; &quot;
+<span class="fc" id="L59">                + valueOrUnknown(action)</span>
+                + &quot; &quot;
+<span class="fc" id="L61">                + target()</span>
+                + &quot; - &quot;
+<span class="fc" id="L63">                + normalizeMessage(message);</span>
+    }
+
+    private String target() {
+<span class="fc" id="L67">        return &quot;[scope=&quot;</span>
+<span class="fc" id="L68">                + valueOrPlaceholder(scope)</span>
+                + &quot;, key=&quot;
+<span class="fc" id="L70">                + valueOrPlaceholder(key)</span>
+                + &quot;, source=&quot;
+<span class="fc" id="L72">                + valueOrPlaceholder(sourcePath)</span>
+                + &quot;]&quot;;
+    }
+
+    private static String valueOrUnknown(Object value) {
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        return value == null ? &quot;UNKNOWN&quot; : value.toString();</span>
+    }
+
+    private static String valueOrPlaceholder(String value) {
+<span class="pc bpc" id="L81" title="2 of 4 branches missed.">        return value == null || value.isBlank() ? &quot;&lt;blank&gt;&quot; : value;</span>
+    }
+
+    private static String normalizeMessage(String message) {
+<span class="pc bpc" id="L85" title="2 of 4 branches missed.">        return message == null || message.isBlank() ? &quot;No message available.&quot; : message;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

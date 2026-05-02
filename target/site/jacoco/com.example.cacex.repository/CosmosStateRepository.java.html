@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CosmosStateRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cac-ex</a> &gt; <a href="index.source.html" class="el_package">com.example.cacex.repository</a> &gt; <span class="el_source">CosmosStateRepository.java</span></div><h1>CosmosStateRepository.java</h1><pre class="source lang-java linenums">package com.example.cacex.repository;
+
+import com.azure.cosmos.CosmosContainer;
+import com.azure.cosmos.CosmosException;
+import com.azure.cosmos.models.*;
+import com.azure.cosmos.util.CosmosPagedIterable;
+import com.example.cacex.model.StateDocument;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
+
+/**
+ * Cosmos DB implementation of {@link StateRepository}.
+ */
+@Service
+public class CosmosStateRepository implements StateRepository {
+
+    private final CosmosContainer container;
+
+<span class="nc" id="L23">    public CosmosStateRepository(CosmosContainer container) {</span>
+<span class="nc" id="L24">        this.container = container;</span>
+<span class="nc" id="L25">    }</span>
+
+    @Override
+    public Optional&lt;StateDocument&gt; find(String id, String typeOfItem) {
+        try {
+<span class="nc" id="L30">            return Optional.ofNullable(container.readItem(id, new PartitionKey(typeOfItem), StateDocument.class)</span>
+<span class="nc" id="L31">                    .getItem());</span>
+<span class="nc" id="L32">        } catch (CosmosException e) {</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">            if (e.getStatusCode() == 404) {</span>
+<span class="nc" id="L34">                return Optional.empty();</span>
+            }
+<span class="nc" id="L36">            throw e;</span>
+        }
+    }
+
+    @Override
+    public List&lt;StateDocument&gt; list(String typeOfItem, String scope) {
+<span class="nc" id="L42">        StringBuilder query = new StringBuilder(&quot;SELECT * FROM c WHERE c.typeOfItem = @typeOfItem&quot;);</span>
+<span class="nc" id="L43">        List&lt;SqlParameter&gt; parameters = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L44">        parameters.add(new SqlParameter(&quot;@typeOfItem&quot;, typeOfItem));</span>
+<span class="nc bnc" id="L45" title="All 4 branches missed.">        if (scope != null &amp;&amp; !scope.isBlank()) {</span>
+<span class="nc" id="L46">            query.append(&quot; AND c.scope = @scope&quot;);</span>
+<span class="nc" id="L47">            parameters.add(new SqlParameter(&quot;@scope&quot;, scope));</span>
+        }
+<span class="nc" id="L49">        SqlQuerySpec spec = new SqlQuerySpec(query.toString(), parameters);</span>
+<span class="nc" id="L50">        CosmosQueryRequestOptions options = new CosmosQueryRequestOptions()</span>
+<span class="nc" id="L51">                .setPartitionKey(new PartitionKey(typeOfItem));</span>
+<span class="nc" id="L52">        CosmosPagedIterable&lt;StateDocument&gt; items = container.queryItems(spec, options, StateDocument.class);</span>
+<span class="nc" id="L53">        return StreamSupport.stream(items.spliterator(), false).toList();</span>
+    }
+
+    @Override
+    public void upsert(StateDocument document) {
+<span class="nc" id="L58">        container.upsertItem(document, new PartitionKey(document.getTypeOfItem()), new CosmosItemRequestOptions());</span>
+<span class="nc" id="L59">    }</span>
+
+    @Override
+    public void delete(String id, String typeOfItem) {
+        try {
+<span class="nc" id="L64">            container.deleteItem(id, new PartitionKey(typeOfItem), new CosmosItemRequestOptions());</span>
+<span class="nc" id="L65">        } catch (CosmosException e) {</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">            if (e.getStatusCode() != 404) {</span>
+<span class="nc" id="L67">                throw e;</span>
+            }
+        }
+<span class="nc" id="L70">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

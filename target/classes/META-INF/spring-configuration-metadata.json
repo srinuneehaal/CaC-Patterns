@@ -1,0 +1,117 @@
+{
+  "groups": [
+    {
+      "name": "azure.cosmos",
+      "type": "com.example.cacex.config.CosmosStateProperties",
+      "sourceType": "com.example.cacex.config.CosmosStateProperties"
+    },
+    {
+      "name": "cacex.paths",
+      "type": "com.example.cacex.config.FileLocationProperties",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "plan.ordering",
+      "type": "com.example.cacex.service.plan.rules.PlanOrderingProperties",
+      "sourceType": "com.example.cacex.service.plan.rules.PlanOrderingProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "azure.cosmos.container",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.CosmosStateProperties"
+    },
+    {
+      "name": "azure.cosmos.database",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.CosmosStateProperties"
+    },
+    {
+      "name": "azure.cosmos.key",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.CosmosStateProperties"
+    },
+    {
+      "name": "azure.cosmos.partition-key",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.CosmosStateProperties"
+    },
+    {
+      "name": "azure.cosmos.uri",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.CosmosStateProperties"
+    },
+    {
+      "name": "cacex.paths.abor-configurations-dir-name",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.abor-dir-name",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.accounts-dir-name",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.changed-files-dir",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.chart-of-accounts-dir-name",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.derived-portfolios-dir-name",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.general-ledger-profiles-dir-name",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.master-plan-file",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.plan-dir",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.portfolio-groups-dir-name",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.posting-rules-dir-name",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.sides-dir-name",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "cacex.paths.transactions-dir-name",
+      "type": "java.lang.String",
+      "sourceType": "com.example.cacex.config.FileLocationProperties"
+    },
+    {
+      "name": "plan.ordering.rules",
+      "type": "java.util.List<com.example.cacex.service.plan.rules.PlanOrderingProperties$Rule>",
+      "sourceType": "com.example.cacex.service.plan.rules.PlanOrderingProperties"
+    }
+  ],
+  "hints": []
+}

@@ -43,7 +43,7 @@ class ApplyRunnerTest {
 
     @Test
     void swallowsPlanApplyException() {
-        doThrow(new PlanApplyException("boom")).when(planApplyService).applyPlan();
+        when(planApplyService.applyPlan()).thenThrow(new PlanApplyException("boom"));
 
         assertDoesNotThrow(() -> runner.run("--apply"));
         verify(planApplyService).applyPlan();
@@ -51,7 +51,7 @@ class ApplyRunnerTest {
 
     @Test
     void handlesUnexpectedException() {
-        doThrow(new RuntimeException("boom")).when(planApplyService).applyPlan();
+        when(planApplyService.applyPlan()).thenThrow(new RuntimeException("boom"));
 
         assertDoesNotThrow(() -> runner.run("--apply"));
         verify(planApplyService).applyPlan();
