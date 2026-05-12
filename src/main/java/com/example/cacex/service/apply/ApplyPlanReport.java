@@ -49,6 +49,7 @@ public class ApplyPlanReport {
                 .append(", failed=")
                 .append(getFailureCount());
 
+
         if (itemResults.isEmpty()) {
             builder.append(System.lineSeparator()).append("No plan items were processed.");
             return builder.toString();
